@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wasla - Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "text-muted": "#8A8278",
+                        "outline-variant": "#bdc9ca",
+                        "surface-bright": "#fbf9f5",
+                        "outline": "#6e797a",
+                        "on-tertiary-fixed": "#001f24",
+                        "secondary": "#865300",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1b1c1a",
+                        "secondary-fixed-dim": "#ffb961",
+                        "tertiary-fixed-dim": "#a9cdd3",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e4e2de",
+                        "on-tertiary-fixed-variant": "#294c51",
+                        "border-medium": "#EAE4DA",
+                        "on-primary-fixed-variant": "#004f56",
+                        "on-background": "#1b1c1a",
+                        "secondary-fixed": "#ffddb8",
+                        "on-surface-variant": "#3e494a",
+                        "inverse-on-surface": "#f2f0ed",
+                        "surface-container-highest": "#e4e2de",
+                        "cars-blue": "#0369A1",
+                        "primary": "#006068",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#d1faff",
+                        "inverse-surface": "#30312e",
+                        "surface-container-high": "#eae8e4",
+                        "inverse-primary": "#7dd4df",
+                        "background": "#fbf9f5",
+                        "secondary-container": "#fda627",
+                        "error-red": "#DC2626",
+                        "on-primary-fixed": "#001f23",
+                        "primary-container": "#0d7a84",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "success-green": "#16A34A",
+                        "text-primary": "#161210",
+                        "surface-base": "#FFFFFF",
+                        "tertiary-fixed": "#c4e9ef",
+                        "on-secondary-fixed": "#2b1700",
+                        "on-secondary-container": "#694000",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#395c61",
+                        "primary-fixed-dim": "#7dd4df",
+                        "surface-tint": "#006972",
+                        "on-tertiary-container": "#d5f9ff",
+                        "error": "#ba1a1a",
+                        "geo-green": "#15803D",
+                        "auth-purple": "#5B21B6",
+                        "surface-dim": "#dbdad6",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "surface-container-low": "#f5f3ef",
+                        "surface": "#fbf9f5",
+                        "surface-container": "#efeeea",
+                        "tertiary-container": "#52747a",
+                        "primary-fixed": "#99f0fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "touch-target": "48px",
+                        "lg": "24px",
+                        "margin-mobile": "20px",
+                        "safe": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Cairo", "sans-serif"],
+                        "micro-tag": ["Cairo", "sans-serif"],
+                        "headline-md": ["Cairo", "sans-serif"],
+                        "display-lg": ["Cairo", "sans-serif"],
+                        "body-lg": ["Cairo", "sans-serif"],
+                        "headline-lg": ["Cairo", "sans-serif"],
+                        "label-mono": ["IBM Plex Mono", "monospace"],
+                        "headline-lg-mobile": ["Cairo", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "micro-tag": ["10px", {"lineHeight": "12px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "fontWeight": "900"}],
+                        "body-lg": ["16px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "800"}],
+                        "label-mono": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        /* Hide scrollbar for horizontal scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Material Symbols Customization */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md pb-[90px] pt-[140px] md:pt-[160px]">
+<!-- Top Area (Search + Filters Sticky Header) -->
+<header class="fixed top-0 w-full z-40 bg-surface/92 backdrop-blur-md shadow-sm border-b border-border-medium rtl">
+<div class="px-margin-mobile py-sm">
+<!-- Search Bar Row -->
+<div class="flex items-center gap-sm mt-sm">
+<!-- Back Button (Optional context) -->
+<button class="h-touch-target w-touch-target flex items-center justify-center rounded-full hover:bg-surface-container-high transition-all duration-200 active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<!-- Search Input -->
+<div class="flex-1 relative">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full h-[48px] pl-3 pr-10 rounded-lg bg-surface-container-low border border-border-medium focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-body-md text-on-surface" placeholder="ابحث عن سيارات، عقارات، وظائف..." type="text" value="سيارات تويوتا"/>
+<button class="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Advanced Filter Toggle -->
+<button class="h-touch-target w-touch-target flex items-center justify-center rounded-lg bg-surface-container-low border border-border-medium hover:bg-surface-container-high transition-all duration-200 active:scale-95 text-primary">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</div>
+<!-- Filter Chips Row -->
+<div class="flex overflow-x-auto gap-sm py-sm no-scrollbar mt-xs">
+<button class="whitespace-nowrap px-md py-sm rounded-full bg-primary-container text-on-primary-container font-body-md font-bold text-[14px] flex items-center gap-xs border border-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="verified">verified</span>
+                    موثق فقط
+                </button>
+<button class="whitespace-nowrap px-md py-sm rounded-full bg-surface-base text-on-surface-variant font-body-md text-[14px] flex items-center gap-xs border border-border-medium hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="sort">sort</span>
+                    الأقل سعراً
+                </button>
+<button class="whitespace-nowrap px-md py-sm rounded-full bg-surface-base text-on-surface-variant font-body-md text-[14px] flex items-center gap-xs border border-border-medium hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="near_me">near_me</span>
+                    بالقرب مني
+                </button>
+<button class="whitespace-nowrap px-md py-sm rounded-full bg-surface-base text-on-surface-variant font-body-md text-[14px] flex items-center gap-xs border border-border-medium hover:bg-surface-container-low transition-colors">
+                    حديث
+                </button>
+</div>
+</div>
+</header>
+<!-- Main Content: Search Results Canvas -->
+<main class="max-w-[1140px] mx-auto px-margin-mobile md:px-lg">
+<!-- Results Count -->
+<div class="mb-md text-on-surface-variant font-body-md">
+            تم العثور على <span class="font-bold text-on-surface">١٤٢</span> نتيجة لـ "سيارات تويوتا"
+        </div>
+<!-- Ad Cards List -->
+<div class="flex flex-col gap-md md:grid md:grid-cols-2 lg:grid-cols-3">
+<!-- Card 1 (Featured) -->
+<article class="bg-surface-base rounded-xl border-2 border-secondary-container shadow-sm overflow-hidden flex flex-col md:flex-row md:col-span-2 lg:col-span-1 relative group hover:shadow-[0_8px_20px_rgba(13,122,132,0.08)] transition-shadow duration-300">
+<!-- Featured Badge -->
+<div class="absolute top-sm right-sm bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg font-micro-tag text-micro-tag flex items-center gap-[2px] z-10 shadow-sm">
+<span class="material-symbols-outlined text-[12px]" data-icon="stars">stars</span> مميز
+                </div>
+<!-- Image Container -->
+<div class="h-[200px] md:h-auto md:w-[40%] relative bg-surface-container-low overflow-hidden">
+<img alt="تويوتا كورولا 2022 للبيع في مصر" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A clean, professional photo of a modern white Toyota Corolla parked on a bright, sunny street in Egypt. The lighting is warm and natural, casting soft shadows. The overall aesthetic is bright and trustworthy, aligning with a high-quality classifieds app style, using neutral warm sand tones in the background to emphasize the car." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFmAJyym5Wqc7wCFjlum3t23TAlqiDeIMPiNGiiOIdBs1Zso68EXxImPtZ0odENGS5OmD20ECZ1Bip_W5T7cOBintOVKfmCic4Hdi-nNyJBYb556KakvZmnVLVgRH0RLpdhSCTzBunWJ8WEBZiEMVbAqNIlENiBQ5MUECdkrtFzbDaMMkDz_mjsYHFA8fHclVrVgkn6DDXnaTFcBUisuKj1Pku4_aVAtA_LNIsiB_8CFq9DHcyNIRrt4DcJwJS3rhswfkIR1G4iyk"/>
+<div class="absolute bottom-sm right-sm bg-surface-base/90 backdrop-blur-sm px-2 py-1 rounded font-label-mono text-label-mono text-on-surface flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]" data-icon="photo_camera">photo_camera</span> 5
+                    </div>
+</div>
+<!-- Content -->
+<div class="p-md flex-1 flex flex-col justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs line-clamp-2">تويوتا كورولا الفئة الثانية 2022 بحالة الزيرو</h3>
+<div class="font-label-mono text-[20px] font-bold text-primary-container mb-sm" dir="ltr">EGP 850,000</div>
+</div>
+<div class="flex items-center gap-sm flex-wrap mb-sm text-on-surface-variant font-body-md text-[13px]">
+<span class="flex items-center gap-[4px] bg-surface-container-low px-2 py-1 rounded-md border border-border-medium">
+<span class="material-symbols-outlined text-[16px]" data-icon="speed">speed</span> 45,000 كم
+                        </span>
+<span class="flex items-center gap-[4px] bg-surface-container-low px-2 py-1 rounded-md border border-border-medium">
+<span class="material-symbols-outlined text-[16px]" data-icon="settings">settings</span> اوتوماتيك
+                        </span>
+</div>
+<div class="flex items-center justify-between mt-auto pt-sm border-t border-border-medium">
+<div class="flex items-center gap-xs text-text-muted font-body-md text-[12px]">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span> المعادي
+                        </div>
+<div class="flex items-center gap-xs text-text-muted font-body-md text-[12px]">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span> منذ ساعتين
+                        </div>
+</div>
+</div>
+</article>
+<!-- Card 2 (Standard) -->
+<article class="bg-surface-base rounded-xl border border-border-medium shadow-sm overflow-hidden flex flex-col group hover:shadow-[0_8px_20px_rgba(13,122,132,0.08)] transition-shadow duration-300 relative">
+<!-- Favorite Toggle -->
+<button class="absolute top-sm left-sm h-10 w-10 bg-surface-base/80 backdrop-blur-sm rounded-full flex items-center justify-center text-outline hover:text-error-red transition-colors z-10 shadow-sm border border-border-medium">
+<span class="material-symbols-outlined" data-icon="favorite_border">favorite_border</span>
+</button>
+<div class="h-[180px] w-full relative bg-surface-container-low overflow-hidden">
+<img alt="تويوتا يارس 2019" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A front-angle shot of a silver Toyota Yaris parked in a quiet residential area during golden hour. The sunlight reflects softly off the car's metallic paint. The image has a warm, slightly high-contrast look consistent with a premium marketplace listing, emphasizing trust and clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD989AZGQXTz_36nwzaCGsR9zBA8COV6ZEQ961QM6whkKMVXINPi4q-LPvi9PKKEKHPdVpTR--4YCIP42lXRmMfYHV6Wwldvw2JlxQKviXLh1YhSF8fH_M7ehoZqqNp5BENeWZnMpvJYD3ba5MTOUnHz2YwxvclxxCpu3t5UIYBF9R78FZWKg_e90evEGW-Xr3TVmOIfNqNFmGhjA9lyjqnPJmFJIg0HiUtruicLmPJqLPo6rTOev3NvdmNekEYu9wQB8j4-m39qRk"/>
+</div>
+<div class="p-md flex flex-col flex-1">
+<h3 class="font-headline-md text-[16px] font-bold text-on-surface mb-xs line-clamp-1">تويوتا يارس 2019 فابريكا بالكامل</h3>
+<div class="font-label-mono text-[18px] font-bold text-primary-container mb-sm" dir="ltr">EGP 520,000</div>
+<div class="mt-auto pt-sm border-t border-border-medium flex items-center justify-between text-text-muted font-body-md text-[12px]">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span> مدينة نصر
+                        </div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span> منذ 5 ساعات
+                        </div>
+</div>
+</div>
+</article>
+<!-- Card 3 (Standard) -->
+<article class="bg-surface-base rounded-xl border border-border-medium shadow-sm overflow-hidden flex flex-col group hover:shadow-[0_8px_20px_rgba(13,122,132,0.08)] transition-shadow duration-300 relative">
+<button class="absolute top-sm left-sm h-10 w-10 bg-surface-base/80 backdrop-blur-sm rounded-full flex items-center justify-center text-outline hover:text-error-red transition-colors z-10 shadow-sm border border-border-medium">
+<span class="material-symbols-outlined" data-icon="favorite_border">favorite_border</span>
+</button>
+<div class="h-[180px] w-full relative bg-surface-container-low overflow-hidden">
+<img alt="تويوتا فورتشنر 2021" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A robust black Toyota Fortuner SUV parked against a backdrop of a modern urban landscape. The lighting is crisp and clear, highlighting the vehicle's glossy finish. The overall style is clean and professional, fitting for a high-end vehicle listing in a modern, culturally grounded app interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlhtFDCwUiQb2mqpzqNtElNy_K0wMPWK_3MF3EAYoiz-Maq2nrq214Hr2lq596Lrh135GqZaB8yy_f21TG3wRZYG-NZPwldE1_oJ_wI-Ey4G5QDIiT0QSzApfNIho5rzlUkYmgp3_lXp4dtzuNxDl7HMWwa3mzBUYZ6GbSQVQZhc8jn17RnLEEVXJxtGnmCn8QiF0fU6XAT5XGDNbTXT7FKtEOIgt6U0M9sp06Fdl96JOTBd1gktlVCdQh2MeA9PI0afJcoUxRiBw"/>
+</div>
+<div class="p-md flex flex-col flex-1">
+<h3 class="font-headline-md text-[16px] font-bold text-on-surface mb-xs line-clamp-1">تويوتا فورتشنر 2021 ادفانتشر 4x4</h3>
+<div class="font-label-mono text-[18px] font-bold text-primary-container mb-sm" dir="ltr">EGP 2,100,000</div>
+<div class="mt-auto pt-sm border-t border-border-medium flex items-center justify-between text-text-muted font-body-md text-[12px]">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span> التجمع الخامس
+                        </div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span> أمس
+                        </div>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Shared Component) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface shadow-[0_-4px_12px_rgba(13,122,132,0.06)] rounded-t-xl rtl">
+<div class="flex justify-around items-center px-4 pb-safe h-[72px] w-full">
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-[64px] hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-xl p-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span class="font-body-md text-[11px] mt-1">الرئيسية</span>
+</a>
+<!-- Active (Search/Categories context) -->
+<a class="flex flex-col items-center justify-center text-primary font-bold bg-primary-container/10 w-[64px] transition-transform duration-200 active:scale-90 rounded-xl p-1" href="#">
+<span class="material-symbols-outlined material-symbols-fill text-[24px]" data-icon="grid_view" data-weight="fill" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-body-md text-[11px] mt-1">الفئات</span>
+</a>
+<!-- FAB Replacement (Add Ad) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-[64px] hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-xl p-1 -mt-4" href="#">
+<div class="bg-primary-container text-on-primary-container rounded-full h-12 w-12 flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[28px]" data-icon="add_circle">add_circle</span>
+</div>
+<span class="font-body-md text-[11px] mt-1">أضف إعلان</span>
+</a>
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-[64px] hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-xl p-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="favorite">favorite</span>
+<span class="font-body-md text-[11px] mt-1">المفضلة</span>
+</a>
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant w-[64px] hover:bg-surface-container-low transition-transform duration-200 active:scale-90 rounded-xl p-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="person">person</span>
+<span class="font-body-md text-[11px] mt-1">حسابي</span>
+</a>
+</div>
+</nav>
+</body></html>

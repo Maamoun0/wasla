@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'core/theme/wasla_theme.dart';
-import 'core/routing/app_router.dart';
+import 'core/constants/app_constants.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Supabase (We will replace with actual keys later)
-  // await Supabase.initialize(
-  //   url: 'YOUR_SUPABASE_URL',
-  //   anonKey: 'YOUR_SUPABASE_ANON_KEY',
-  // );
+
+  // ── Status Bar Style ──────────────────────────────────────────
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
+
+  // ── Portrait Only ─────────────────────────────────────────────
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  // ── Supabase ──────────────────────────────────────────────────
+  await Supabase.initialize(
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
+    debug: false,
+  );
 
   runApp(
     const ProviderScope(
@@ -19,6 +37,9 @@ void main() async {
     ),
   );
 }
+
+// ── Supabase Client Shortcut ──────────────────────────────────
+final supabase = Supabase.instance.client;
 
 class WaslaApp extends ConsumerWidget {
   const WaslaApp({super.key});
@@ -28,17 +49,23 @@ class WaslaApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'Wasla - وصلة',
+      title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme: WaslaTheme.lightTheme,
-      // For Arabic RTL support by default
+
+      // ── Theme ───────────────────────────────────────────────
+      theme: AppTheme.light,
+      themeMode: ThemeMode.light,
+
+      // ── Router ──────────────────────────────────────────────
+      routerConfig: router,
+
+      // ── RTL ─────────────────────────────────────────────────
       builder: (context, child) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: child!,
         );
       },
-      routerConfig: router,
     );
   }
 }

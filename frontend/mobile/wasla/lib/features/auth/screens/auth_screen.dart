@@ -1,0 +1,254 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/router/app_router.dart';
+import '../../../shared/widgets/wasla_logo.dart';
+import '../../../shared/widgets/primary_button.dart';
+import '../providers/auth_provider.dart';
+
+class AuthScreen extends ConsumerStatefulWidget {
+  const AuthScreen({super.key});
+
+  @override
+  ConsumerState<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends ConsumerState<AuthScreen> {
+  final _phoneController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  String _formatPhone(String raw) {
+    String digits = raw.replaceAll(RegExp(r'\D'), '');
+    if (digits.startsWith('0')) digits = digits.substring(1);
+    return '+20$digits';
+  }
+
+  Future<void> _sendOtp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final phone = _formatPhone(_phoneController.text.trim());
+      await ref.read(authNotifierProvider.notifier).sendOtp(phone);
+
+      if (mounted) {
+        context.push('${AppRoutes.otp}?phone=${Uri.encodeComponent(phone)}');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showError('حدث خطأ في إرسال الرمز. تحقق من رقم هاتفك وحاول مرة أخرى.');
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.neutral50,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 48),
+
+                // ── Logo ──────────────────────────────────────
+                Center(
+                  child: WaslaLogoFull(
+                    size: 48,
+                    variant: WaslaLogoVariant.color,
+                  ),
+                ),
+                const SizedBox(height: 40),
+
+                // ── Title ─────────────────────────────────────
+                Text(
+                  AppStrings.welcome,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'أدخل رقم هاتفك للمتابعة',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.neutral500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40),
+
+                // ── Phone Field ───────────────────────────────
+                _PhoneField(controller: _phoneController),
+                const SizedBox(height: 20),
+
+                // ── Send OTP Button ───────────────────────────
+                PrimaryButton(
+                  label: AppStrings.sendOtp,
+                  isLoading: _isLoading,
+                  onPressed: _sendOtp,
+                ),
+                const SizedBox(height: 28),
+
+                // ── Divider ───────────────────────────────────
+                Row(
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        AppStrings.orContinueWith,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    const Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // ── Social Login ──────────────────────────────
+                _SocialLoginButton(
+                  icon: Icons.g_mobiledata_rounded,
+                  label: 'تابع بـ Google',
+                  onPressed: () async {
+                    try {
+                      await ref
+                          .read(authNotifierProvider.notifier)
+                          .signInWithGoogle();
+                    } catch (_) {
+                      _showError(AppStrings.errorGeneral);
+                    }
+                  },
+                ),
+                const SizedBox(height: 28),
+
+                // ── Guest Mode ────────────────────────────────
+                TextButton(
+                  onPressed: () => context.go(AppRoutes.home),
+                  child: Text(
+                    AppStrings.browseAsGuest,
+                    style: const TextStyle(
+                      color: AppColors.neutral500,
+                      fontFamily: 'Cairo',
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // ── Terms ─────────────────────────────────────
+                Text(
+                  'بالمتابعة توافق على شروط الاستخدام وسياسة الخصوصية',
+                  style: Theme.of(context).textTheme.labelSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Phone Field ───────────────────────────────────────────────────
+class _PhoneField extends StatelessWidget {
+  const _PhoneField({required this.controller});
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.phone,
+      textDirection: TextDirection.ltr,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      maxLength: 11,
+      style: const TextStyle(
+        fontFamily: 'Cairo',
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 2,
+      ),
+      decoration: InputDecoration(
+        hintText: AppStrings.phoneHint,
+        counterText: '',
+        prefixIcon: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          child: const Text(
+            '🇪🇬 +20',
+            style: TextStyle(
+              fontFamily: 'Cairo',
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.neutral700,
+            ),
+          ),
+        ),
+        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+      ),
+      validator: (val) {
+        if (val == null || val.isEmpty) return AppStrings.errorRequired;
+        final digits = val.replaceAll(RegExp(r'\D'), '');
+        if (digits.length < 10 || digits.length > 11) {
+          return AppStrings.errorInvalidPhone;
+        }
+        return null;
+      },
+    );
+  }
+}
+
+// ── Social Login Button ───────────────────────────────────────────
+class _SocialLoginButton extends StatelessWidget {
+  const _SocialLoginButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 22),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.neutral700,
+        side: const BorderSide(color: AppColors.neutral200, width: 1.5),
+        backgroundColor: AppColors.white,
+      ),
+    );
+  }
+}

@@ -1,2 +1,8 @@
 [functions.request-otp]
 verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false

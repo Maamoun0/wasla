@@ -48,11 +48,24 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
 
   AuthNotifier(this._client) : super(const AsyncValue.data(null));
 
-  // Send OTP to phone
+  // Send OTP to phone via secure request-otp Edge Function
   Future<void> sendOtp(String phone) async {
     state = const AsyncValue.loading();
     try {
-      await _client.auth.signInWithOtp(phone: phone);
+      final response = await _client.functions.invoke(
+        'request-otp',
+        body: {'phone_number': phone},
+      );
+
+      if (response.status != 200) {
+        final data = response.data;
+        String errorMessage = 'فشل إرسال رمز التحقق';
+        if (data is Map) {
+          errorMessage = data['message'] ?? data['error'] ?? errorMessage;
+        }
+        throw Exception(errorMessage);
+      }
+      
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

@@ -97,7 +97,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           ),
         );
       }
-    } catch (_) {}
+    } catch (e) {
+      if (mounted) {
+        final msg = e.toString().replaceFirst('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg.isNotEmpty ? msg : 'فشل إعادة إرسال الرمز', style: const TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    }
   }
 
   @override

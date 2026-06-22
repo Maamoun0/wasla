@@ -7,6 +7,10 @@
 -- ================================================================
 
 
+-- Clean public schema reset to prevent partial deployment conflicts
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA public;
+
 -- ────────────────────────────────────────────────────────────────
 -- §1 · EXTENSIONS
 -- ────────────────────────────────────────────────────────────────
@@ -14,7 +18,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 CREATE EXTENSION IF NOT EXISTS "unaccent";
--- NOTE: Enable postgis + pg_cron from Supabase Dashboard → Extensions
+-- Enable postgis and pg_cron extensions
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 
 -- ────────────────────────────────────────────────────────────────
@@ -607,7 +613,7 @@ CREATE INDEX idx_bookings_status          ON public.service_bookings(status);
 CREATE INDEX idx_transactions_user   ON public.transactions(user_id, created_at DESC);
 CREATE INDEX idx_transactions_status ON public.transactions(status);
 CREATE INDEX idx_ad_boosts_ad        ON public.ad_boosts(ad_id, expires_at);
-CREATE INDEX idx_ad_boosts_active    ON public.ad_boosts(expires_at) WHERE expires_at > NOW();
+CREATE INDEX idx_ad_boosts_active    ON public.ad_boosts(expires_at);
 CREATE INDEX idx_subs_user           ON public.user_subscriptions(user_id, status);
 CREATE INDEX idx_credit_tx_user      ON public.credit_transactions(user_id, created_at DESC);
 

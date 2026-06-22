@@ -6,7 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../features/auth/providers/auth_provider.dart';
-import '../../../shared/widgets/wasla_logo.dart' show VerifiedBadge;
+import '../../../shared/widgets/trust_badge.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -128,16 +128,7 @@ class _LoggedInView extends ConsumerWidget {
                         children: [
                           Text(name, style: const TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
                           const SizedBox(height: 4),
-                          Row(children: [
-                            if (isVerified) ...[const VerifiedBadge(), const SizedBox(width: 6)],
-                            // Stars
-                            ...List.generate(5, (i) => Icon(
-                              i < score.round() ? Icons.star_rounded : Icons.star_border_rounded,
-                              size: 14, color: AppColors.accent300,
-                            )),
-                            const SizedBox(width: 4),
-                            Text(score.toStringAsFixed(1), style: const TextStyle(fontFamily: 'Cairo', color: Colors.white70, fontSize: 12)),
-                          ]),
+                          TrustBadge(trustScore: score, isVerified: isVerified),
                           if (userType == 'business')
                             Container(
                               margin: const EdgeInsets.only(top: 6),

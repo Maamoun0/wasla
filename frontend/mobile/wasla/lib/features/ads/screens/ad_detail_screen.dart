@@ -9,7 +9,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
-import '../../../shared/widgets/wasla_logo.dart' show VerifiedBadge, EmptyState;
+import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
+import '../../../shared/widgets/trust_badge.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 
@@ -96,7 +97,7 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
         if (ad == null) return const Scaffold(body: EmptyState(title: 'الإعلان غير موجود'));
 
         final media      = (ad['ad_media'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-        final user       = (ad['users'] as Map?) ?? {};
+        final user       = (ad['users'] as Map?)?.cast<String, dynamic>() ?? {};
         final cityName   = (ad['cities'] as Map?)?['name_ar'] as String? ?? '';
         final distName   = (ad['districts'] as Map?)?['name_ar'] as String? ?? '';
         final fields     = (ad['ad_fields'] as List?)?.cast<Map<String, dynamic>>() ?? [];
@@ -398,23 +399,19 @@ class _SellerCard extends StatelessWidget {
               backgroundImage: avatar != null ? NetworkImage(avatar) : null,
               child: avatar == null ? const Icon(Icons.person_rounded, color: AppColors.primary200, size: 26) : null,
             ),
-            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(children: [
-                    Text(name, style: Theme.of(context).textTheme.titleMedium),
-                    if (isVerified) ...[const SizedBox(width: 6), const VerifiedBadge()],
-                  ]),
-                  Row(children: [
-                    ...List.generate(5, (i) => Icon(
-                      i < score.round() ? Icons.star_rounded : Icons.star_border_rounded,
-                      size: 14, color: AppColors.accent500,
-                    )),
-                    const SizedBox(width: 4),
-                    Text(score.toStringAsFixed(1), style: Theme.of(context).textTheme.labelSmall),
-                  ]),
+                  Text(
+                    name, 
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  TrustBadge(trustScore: score, isVerified: isVerified),
                 ],
               ),
             ),

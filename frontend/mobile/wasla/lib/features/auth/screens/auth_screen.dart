@@ -48,7 +48,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showError('حدث خطأ في إرسال الرمز. تحقق من رقم هاتفك وحاول مرة أخرى.');
+        final msg = e.toString().replaceFirst('Exception: ', '');
+        _showError(msg.isNotEmpty ? msg : 'حدث خطأ في إرسال الرمز. تحقق من رقم هاتفك وحاول مرة أخرى.');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

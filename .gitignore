@@ -1,16 +1,39 @@
-# OS files
+# Wasla Root Gitignore
+
+# Secrets and environment variables
+.env
+.env.*
+*.env
+
+# Keystores and security keys
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+
+# Flutter/Dart build outputs
+/build/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# OS-specific hidden files
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# IDE files
-.idea/
-.vscode/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.swp
+# Firebase configuration secrets
+google-services.json
+GoogleService-Info.plist
+firebase-debug.log
 
-# Local log files
-*.log
+# Temporary/Backup/Draft files
+/1/
+/workflow_skill_creator/
+/backups/
+/wasla-sprint*-execution-checklist.md
+/wasla-sprint*-execution-checklist-v*.md
+supabase/.temp/
+.temp/
+

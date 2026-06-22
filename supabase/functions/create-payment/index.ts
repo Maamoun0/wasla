@@ -22,6 +22,7 @@ serve(async (req) => {
       throw new Error("Supabase environment variables are not configured on the host.");
     }
 
+    // Initialize Supabase Client with service_role to query/update transactions securely
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -29,259 +30,281 @@ serve(async (req) => {
       },
     });
 
-    // ── HTTP GET: Serve the Mock Payment HTML Page ──
-    if (method === "GET") {
-      const url = new URL(req.url);
-      const txId = url.searchParams.get("tx_id") ?? "unknown";
-      const amount = url.searchParams.get("amount") ?? "0.00";
-
-      const html = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>بوابة دفع وصلة التجريبية | Paymob Sandbox</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #F9F7F3;
-      color: #1F2937;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-      width: 100%;
-      max-width: 450px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    .logo {
-      color: #0D7A84;
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .amount-box {
-      background: #F3F4F6;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 18px;
-      margin-bottom: 25px;
-    }
-    .amount-val {
-      font-weight: bold;
-      color: #0D7A84;
-    }
-    .card-fields {
-      text-align: right;
-      margin-bottom: 25px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 5px;
-      color: #4B5563;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #D1D5DB;
-      border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    .flex-inputs {
-      display: flex;
-      gap: 15px;
-    }
-    .flex-inputs .form-group {
-      flex: 1;
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      background: #E89510;
-      color: white;
-      border: none;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: background 0.2s;
-    }
-    .btn:hover {
-      background: #D1840E;
-    }
-    .btn-cancel {
-      background: #E5E7EB;
-      color: #374151;
-    }
-    .btn-cancel:hover {
-      background: #D1D5DB;
-    }
-    .btn-fail {
-      background: #EF4444;
-      color: white;
-    }
-    .btn-fail:hover {
-      background: #DC2626;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="logo">وصلة Wasla</div>
-    <h3>بوابة الدفع الآمنة (Paymob Sandbox)</h3>
-    <div class="amount-box">
-      مبلغ الدفع المطلوب: <span class="amount-val"><span id="amount-text">${amount}</span> ج.م</span>
-    </div>
-    
-    <div class="card-fields">
-      <div class="form-group">
-        <label>رقم البطاقة الائتمانية</label>
-        <input type="text" value="4000 1234 5678 9010" disabled>
-      </div>
-      <div class="flex-inputs">
-        <div class="form-group">
-          <label>تاريخ الانتهاء</label>
-          <input type="text" value="12 / 29" disabled>
-        </div>
-        <div class="form-group">
-          <label>الرمز السري (CVV)</label>
-          <input type="text" value="123" disabled>
-        </div>
-      </div>
-    </div>
-    
-    <button class="btn" onclick="triggerSuccess()">تأكيد الدفع (تفعيل نجاح المعاملة)</button>
-    <button class="btn btn-fail" onclick="triggerFail()">محاكاة فشل الدفع</button>
-    <button class="btn btn-cancel" onclick="triggerCancel()">إلغاء المعاملة والعودة</button>
-  </div>
-
-  <script>
-    function triggerSuccess() {
-      window.location.href = 'https://wasla.eg/payment/callback?success=true&id=${txId}';
-    }
-    function triggerFail() {
-      window.location.href = 'https://wasla.eg/payment/callback?success=false&id=${txId}';
-    }
-    function triggerCancel() {
-      window.location.href = 'https://wasla.eg/payment/cancel?id=${txId}';
-    }
-  </script>
-</body>
-</html>`;
-
-      return new Response(html, {
-        headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
-      });
-    }
-
-    // ── HTTP POST: Generate Transaction & Return Payment URL ──
-    if (method === "POST") {
-      const authHeader = req.headers.get("Authorization") ?? "";
-      if (!authHeader.startsWith("Bearer ")) {
-        return new Response(
-          JSON.stringify({ error: "غير مصرح بالدخول (رمز مصادقة مفقود)" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      
-      const token = authHeader.substring(7);
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-      
-      if (authError || !user) {
-        return new Response(
-          JSON.stringify({ error: "جلسة العمل منتهية أو غير صالحة" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Read request body
-      const { type, reference_id, amount, payment_method } = await req.json();
-
-      if (!type || !amount || !payment_method) {
-        return new Response(
-          JSON.stringify({ error: "البيانات المرسلة غير مكتملة (type, amount, payment_method مطلوبة)" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Validate payment method
-      const validMethods = ["card", "fawry", "instapay", "vodafone_cash"];
-      if (!validMethods.includes(payment_method)) {
-        return new Response(
-          JSON.stringify({ error: "طريقة الدفع المحددة غير مدعومة" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Validate transaction type
-      const validTypes = ["subscription", "ad_boost", "credit_purchase"];
-      if (!validTypes.includes(type)) {
-        return new Response(
-          JSON.stringify({ error: "نوع المعاملة المحدد غير صالح" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Insert transaction into public.transactions (initially status = 'pending')
-      const { data: transaction, error: insertError } = await supabase
-        .from("transactions")
-        .insert({
-          user_id: user.id,
-          type: type,
-          reference_id: reference_id ?? null,
-          reference_type: type === "ad_boost" ? "ad" : type === "subscription" ? "subscription_plan" : null,
-          amount: parseFloat(amount),
-          currency: "EGP",
-          payment_method: payment_method,
-          payment_gateway: "paymob",
-          status: "pending",
-        })
-        .select("id")
-        .single();
-
-      if (insertError) {
-        throw new Error(`فشل إدراج المعاملة في قاعدة البيانات: ${insertError.message}`);
-      }
-
-      // Construct Sandbox payment redirect URL (points back to this function's GET method)
-      const functionUrl = `${new URL(req.url).origin}/create-payment`;
-      const paymentUrl = `${functionUrl}?tx_id=${transaction.id}&amount=${amount}`;
-
+    if (method !== "POST") {
       return new Response(
-        JSON.stringify({
-          success: true,
-          transaction_id: transaction.id,
-          payment_url: paymentUrl,
-        }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "طريقة الطلب غير مدعومة" }),
+        { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    // ── HTTP POST: Process payment request and return iframe_url ──
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "غير مصرح بالدخول (توكن مفقود)" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    const token = authHeader.substring(7);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "جلسة العمل منتهية أو غير صالحة" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Parse request body
+    const { type, reference_id, amount, payment_method, metadata } = await req.json();
+
+    if (!type || !amount || !payment_method) {
+      return new Response(
+        JSON.stringify({ error: "البيانات المرسلة غير مكتملة (type, amount, payment_method مطلوبة)" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate payment method
+    const validMethods = ["card", "fawry", "instapay", "vodafone_cash"];
+    if (!validMethods.includes(payment_method)) {
+      return new Response(
+        JSON.stringify({ error: "طريقة الدفع المحددة غير مدعومة" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate transaction type
+    const validTypes = ["subscription", "ad_boost", "credit_purchase"];
+    if (!validTypes.includes(type)) {
+      return new Response(
+        JSON.stringify({ error: "نوع المعاملة المحدد غير صالح" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── 1. Security Ownership Check ──
+    if (type === "ad_boost") {
+      if (!reference_id) {
+        return new Response(
+          JSON.stringify({ error: "رقم تعريف الإعلان مطلوب للترقية" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { data: ad, error: adError } = await supabase
+        .from("ads")
+        .select("user_id, status")
+        .eq("id", reference_id)
+        .single();
+
+      if (adError || !ad) {
+        return new Response(
+          JSON.stringify({ error: "الإعلان المحدد غير موجود" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (ad.user_id !== user.id) {
+        return new Response(
+          JSON.stringify({ error: "غير مصرح لك بترقية هذا الإعلان (أنت لا تملكه)" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (ad.status !== "active") {
+        return new Response(
+          JSON.stringify({ error: "لا يمكن ترقية إعلان غير نشط" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    if (type === "subscription") {
+      if (!reference_id) {
+        return new Response(
+          JSON.stringify({ error: "رقم باقة الاشتراك مطلوبة للعملية" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const { data: plan, error: planError } = await supabase
+        .from("subscription_plans")
+        .select("id, is_active")
+        .eq("id", parseInt(reference_id))
+        .single();
+
+      if (planError || !plan) {
+        return new Response(
+          JSON.stringify({ error: "باقة الاشتراك المحددة غير موجودة" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      if (!plan.is_active) {
+        return new Response(
+          JSON.stringify({ error: "باقة الاشتراك المحددة غير مفعلة حالياً" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // ── 2. Create local transactions record (status = 'pending') ──
+    const { data: transaction, error: insertError } = await supabase
+      .from("transactions")
+      .insert({
+        user_id: user.id,
+        type: type,
+        reference_id: reference_id ?? null,
+        reference_type: type === "ad_boost" ? "ad" : type === "subscription" ? "subscription_plan" : null,
+        amount: parseFloat(amount),
+        currency: "EGP",
+        payment_method: payment_method,
+        payment_gateway: "paymob",
+        status: "pending",
+        metadata: metadata ?? {},
+      })
+      .select("id")
+      .single();
+
+    if (insertError || !transaction) {
+      throw new Error(`فشل إدراج المعاملة محلياً: ${insertError?.message}`);
+    }
+
+    // ── 3. Paymob API Sequence Integration ──
+    const paymobApiKey = Deno.env.get("PAYMOB_API_KEY") ?? "";
+    const paymobIntegrationId = parseInt(Deno.env.get("PAYMOB_INTEGRATION_ID") ?? "0");
+    const paymobIframeId = parseInt(Deno.env.get("PAYMOB_IFRAME_ID") ?? "0");
+
+    if (!paymobApiKey || !paymobIntegrationId || !paymobIframeId) {
+      throw new Error("Paymob credentials are not configured in environment variables.");
+    }
+
+    const amountCents = Math.round(parseFloat(amount) * 100);
+
+    // Fetch user details for Paymob billing data
+    const { data: userProfile } = await supabase
+      .from("users")
+      .select("full_name, email, phone")
+      .eq("id", user.id)
+      .single();
+
+    const fullName = userProfile?.full_name?.trim() || "Wasla User";
+    const nameParts = fullName.split(" ");
+    const firstName = nameParts[0] || "Wasla";
+    const lastName = nameParts.slice(1).join(" ") || "User";
+    const userEmail = userProfile?.email || user.email || "test@wasla.eg";
+    const userPhone = userProfile?.phone || user.phone || "+201000000000";
+
+    let paymobToken = "";
+    let paymobOrderId = "";
+    let paymentKey = "";
+
+    // Step 3.1: Get auth token
+    try {
+      const authRes = await fetch("https://accept.paymob.com/api/auth/tokens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ api_key: paymobApiKey }),
+      });
+      const authData = await authRes.json();
+      paymobToken = authData.token;
+      if (!paymobToken) throw new Error(authData.message || "Token is empty");
+    } catch (err: any) {
+      throw new Error(`[Step 1/4] فشل استدعاء مصادقة Paymob: ${err.message}`);
+    }
+
+    // Step 3.2: Create order on Paymob
+    try {
+      const orderRes = await fetch("https://accept.paymob.com/api/ecommerce/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auth_token: paymobToken,
+          delivery_needed: "false",
+          amount_cents: amountCents,
+          currency: "EGP",
+          items: [],
+        }),
+      });
+      const orderData = await orderRes.json();
+      paymobOrderId = orderData.id?.toString();
+      if (!paymobOrderId) throw new Error("Order ID is empty");
+    } catch (err: any) {
+      throw new Error(`[Step 2/4] فشل تسجيل الطلب في Paymob: ${err.message}`);
+    }
+
+    // Step 3.3: Request payment key
+    try {
+      const keyRes = await fetch("https://accept.paymob.com/api/acceptance/payment_keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auth_token: paymobToken,
+          amount_cents: amountCents,
+          expiration: 3600,
+          order_id: parseInt(paymobOrderId),
+          billing_data: {
+            apartment: "NA",
+            floor: "NA",
+            street: "NA",
+            building: "NA",
+            room_number: "NA",
+            additional_info: "NA",
+            city: "Cairo",
+            state: "Cairo",
+            country: "EGP",
+            first_name: firstName,
+            last_name: lastName,
+            email: userEmail,
+            phone_number: userPhone,
+          },
+          currency: "EGP",
+          integration_id: paymobIntegrationId,
+        }),
+      });
+      const keyData = await keyRes.json();
+      paymentKey = keyData.token;
+      if (!paymentKey) throw new Error(keyData.message || "Payment key token is empty");
+    } catch (err: any) {
+      throw new Error(`[Step 3/4] فشل إصدار مفتاح الدفع من Paymob: ${err.message}`);
+    }
+
+    // Step 3.4: Construct iframe URL
+    const iframeUrl = `https://accept.paymob.com/api/acceptance/iframes/${paymobIframeId}?payment_token=${paymentKey}`;
+
+    // ── 4. Update the local transactions record ──
+    const { error: updateError } = await supabase
+      .from("transactions")
+      .update({
+        gateway_transaction_id: paymobOrderId, // Use Paymob order_id as the primary reference
+        metadata: {
+          ...(metadata || {}),
+          paymob_payment_key: paymentKey,
+          paymob_order_id: paymobOrderId,
+          billing: { firstName, lastName, userEmail, userPhone }
+        }
+      })
+      .eq("id", transaction.id);
+
+    if (updateError) {
+      throw new Error(`فشل تحديث المعاملة بمعرفات Paymob: ${updateError.message}`);
+    }
+
     return new Response(
-      JSON.stringify({ error: "طريقة الطلب غير مدعومة" }),
-      { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        success: true,
+        transaction_id: transaction.id,
+        payment_url: iframeUrl,
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error: any) {
-    console.error("Payment creation stub error:", error);
+    console.error("Payment creation error:", error.message);
     return new Response(
-      JSON.stringify({ error: error.message ?? "حدث خطأ غير متوقع أثناء معالجة الطلب" }),
+      JSON.stringify({ error: error.message ?? "حدث خطأ غير متوقع أثناء معالجة طلبك" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

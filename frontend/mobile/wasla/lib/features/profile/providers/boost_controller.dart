@@ -256,6 +256,11 @@ class BoostController extends StateNotifier<BoostState> {
           'reference_id': ad['id'],
           'amount': package.price,
           'payment_method': 'card', // default method for Sandbox
+          'metadata': {
+            'boost_package_key': package.key,
+            'boost_type': package.type,
+            'duration_days': package.durationDays,
+          }
         },
       );
 

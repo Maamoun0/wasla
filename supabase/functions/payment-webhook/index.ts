@@ -54,17 +54,6 @@ serve(async (req) => {
       return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
     }
 
-    // Parse the Webhook request body
-    const body = await req.json();
-    const transaction = body.obj;
-
-    if (!transaction) {
-      return new Response(
-        JSON.stringify({ error: "محتوى الطلب غير صالح" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     // ── 1. Secure HMAC Signature Verification ──
     const url = new URL(req.url);
     const receivedHmac = url.searchParams.get("hmac") ?? "";
@@ -75,6 +64,26 @@ serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Parse the Webhook request body safely
+    let body: any;
+    try {
+      body = await req.json();
+    } catch (_err) {
+      return new Response(
+        JSON.stringify({ error: "محتوى الطلب غير صالح (JSON غير صالح)" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const transaction = body?.obj;
+    if (!transaction) {
+      return new Response(
+        JSON.stringify({ error: "محتوى الطلب غير صالح" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
 
     // Retrieve fields in the strict lexicographical order required by Paymob Egypt
     const values = [

@@ -28,6 +28,7 @@ import '../../features/profile/screens/subscription_screen.dart';
 import '../../features/profile/screens/verification_screen.dart';
 import '../../features/profile/screens/my_reviews_screen.dart';
 import '../../features/profile/screens/settings_screen.dart';
+import '../../features/profile/screens/payment_webview_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../shared/widgets/bottom_nav_shell.dart';
 
@@ -67,6 +68,7 @@ class AppRoutes {
   static const String verification  = '/profile/verify';
   static const String myReviews     = '/profile/reviews';
   static const String settings      = '/settings';
+  static const String paymentWebView = '/profile/payment';
 
   // Admin
   static const String admin         = '/admin';
@@ -211,6 +213,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.settings,
         builder: (ctx, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentWebView,
+        builder: (ctx, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return PaymentWebViewScreen(
+            paymentUrl: extra['paymentUrl'] as String,
+            transactionId: extra['transactionId'] as String,
+            paymentType: extra['paymentType'] as String,
+            referenceId: extra['referenceId'] as String?,
+          );
+        },
       ),
     ],
     errorBuilder: (ctx, state) => Scaffold(

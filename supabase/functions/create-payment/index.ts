@@ -9,7 +9,6 @@ const corsHeaders = {
 serve(async (req) => {
   const method = req.method;
 
-  // Handle CORS preflight requests
   if (method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -22,7 +21,6 @@ serve(async (req) => {
       throw new Error("Supabase environment variables are not configured on the host.");
     }
 
-    // Initialize Supabase Client with service_role to query/update transactions securely
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -37,7 +35,6 @@ serve(async (req) => {
       );
     }
 
-    // ── HTTP POST: Process payment request and return iframe_url ──
     const authHeader = req.headers.get("Authorization") ?? "";
     if (!authHeader.startsWith("Bearer ")) {
       return new Response(
@@ -56,7 +53,6 @@ serve(async (req) => {
       );
     }
 
-    // Parse request body
     const { type, reference_id, amount, payment_method, metadata } = await req.json();
 
     if (!type || !amount || !payment_method) {
@@ -66,7 +62,6 @@ serve(async (req) => {
       );
     }
 
-    // Validate payment method
     const validMethods = ["card", "fawry", "instapay", "vodafone_cash"];
     if (!validMethods.includes(payment_method)) {
       return new Response(
@@ -75,7 +70,6 @@ serve(async (req) => {
       );
     }
 
-    // Validate transaction type
     const validTypes = ["subscription", "ad_boost", "credit_purchase"];
     if (!validTypes.includes(type)) {
       return new Response(
@@ -84,7 +78,6 @@ serve(async (req) => {
       );
     }
 
-    // ── 1. Security Ownership Check ──
     if (type === "ad_boost") {
       if (!reference_id) {
         return new Response(
@@ -150,7 +143,6 @@ serve(async (req) => {
       }
     }
 
-    // ── 2. Create local transactions record (status = 'pending') ──
     const { data: transaction, error: insertError } = await supabase
       .from("transactions")
       .insert({
@@ -172,7 +164,6 @@ serve(async (req) => {
       throw new Error(`فشل إدراج المعاملة محلياً: ${insertError?.message}`);
     }
 
-    // ── 3. Paymob API Sequence Integration ──
     const paymobApiKey = Deno.env.get("PAYMOB_API_KEY") ?? "";
     const paymobIntegrationId = parseInt(Deno.env.get("PAYMOB_INTEGRATION_ID") ?? "0");
     const paymobIframeId = parseInt(Deno.env.get("PAYMOB_IFRAME_ID") ?? "0");
@@ -183,7 +174,6 @@ serve(async (req) => {
 
     const amountCents = Math.round(parseFloat(amount) * 100);
 
-    // Fetch user details for Paymob billing data
     const { data: userProfile } = await supabase
       .from("users")
       .select("full_name, email, phone")
@@ -201,7 +191,6 @@ serve(async (req) => {
     let paymobOrderId = "";
     let paymentKey = "";
 
-    // Step 3.1: Get auth token
     try {
       const authRes = await fetch("https://accept.paymob.com/api/auth/tokens", {
         method: "POST",
@@ -215,7 +204,6 @@ serve(async (req) => {
       throw new Error(`[Step 1/4] فشل استدعاء مصادقة Paymob: ${err.message}`);
     }
 
-    // Step 3.2: Create order on Paymob
     try {
       const orderRes = await fetch("https://accept.paymob.com/api/ecommerce/orders", {
         method: "POST",
@@ -235,7 +223,6 @@ serve(async (req) => {
       throw new Error(`[Step 2/4] فشل تسجيل الطلب في Paymob: ${err.message}`);
     }
 
-    // Step 3.3: Request payment key
     try {
       const keyRes = await fetch("https://accept.paymob.com/api/acceptance/payment_keys", {
         method: "POST",
@@ -271,14 +258,12 @@ serve(async (req) => {
       throw new Error(`[Step 3/4] فشل إصدار مفتاح الدفع من Paymob: ${err.message}`);
     }
 
-    // Step 3.4: Construct iframe URL
     const iframeUrl = `https://accept.paymob.com/api/acceptance/iframes/${paymobIframeId}?payment_token=${paymentKey}`;
 
-    // ── 4. Update the local transactions record ──
     const { error: updateError } = await supabase
       .from("transactions")
       .update({
-        gateway_transaction_id: paymobOrderId, // Use Paymob order_id as the primary reference
+        gateway_transaction_id: paymobOrderId,
         metadata: {
           ...(metadata || {}),
           paymob_payment_key: paymentKey,
@@ -291,6 +276,15 @@ serve(async (req) => {
     if (updateError) {
       throw new Error(`فشل تحديث المعاملة بمعرفات Paymob: ${updateError.message}`);
     }
+
+    // ── Sprint 8: User Activity Logging ──
+    const ipAddress = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
+    await supabase.from("user_activity_log").insert({
+      user_id: user.id,
+      action_type: "payment_attempted",
+      ip_address: ipAddress,
+      metadata: { transaction_id: transaction.id, amount, type }
+    });
 
     return new Response(
       JSON.stringify({

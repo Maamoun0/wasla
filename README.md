@@ -1,138 +1,96 @@
-# 🚗 📱 منصة وصلة (Wasla) - Classifieds & Smart Map-Based Ads Platform
+# Wasla (وصلة) — Smart Classifieds Platform
 
-[![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=flat&logo=Flutter&logoColor=white)](https://flutter.dev)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white)](https://supabase.com)
-[![Dart](https://img.shields.io/badge/Dart-%230175C2.svg?style=flat&logo=dart&logoColor=white)](https://dart.dev)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Wasla is a modern, high-performance classifieds platform designed for the MENA region. It connects buyers and sellers seamlessly through an intuitive mobile interface, robust backend, and intelligent content review system.
 
-**منصة "وصلة" (Wasla)** هي منصة إعلانات مبوبة مبتكرة ومصممة خصيصاً لتلبية احتياجات السوق المصري بشكل ذكي وآمن. تركز المنصة على حل مشاكل الثقة والوصول الجغرافي وجودة التواصل من خلال دمج تقنيات التوثيق الأمني الرقمي (KYC)، والخرائط الحية لتحديد موقع الإعلانات بدقة، مع الحفاظ على تجربة مستخدم سريعة وعصرية.
+![Wasla App](docs/assets/hero-placeholder.png)
 
----
+## Architecture Overview
 
-## 🌍 Table of Contents / جدول المحتويات
-1. [Key Features / الميزات الرئيسية](#-key-features--الميزات-الرئيسية)
-2. [Architecture & Tech Stack / بنية النظام والتقنيات](#-architecture--tech-stack--بنية-النظام-والتقنيات)
-3. [Project Directory Structure / هيكل مجلدات المشروع](#-project-directory-structure--هيكل-مجلدات-المشروع)
-4. [Getting Started / خطوات التشغيل والتهيئة](#-getting-started--خطوات-التشغيل-والتهيئة)
-5. [Database & Backend Setup / إعداد قاعدة البيانات والخدمات الخلفية](#-database--backend-setup--إعداد-قاعدة-البيانات-والخدمات-الخلفية)
-6. [Security & Verification (KYC) / الأمان ونظام التحقق](#-security--verification-kyc--الأمان-ونظام-التحقق)
-7. [Contributing & Version Control / المساهمة وإدارة النسخ](#-contributing--version-control--المساهمة-وإدارة-النسخ)
+Wasla is built on a scalable and secure architecture utilizing the following technologies:
 
----
+- **Frontend:** Flutter (Mobile App), Riverpod (State Management), GoRouter (Routing)
+- **Backend/BaaS:** Supabase (PostgreSQL, Authentication, Storage, Edge Functions)
+- **Design System:** Custom theme with modern typography and fluid animations.
 
-## 🌟 Key Features / الميزات الرئيسية
+### High-Level Diagram
 
-### 🛡️ Trust & Security / الأمان والموثوقية
-* **Verified Profiles (KYC):** نظام تحقق اختياري بالرقم القومي من خلال فحص الوجه وبطاقة الهوية لمنع الإعلانات الوهمية وإضفاء شارة "✓ موثق".
-* **Trust Badges & User Ratings:** نظام تقييم متبادل يعتمد على الشفافية والتجارب الحقيقية للمستخدمين.
+```mermaid
+graph TD
+    Client[Flutter Mobile App]
+    Backend[Supabase Backend]
+    Storage[Supabase Storage]
+    Functions[Edge Functions]
 
-### 📍 Smart Geolocation / التموضع الجغرافي الذكي
-* **Proximity Searches:** عرض الإعلانات الأقرب جغرافياً للمستخدم بشكل تلقائي اعتماداً على نظام تحديد المواقع (GPS).
-* **Live Map Views:** تصفح الإعلانات بشكل تفاعلي على الخرائط مع تجميع الإعلانات القريبة (Clustering) لتسهيل الاستكشاف.
-
-### ⚡ Professional User Experience / تجربة نشر إعلانات احترافية
-* **Dynamic Ad Wizard:** فورم نشر ديناميكي يتكيف حسب القسم المختار (مثال: حقول العداد وسنة الصنع للسيارات، أو المساحة وعدد الغرف للعقارات).
-* **Robust Media Manager:** إمكانية رفع وتعديل وترتيب حتى 8 صور عالية الدقة لكل إعلان مع معالجة الصور وضغطها محلياً وسحابياً.
-
----
-
-## 🛠️ Architecture & Tech Stack / بنية النظام والتقنيات
-
-### 📱 Frontend (Mobile App)
-* **Framework:** Flutter (>= 3.3.0) & Dart (>= 3.3.0)
-* **State Management:** Riverpod 3.0 (with automatic code generation and clean state flow).
-* **Navigation:** GoRouter (implementing shell routing, guards, and smooth transitions).
-* **Local Storage & Cache:** SharedPreferences & cached_network_image for offline media persistence.
-
-### 🔌 Backend & Serverless
-* **Database & Auth:** Supabase (PostgreSQL with custom triggers, Row Level Security (RLS), and custom indexes).
-* **Serverless Functions:** Supabase Edge Functions (Deno TypeScript) for heavy and secure logic (e.g. OTP validation, KYC document handling, payment gateway integration).
-* **Third-Party APIs:**
-  * **Google Maps API:** Geocoding and interactive maps.
-  * **Paymob:** Egyptian Payment gateway for credit card, mobile wallets, and Fawry.
-
----
-
-## 📁 Project Directory Structure / هيكل مجلدات المشروع
-
+    Client <-->|REST / Realtime| Backend
+    Client -->|Upload Images| Storage
+    Client -->|Trigger KYC/Review| Functions
+    Functions -->|Update DB| Backend
 ```
+
+## Key Features
+
+- **Dynamic Categories & Fields:** Ad categories support dynamic form fields (e.g., mileage for cars, area for real estate), ensuring structured data collection.
+- **Smart Ad Publishing Wizard:** A multi-step, resilient ad publishing flow that handles draft state, image uploads, and geographical tagging effortlessly.
+- **Automated Content Review:** Edge functions integrate with AI content moderation to automatically flag or approve ads based on policy rules.
+- **KYC Integration:** Built-in identity verification workflow to establish trust between buyers and sellers.
+- **Secure Authentication:** Passwordless and traditional authentication flows powered by Supabase Auth.
+- **Role-Level Security (RLS):** Strict database policies ensure users can only access and modify their own data.
+
+## Project Structure
+
+```text
 wasla/
-├── .github/                   # GitHub Actions for CI/CD pipeline
-├── backend/
-│   └── database/              # PostgreSQL schema migration, functions, and seed data
-│       ├── wasla-schema.sql   # Primary core database schema
-│       └── *.sql              # Schema updates, triggers, and query extensions
-├── docs/                      # Architectural specs, QA testing plans, SRS, and deployment guides
 ├── frontend/
-│   └── mobile/
-│       └── wasla/             # Flutter mobile application
-│           ├── lib/
-│           │   ├── core/      # App routing, themes, and common utility validators
-│           │   ├── features/  # Feature-driven modules (Auth, Ads, Post Ad, Profile)
-│           │   └── shared/    # Shared global widgets (e.g. Trust Badge, Bottom Navigation Shell)
-│           └── test/          # Comprehensive widget and unit tests
-└── supabase/
-    └── functions/             # Serverless edge functions (KYC submission, OTP, Ad creation)
+│   ├── mobile/         # Main Flutter application
+│   └── admin/          # Admin dashboard (Web)
+├── backend/            # Backend architecture documentation
+├── supabase/           # Supabase Edge Functions and Configuration
+├── database/           # SQL migration scripts and seed data
+├── scripts/            # Automation, testing, and utility scripts
+└── docs/               # In-depth architectural and API documentation
 ```
 
----
+## Getting Started
 
-## 🚀 Getting Started / خطوات التشغيل والتهيئة
+### Prerequisites
 
-### 1. Prerequisites / المتطلبات الأساسية
-* Flutter SDK (>= 3.3.0)
-* Dart SDK (>= 3.3.0)
-* Supabase CLI (Optional, for local development)
-* Android Studio / Xcode
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) (latest stable)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (optional, for local development)
+- Dart SDK
 
-### 2. Environment Configuration / إعداد ملف المتغيرات
-Create a `.env` file inside `frontend/mobile/wasla/` with the following configuration:
-```env
-SUPABASE_URL=https://<your-project-ref>.supabase.co
-SUPABASE_ANON_KEY=<your-anon-key>
-GOOGLE_MAPS_KEY=AIzaSy...
-PAYMOB_API_KEY=...
-```
+### Installation
 
-### 3. Install Dependencies / تثبيت الحزم
-Navigate to the flutter workspace and install packages:
-```bash
-cd frontend/mobile/wasla
-flutter pub get
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/wasla.git
+   cd wasla/frontend/mobile/wasla
+   ```
 
----
+2. **Install dependencies:**
+   ```bash
+   flutter pub get
+   ```
 
-## 🗄️ Database & Backend Setup / إعداد قاعدة البيانات والخدمات الخلفية
+3. **Environment Setup:**
+   Create a `.env` file in the root of the mobile project:
+   ```env
+   SUPABASE_URL=your_supabase_project_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-1. Create a new project on [Supabase Console](https://supabase.com).
-2. Open the **SQL Editor** in the dashboard.
-3. Execute `backend/database/wasla-schema.sql` to initialize tables, relationships, triggers, and security policies.
-4. Execute migration updates from `backend/database/` sequentially for the latest system features.
-5. Setup the storage buckets in Supabase Storage:
-   * `ads` (Public) - For ad photos.
-   * `avatars` (Public) - For user profile pictures.
-   * `id-documents` (Private) - For sensitive identity card photos (KYC).
+4. **Run the app:**
+   ```bash
+   flutter run
+   ```
 
----
+## Development & Deployment
 
-## 🛡️ Security & Verification (KYC) / الأمان ونظام التحقق
+To deploy edge functions or manage the database, navigate to the `supabase/` directory and use the Supabase CLI. For comprehensive database seeding and utility scripts, refer to the tools inside the `scripts/` directory.
 
-Wasla treats user data with extreme sensitivity:
-* **Private Buckets:** KYC images are stored in a private bucket (`id-documents`) restricted via Supabase RLS.
-* **Secured Edge Functions:** The KYC document verification is processed through the serverless function `submit-kyc-request` with role validation.
-* **Row-Level Security (RLS):** Enabled on all transaction, messages, and profile tables to guarantee data isolation.
+## Contributing
 
----
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
-## 📈 Contributing & Version Control / المساهمة وإدارة النسخ
+## License
 
-* We adopt the **Git Flow** strategy:
-  * `main` is reserved strictly for production-ready releases.
-  * `develop` is the primary integration branch for active development.
-  * Feature branches are branched from `develop` and merged back via pull requests.
-* All commits are structured under conventional commit guidelines (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`).
-
----
-Developed by **Ahmed Maamoun** - Egypt
-[GitHub Profile](https://github.com/Maamoun0) | [Email](mailto:ahmed.maamoun.dev@gmail.com)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

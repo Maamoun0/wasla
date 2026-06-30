@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 import '../../features/auth/screens/auth_screen.dart';
@@ -30,6 +31,7 @@ import '../../features/profile/screens/my_reviews_screen.dart';
 import '../../features/profile/screens/settings_screen.dart';
 import '../../features/profile/screens/payment_webview_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
+import '../../features/profile/screens/notification_settings_screen.dart';
 import '../../shared/widgets/bottom_nav_shell.dart';
 
 // ── Route Names ──────────────────────────────────────────────────
@@ -52,6 +54,7 @@ class AppRoutes {
   static const String sellerProfile  = '/seller/:id';
   static const String photoViewer    = '/photos/:adId';
   static const String notifications  = '/notifications';
+  static const String notificationSettings = '/settings/notifications';
 
   // Post Ad Wizard
   static const String postForm       = '/post/form';
@@ -79,7 +82,9 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
-    redirect: _authGuard,
+    redirect: (context, state) => _authGuard(context, state, ref),
+    // يُعيد توجيه المستخدم تلقائياً عند تغيّر حالة المصادقة (Google OAuth)
+    refreshListenable: _AuthStateListenable(ref),
     routes: [
       // ── Standalone Routes ────────────────────────────────────
       GoRoute(
@@ -157,6 +162,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.notifications,
         builder: (ctx, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notificationSettings,
+        builder: (ctx, state) => const NotificationSettingsScreen(),
       ),
 
       // ── Post Ad Wizard ───────────────────────────────────────
@@ -247,8 +256,16 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
+// ── Auth State Listenable ────────────────────────────────────────
+// يُخطِر GoRouter عند تغيّر حالة المصادقة (ضروري لـ Google OAuth)
+class _AuthStateListenable extends ChangeNotifier {
+  _AuthStateListenable(Ref ref) {
+    ref.listen(authStateProvider, (_, __) => notifyListeners());
+  }
+}
+
 // ── Auth Guard ───────────────────────────────────────────────────
-String? _authGuard(BuildContext context, GoRouterState state) {
+String? _authGuard(BuildContext context, GoRouterState state, Ref ref) {
   final session = Supabase.instance.client.auth.currentSession;
   final isLoggedIn = session != null;
 
@@ -257,6 +274,8 @@ String? _authGuard(BuildContext context, GoRouterState state) {
     AppRoutes.onboarding,
     AppRoutes.auth,
     AppRoutes.otp,
+    AppRoutes.home,
+    AppRoutes.explore,
   ];
 
   final isPublicRoute = publicRoutes.contains(state.matchedLocation);

@@ -132,7 +132,6 @@ class BoostController extends StateNotifier<BoostState> {
       for (final item in response) {
         final key = item['key'] as String;
         final value = double.tryParse(item['value'] as String? ?? '0') ?? 0.0;
-        final description = item['description'] as String? ?? '';
 
         String nameAr = 'باقة الترقية';
         String type = 'bump';

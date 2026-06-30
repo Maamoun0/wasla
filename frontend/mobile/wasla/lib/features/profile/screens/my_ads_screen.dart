@@ -1,10 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../../core/utils/image_utils.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
@@ -21,10 +22,10 @@ class _MyAdsScreenState extends ConsumerState<MyAdsScreen>
   late TabController _tab;
 
   final _statuses = [
-    ('active',   'نشطة',   AppColors.success),
-    ('pending',  'معلّقة', AppColors.warning),
-    ('expired',  'منتهية', AppColors.neutral500),
-    ('rejected', 'مرفوضة',AppColors.error),
+    ('active',   'active'.tr(),   AppColors.success),
+    ('pending',  'pending'.tr(), AppColors.warning),
+    ('expired',  'expired'.tr(), AppColors.neutral500),
+    ('rejected', 'rejectedStatusFem'.tr(),AppColors.error),
   ];
 
   @override
@@ -44,12 +45,12 @@ class _MyAdsScreenState extends ConsumerState<MyAdsScreen>
     return Scaffold(
       backgroundColor: AppColors.neutral50,
       appBar: AppBar(
-        title: const Text('إعلاناتي'),
+        title: Text('myAds'.tr()),
         bottom: TabBar(
           controller: _tab,
           isScrollable: true,
           tabs: _statuses.map((s) => Tab(
-            child: Text(s.$2, style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w600)),
+            child: Text(s.$2, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w600)),
           )).toList(),
         ),
       ),
@@ -61,7 +62,7 @@ class _MyAdsScreenState extends ConsumerState<MyAdsScreen>
         onPressed: () => context.go(AppRoutes.postCategory),
         backgroundColor: AppColors.primary600,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('إعلان جديد', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, color: Colors.white)),
+        label: Text('newAd'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, color: Colors.white)),
       ),
     );
   }
@@ -94,8 +95,8 @@ class _AdsByStatus extends ConsumerWidget {
         final ads = snap.data ?? [];
         if (ads.isEmpty) {
           return EmptyState(
-            title: 'لا توجد إعلانات',
-            subtitle: status == 'active' ? 'انشر إعلانك الأول الآن!' : 'لا يوجد في هذه الحالة',
+            title: 'noAdsFound'.tr(),
+            subtitle: status == 'active' ? 'postFirstAd'.tr() : 'noAdsStatus'.tr(),
           );
         }
         return RefreshIndicator(
@@ -138,7 +139,7 @@ class _MyAdCard extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          // ── Top Row ──────────────────────────────────────
+          // ――――――――――――――――――――――――――――――――――――――――
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -147,7 +148,7 @@ class _MyAdCard extends ConsumerWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: imgUrl != null
-                      ? CachedNetworkImage(imageUrl: imgUrl, width: 72, height: 72, fit: BoxFit.cover)
+                      ? CachedNetworkImage(imageUrl: ImageUtils.thumbnail(imgUrl, width: 200), width: 72, height: 72, fit: BoxFit.cover)
                       : Container(width: 72, height: 72, color: AppColors.neutral100,
                           child: const Icon(Icons.image_outlined, color: AppColors.neutral300)),
                 ),
@@ -166,7 +167,7 @@ class _MyAdCard extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(color: AppColors.accent50, borderRadius: BorderRadius.circular(6)),
-                            child: const Text('⭐ مميز', style: TextStyle(fontFamily: 'Cairo', fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.accent600)),
+                            child: Text('⭐ ${'featured'.tr()}', style: const TextStyle(fontFamily: 'Cairo', fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.accent600)),
                           ),
                       ]),
                       const SizedBox(height: 4),
@@ -199,23 +200,23 @@ class _MyAdCard extends ConsumerWidget {
               child: Row(children: [
                 const Icon(Icons.info_outline_rounded, color: AppColors.error, size: 16),
                 const SizedBox(width: 6),
-                Expanded(child: Text('سبب الرفض: $reason',
+                Expanded(child: Text('${'rejectionReason'.tr()}: $reason',
                   style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.error))),
               ]),
             ),
 
           const Divider(height: 1),
 
-          // ── Stats ────────────────────────────────────────
+          // ――――――――――――――――――――――――――――――――――――――――――――――――
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
-                _StatChip(icon: Icons.visibility_outlined,    value: views,  label: 'مشاهدة'),
+                _StatChip(icon: Icons.visibility_outlined,    value: views,  label: 'views'.tr()),
                 const SizedBox(width: 12),
-                _StatChip(icon: Icons.phone_outlined,         value: ctcts,  label: 'تواصل'),
+                _StatChip(icon: Icons.phone_outlined,         value: ctcts,  label: 'contactsCount'.tr()),
                 const SizedBox(width: 12),
-                _StatChip(icon: Icons.favorite_border_rounded, value: favs,  label: 'حفظ'),
+                _StatChip(icon: Icons.favorite_border_rounded, value: favs,  label: 'saves'.tr()),
                 const Spacer(),
                 // Actions
                 if (status == 'active') ...[
@@ -235,12 +236,12 @@ class _MyAdCard extends ConsumerWidget {
   }
 
   String _statusLabel(String s) => switch (s) {
-    'active'   => '● نشط',
-    'pending'  => '⏳ قيد المراجعة',
-    'expired'  => '⏰ منتهي',
-    'rejected' => '✗ مرفوض',
-    'paused'   => '⏸ موقوف',
-    'sold'     => '✓ تم البيع',
+    'active'   => '● ${'activeStatus'.tr()}',
+    'pending'  => '⏳ ${'pendingStatus'.tr()}',
+    'expired'  => '⌛ ${'expiredStatus'.tr()}',
+    'rejected' => '❌ ${'rejectedStatus'.tr()}',
+    'paused'   => '⏸ ${'pausedStatus'.tr()}',
+    'sold'     => '✓ ${'soldStatus'.tr()}',
     _          => s,
   };
 }

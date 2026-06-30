@@ -119,7 +119,7 @@ class SellerProfileScreen extends ConsumerWidget {
 
   // ── Profile Header Section ──
   Widget _buildProfileHeader(BuildContext context, Map<String, dynamic> profile) {
-    final fullName = profile['full_name'] as String? ?? 'مستخدم وصلة';
+    final fullName = profile['full_name'] as String? ?? 'مستخدم Wasla';
     final bio = profile['bio'] as String? ?? 'لا يوجد نبذة شخصية حتى الآن.';
     final isVerified = profile['is_id_verified'] as bool? ?? false;
     final trustScore = double.tryParse(profile['trust_score']?.toString() ?? '0.00') ?? 0.00;
@@ -218,13 +218,13 @@ class SellerProfileScreen extends ConsumerWidget {
       ),
       data: (ads) {
         if (ads.isEmpty) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.feed_outlined, size: 64, color: AppColors.neutral300),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'لا توجد إعلانات نشطة حالياً لهذا المعلن.',
                   style: TextStyle(fontFamily: 'Cairo', color: AppColors.neutral500),
                 ),
@@ -394,13 +394,13 @@ class SellerProfileScreen extends ConsumerWidget {
       ),
       data: (reviews) {
         if (reviews.isEmpty) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.rate_review_outlined, size: 64, color: AppColors.neutral300),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'لا توجد تقييمات لهذا المعلن بعد.',
                   style: TextStyle(fontFamily: 'Cairo', color: AppColors.neutral500),
                 ),
@@ -417,7 +417,7 @@ class SellerProfileScreen extends ConsumerWidget {
             final rating = review['rating'] as int? ?? 5;
             final comment = review['comment'] as String? ?? '';
             final reviewer = review['reviewer'] as Map<String, dynamic>?;
-            final reviewerName = reviewer != null ? reviewer['full_name'] as String? ?? 'مشتري وصلة' : 'مشتري وصلة';
+            final reviewerName = reviewer != null ? reviewer['full_name'] as String? ?? 'مشتري Wasla' : 'مشتري Wasla';
             final reviewerAvatar = reviewer != null ? reviewer['avatar_url'] as String? : null;
 
             String reviewDateStr = '';
@@ -510,10 +510,10 @@ class SellerProfileScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            const Row(
                               children: [
-                                const Icon(Icons.reply_rounded, color: AppColors.accent600, size: 16),
-                                const SizedBox(width: 6),
+                                Icon(Icons.reply_rounded, color: AppColors.accent600, size: 16),
+                                SizedBox(width: 6),
                                 Text(
                                   'رد المعلن:',
                                   style: TextStyle(

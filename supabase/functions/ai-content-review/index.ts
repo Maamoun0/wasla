@@ -5,83 +5,75 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const BANNED_PATTERNS = [
+  // أسلحة
+  /سلاح|مسدس|بندقية|ذخيرة|متفجر/i,
+  // مخدرات
+  /مخدر|حشيش|بانجو|كوكايين|هيروين/i,
+  // نصب صريح
+  /ربح سريع|مليون في أسبوع|استثمار مضمون 100%/i,
+  // وثائق مزوّرة
+  /شهادة مزور|رخصة مزور|جواز مزور/i,
+];
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const { title, description, price, category } = await req.json();
+    const fullText = `${title ?? ""} ${description ?? ""}`;
 
-    // Standard local check first to catch obvious issues and serve as a fallback
-    let fallbackRiskLevel = "low";
-    let fallbackReviewNotes = "تمت المراجعة التلقائية بنجاح، المحتوى يبدو آمناً وموافق للشروط.";
-    const checkedContent = `${title ?? ""} ${description ?? ""}`.toLowerCase();
-    
-    // Prohibited keywords scanner
-    const prohibitedWords = ["سلاح", "مخدرات", "نصب", "احتيال", "ممنوعات", "دولار", "سوق سوداء"];
-    const foundKeywords = prohibitedWords.filter(word => checkedContent.includes(word));
-    
-    if (foundKeywords.length > 0) {
-      fallbackRiskLevel = "high";
-      fallbackReviewNotes = `تم تعليق الإعلان تلقائياً لاشتباهه في محتوى محظور: (${foundKeywords.join(", ")}).`;
-    }
-
-    // Price anomaly check
-    if (price !== undefined && price !== null) {
-      const priceNum = Number(price);
-      if (priceNum <= 0) {
-        fallbackRiskLevel = "high";
-        fallbackReviewNotes = "سعر غير صالح: يجب أن يكون السعر أكبر من صفر.";
+    // الطبقة 1: RegEx (محلي، بلا استدعاء خارجي)
+    for (const pattern of BANNED_PATTERNS) {
+      if (pattern.test(fullText)) {
+        return new Response(
+          JSON.stringify({
+            ai_risk_level: 'high',
+            ai_review_notes: 'محتوى مخالف صريح — كلمات محظورة',
+            ai_layer_used: 1
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
     const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY");
     if (!anthropicKey) {
-      console.warn("ANTHROPIC_API_KEY is not set. Using local rule-based evaluation.");
-      const risk = fallbackRiskLevel === "high" ? "high" : "medium";
-      const notes = fallbackRiskLevel === "high" 
-        ? fallbackReviewNotes 
-        : "مفتاح مراجعة المحتوى غير متوفر، تم التقييم كمتوسط للمراجعة البشرية.";
       return new Response(
-        JSON.stringify({ ai_risk_level: risk, ai_review_notes: notes }),
+        JSON.stringify({ 
+          ai_risk_level: "medium", 
+          ai_review_notes: "مفتاح مراجعة المحتوى غير متوفر، تم التقييم كمتوسط للمراجعة البشرية.",
+          ai_layer_used: 0 
+        }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Prompt for Claude
-    const prompt = `أنت مراجع محتوى ذكي ومحترف لمنصة إعلانات مبوبة في مصر تُدعى "وصلة".
-قم بمراجعة الإعلان التالي بعناية فائقة لتحديد ما إذا كان يحتوي على أي مخالفات لشروط النشر.
+    const buildPrompt = (t: string, d: string, p: any, c: string) => `
+أنت مراجع محتوى ذكي ومحترف لمنصة إعلانات مبوبة في مصر تُدعى "وصلة".
+قم بمراجعة الإعلان التالي بعناية لتحديد مستوى الخطورة (ai_risk_level).
 
 تفاصيل الإعلان:
-- العنوان: ${title ?? "غير محدد"}
-- الوصف: ${description ?? "غير محدد"}
-- السعر: ${price ?? "غير محدد"} ج.م
-- القسم: ${category ?? "غير محدد"}
+- العنوان: ${t ?? "غير محدد"}
+- الوصف: ${d ?? "غير محدد"}
+- السعر: ${p ?? "غير محدد"} ج.م
+- القسم: ${c ?? "غير محدد"}
 
-القواعد والمعايير:
-1. يمنع منعاً باتاً نشر إعلانات لبيع أو ترويج الأسلحة، المخدرات، الأدوية الطبية، الخدمات الجنسية أو غير اللائقة، معاملات النصب والاحتيال، العملات الأجنبية في السوق السوداء (مثل تداول الدولار خارج البنوك)، أو أي سلع غير قانونية.
-2. تتبع الأسعار الشاذة أو غير المنطقية، مثل عرض هاتف آيفون حديث بـ 1 جنيه، أو سيارة بـ 10 جنيهات، أو أسعار ضخمة خيالية لا تتناسب مع السلعة، فهذا مؤشر قوي على الاحتيال أو التضليل.
-3. تفحص نصوص النصب والاحتيال مثل إعلانات "الربح السريع"، "العمل من المنزل بدون خبرة برواتب خيالية"، أو طلب دفع رسوم قبل التوظيف.
+القيم المتاحة لـ risk_level:
+- "low": الإعلان آمن ومستوفٍ للشروط.
+- "medium": شكوك بسيطة، سعر شاذ، أو يحتاج مراجعة بشرية.
+- "high": مخالف صريح (نصب، أسلحة، مخدرات، سلع غير قانونية).
 
-يجب أن تقوم بتقييم هذا الإعلان وتحديد مستوى الخطورة (ai_risk_level) بإحدى القيم التالية فقط:
-- "low": إذا كان الإعلان آمناً ومستوفياً لكافة الشروط بنسبة 100%.
-- "medium": إذا كان هناك شك بسيط، أو سعر شاذ غير مؤكد، أو حاجة لمراجعة بشرية للتأكد.
-- "high": إذا كان الإعلان يخالف الشروط بوضوح وصراحة ويجب تعليقه فوراً.
-
-أرجع الإجابة فقط بتنسيق JSON صالح ومباشر دون أي مقدمات أو نصوص أخرى بالصيغة التالية تماماً:
+أرجع الإجابة بتنسيق JSON فقط:
 {
-  "ai_risk_level": "low" | "medium" | "high",
-  "ai_review_notes": "تفصيل موجز لسبب التقييم باللغة العربية"
+  "risk_level": "low" | "medium" | "high",
+  "notes": "سبب التقييم باختصار باللغة العربية"
 }`;
 
-    // Call Anthropic API with 10 seconds timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    try {
-      const anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
+    const callClaude = async (model: string, prompt: string) => {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "x-api-key": anthropicKey,
@@ -89,55 +81,55 @@ serve(async (req) => {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          model: "claude-3-5-haiku-20241022",
+          model: model,
           max_tokens: 200,
           messages: [{ role: "user", content: prompt }],
         }),
-        signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
-
-      if (!anthropicResponse.ok) {
-        throw new Error(`Anthropic API returned status ${anthropicResponse.status}`);
-      }
-
-      const resultJson = await anthropicResponse.json();
-      const text = resultJson.content?.[0]?.text?.trim() ?? "";
-      
+      if (!response.ok) throw new Error(`Anthropic API returned status ${response.status}`);
+      const data = await response.json();
+      const text = data.content?.[0]?.text?.trim() ?? "";
       const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        const aiRiskLevel = parsed.ai_risk_level;
-        const aiReviewNotes = parsed.ai_review_notes;
-        
-        if (["low", "medium", "high"].includes(aiRiskLevel)) {
-          if (fallbackRiskLevel === "high" && aiRiskLevel !== "high") {
-            return new Response(
-              JSON.stringify({ 
-                ai_risk_level: "high", 
-                ai_review_notes: `${fallbackReviewNotes} (مراجعة إضافية: ${aiReviewNotes})` 
-              }),
-              { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
+      if (!jsonMatch) throw new Error("Failed to parse valid JSON structure from Claude response.");
+      return JSON.parse(jsonMatch[0]);
+    };
 
-          return new Response(
-            JSON.stringify({ ai_risk_level: aiRiskLevel, ai_review_notes: aiReviewNotes }),
-            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+    try {
+      // الطبقة 2: Haiku (سريع ورخيص)
+      const haikuResult = await callClaude("claude-3-5-haiku-20241022", buildPrompt(title, description, price, category));
+      
+      if (haikuResult.risk_level === 'low') {
+        return new Response(
+          JSON.stringify({ 
+            ai_risk_level: 'low', 
+            ai_review_notes: haikuResult.notes, 
+            ai_layer_used: 2 
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
-      throw new Error("Failed to parse valid JSON structure from Claude response.");
+
+      // الطبقة 3: Sonnet (للحالات المشكوك فيها أو التقييمات المتوسطة/العالية من هايكو)
+      const sonnetResult = await callClaude("claude-3-5-sonnet-20241022", buildPrompt(title, description, price, category));
+      
+      return new Response(
+        JSON.stringify({ 
+          ai_risk_level: sonnetResult.risk_level, 
+          ai_review_notes: sonnetResult.notes, 
+          ai_layer_used: 3 
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
 
     } catch (apiErr) {
-      console.error("Claude API call failed or timed out:", apiErr);
-      const finalRisk = fallbackRiskLevel === "high" ? "high" : "medium";
-      const finalNotes = fallbackRiskLevel === "high" 
-        ? fallbackReviewNotes 
-        : "فشلت المراجعة التلقائية المعمقة للذكاء الاصطناعي بسبب عطل مؤقت، تم تعيين الخطورة افتراضياً كمتوسطة.";
+      console.error("Claude API call failed:", apiErr);
       return new Response(
-        JSON.stringify({ ai_risk_level: finalRisk, ai_review_notes: finalNotes }),
+        JSON.stringify({ 
+          ai_risk_level: "medium", 
+          ai_review_notes: "فشلت المراجعة التلقائية بسبب عطل فني، تم التقييم كمتوسط افتراضياً.",
+          ai_layer_used: 0 
+        }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -146,7 +138,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         ai_risk_level: "medium", 
-        ai_review_notes: `حدث خطأ أثناء معالجة الطلب: ${error.message ?? error}` 
+        ai_review_notes: `حدث خطأ داخلي: ${error.message}` 
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

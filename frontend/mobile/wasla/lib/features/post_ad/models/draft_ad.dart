@@ -195,7 +195,7 @@ class DraftAd extends Equatable {
         'is_primary': img.isCover,
       }).toList(),
       'users': {
-        'full_name': userProfile['full_name'] ?? 'مستخدم وصلة',
+        'full_name': userProfile['full_name'] ?? 'مستخدم Wasla',
         'avatar_url': userProfile['avatar_url'],
         'trust_score': userProfile['trust_score'] ?? 5.0,
         'is_id_verified': userProfile['is_id_verified'] ?? false,

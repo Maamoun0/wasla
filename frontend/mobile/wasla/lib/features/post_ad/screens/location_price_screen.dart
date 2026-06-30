@@ -131,8 +131,8 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
         backgroundColor: AppColors.neutral50,
         appBar: AppBar(
           title: const Text('الموقع والسعر'),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(4),
             child: LinearProgressIndicator(
               value: 4 / 5,
               backgroundColor: AppColors.neutral100,

@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart';
-import '../../../features/auth/providers/auth_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -56,7 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             floating: true,
             backgroundColor: AppColors.white,
             elevation: 0,
-            title: WaslaLogoFull(size: 32),
+            title: const WaslaLogoFull(size: 32),
             actions: [
               Stack(
                 children: [
@@ -209,7 +207,7 @@ class _CategoriesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'الأقسام'),
+        const SectionHeader(title: 'الأقسام'),
         SizedBox(
           height: 90,
           child: ListView.separated(

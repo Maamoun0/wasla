@@ -12,7 +12,7 @@ class NotificationsScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.notifications_rounded, size: 64, color: AppColors.neutral300),
+            const Icon(Icons.notifications_rounded, size: 64, color: AppColors.neutral300),
             const SizedBox(height: 16),
             Text('الإشعارات', style: Theme.of(context).textTheme.headlineSmall),
           ],

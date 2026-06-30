@@ -6,7 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Web Crypto HMAC SHA-512 Generator
 async function computeHmacSha512(secret: string, data: string): Promise<string> {
   const encoder = new TextEncoder();
   const keyBuf = encoder.encode(secret);
@@ -42,7 +41,6 @@ serve(async (req) => {
       throw new Error("Required environment variables are not configured on the host.");
     }
 
-    // Initialize Supabase Client with service_role to securely perform activations bypassing RLS
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -54,7 +52,6 @@ serve(async (req) => {
       return new Response("Method Not Allowed", { status: 405, headers: corsHeaders });
     }
 
-    // ── 1. Secure HMAC Signature Verification ──
     const url = new URL(req.url);
     const receivedHmac = url.searchParams.get("hmac") ?? "";
 
@@ -65,7 +62,6 @@ serve(async (req) => {
       );
     }
 
-    // Parse the Webhook request body safely
     let body: any;
     try {
       body = await req.json();
@@ -84,8 +80,6 @@ serve(async (req) => {
       );
     }
 
-
-    // Retrieve fields in the strict lexicographical order required by Paymob Egypt
     const values = [
       transaction.amount_cents,
       transaction.created_at,
@@ -120,7 +114,6 @@ serve(async (req) => {
       );
     }
 
-    // ── 2. Idempotency Check & Transaction lookup ──
     const paymobOrderId = (transaction.order?.id ?? transaction.order)?.toString();
     
     const { data: dbTx, error: selectError } = await supabase
@@ -141,7 +134,6 @@ serve(async (req) => {
       );
     }
 
-    // If transaction is already resolved (completed or failed), exit immediately
     if (dbTx.status === "completed" || dbTx.status === "failed") {
       console.info(`Transaction ${dbTx.id} already processed. Idempotency triggered.`);
       return new Response(
@@ -150,7 +142,6 @@ serve(async (req) => {
       );
     }
 
-    // ── 3. Update Transaction Record status ──
     const isSuccess = transaction.success === true && transaction.pending === false;
     const finalStatus = isSuccess ? "completed" : "failed";
 
@@ -170,7 +161,6 @@ serve(async (req) => {
       throw new Error(`فشل تحديث حالة المعاملة: ${updateError.message}`);
     }
 
-    // If payment failed, stop here
     if (!isSuccess) {
       console.info(`Transaction ${dbTx.id} resolved as failed.`);
       return new Response(
@@ -179,7 +169,6 @@ serve(async (req) => {
       );
     }
 
-    // ── 4. Secure Activation Logic (Service Role) ──
     if (dbTx.type === "ad_boost") {
       const boostType = dbTx.metadata?.boost_type || "featured";
       const durationDays = parseInt(dbTx.metadata?.duration_days?.toString() || "7");
@@ -187,7 +176,6 @@ serve(async (req) => {
       const startedAt = new Date();
       const expiresAt = new Date(startedAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
-      // Insert boost record
       const { error: boostError } = await supabase
         .from("ad_boosts")
         .insert({
@@ -202,7 +190,6 @@ serve(async (req) => {
         throw new Error(`فشل إدراج سجل ترويج الإعلان: ${boostError.message}`);
       }
 
-      // Update flags in ads table
       const updateFlags: Record<string, any> = {};
       if (boostType === "featured") {
         updateFlags["is_featured"] = true;
@@ -227,9 +214,8 @@ serve(async (req) => {
     if (dbTx.type === "subscription") {
       const planId = parseInt(dbTx.reference_id);
       const startedAt = new Date();
-      const expiresAt = new Date(startedAt.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 Days expiration
+      const expiresAt = new Date(startedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-      // Expire or cancel any previous active subscriptions for the user
       const { error: expireError } = await supabase
         .from("user_subscriptions")
         .update({ status: "cancelled" })
@@ -240,7 +226,6 @@ serve(async (req) => {
         console.warn(`Warning: Could not cancel previous subscriptions: ${expireError.message}`);
       }
 
-      // Insert new active user subscription
       const { error: subError } = await supabase
         .from("user_subscriptions")
         .insert({
@@ -258,6 +243,15 @@ serve(async (req) => {
 
       console.info(`Successfully activated subscription plan ${planId} for User: ${dbTx.user_id}`);
     }
+
+    // ── Sprint 8: User Activity Logging ──
+    const ipAddress = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
+    await supabase.from("user_activity_log").insert({
+      user_id: dbTx.user_id,
+      action_type: "payment_completed",
+      ip_address: ipAddress,
+      metadata: { transaction_id: dbTx.id, amount: dbTx.amount }
+    });
 
     return new Response(
       JSON.stringify({ success: true, message: "تم تفعيل المعاملة والترقية بنجاح" }),

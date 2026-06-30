@@ -20,7 +20,6 @@ serve(async (req) => {
       throw new Error("Supabase environment variables are not configured on the host.");
     }
 
-    // Initialize Supabase client with service_role bypass RLS to check/insert throttling logs
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -28,7 +27,6 @@ serve(async (req) => {
       },
     });
 
-    // Parse request body
     const { phone_number } = await req.json();
     if (!phone_number) {
       return new Response(
@@ -37,7 +35,6 @@ serve(async (req) => {
       );
     }
 
-    // Standardize phone number formatting (e.g. ensure +20 prefix for Egyptian numbers)
     let formattedPhone = phone_number.trim();
     if (formattedPhone.startsWith("01") && formattedPhone.length === 11) {
       formattedPhone = "+20" + formattedPhone.substring(1);
@@ -47,7 +44,6 @@ serve(async (req) => {
 
     const ipAddress = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
 
-    // ── Throttling Rule A: Short Limiter (1 request per 3 minutes) ──
     const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
     const { data: recentRequests, error: errShort } = await supabase
       .from("otp_requests")
@@ -67,7 +63,6 @@ serve(async (req) => {
       );
     }
 
-    // ── Throttling Rule B: Daily Limiter (10 requests per 24 hours) ──
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: dailyRequests, error: errDaily } = await supabase
       .from("otp_requests")
@@ -87,7 +82,6 @@ serve(async (req) => {
       );
     }
 
-    // ── Log the Request ──
     const { error: errLog } = await supabase
       .from("otp_requests")
       .insert({
@@ -97,7 +91,6 @@ serve(async (req) => {
 
     if (errLog) throw errLog;
 
-    // ── Trigger Supabase OTP auth challenge ──
     const { error: errOtp } = await supabase.auth.signInWithOtp({
       phone: formattedPhone,
     });
@@ -107,6 +100,22 @@ serve(async (req) => {
         JSON.stringify({ error: `فشل إرسال الرمز: ${errOtp.message}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // ── Sprint 8: User Activity Logging ──
+    const { data: userData } = await supabase
+      .from("users")
+      .select("id")
+      .eq("phone", formattedPhone)
+      .maybeSingle();
+
+    if (userData) {
+      await supabase.from("user_activity_log").insert({
+        user_id: userData.id,
+        action_type: "otp_requested",
+        ip_address: ipAddress,
+        metadata: { phone: formattedPhone }
+      });
     }
 
     return new Response(

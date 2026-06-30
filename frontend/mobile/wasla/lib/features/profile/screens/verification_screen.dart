@@ -583,15 +583,15 @@ class VerificationScreen extends ConsumerWidget {
     return Container(
       color: AppColors.warningBg,
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.lg, vertical: AppSizes.md),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.security_rounded, color: AppColors.warning, size: 24),
-          const SizedBox(width: AppSizes.md),
+          Icon(Icons.security_rounded, color: AppColors.warning, size: 24),
+          SizedBox(width: AppSizes.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'سياسة منع التزييف والتحايل',
                   style: TextStyle(

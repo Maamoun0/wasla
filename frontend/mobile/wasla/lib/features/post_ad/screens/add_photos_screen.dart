@@ -149,8 +149,8 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
         backgroundColor: AppColors.neutral50,
         appBar: AppBar(
           title: const Text('صور الإعلان'),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(4),
             child: LinearProgressIndicator(
               value: 3 / 5,
               backgroundColor: AppColors.neutral100,
@@ -179,10 +179,10 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSizes.md),
                 color: AppColors.primary600.withOpacity(0.05),
-                child: Row(
+                child: const Row(
                   children: [
-                    const Icon(Icons.info_outline_rounded, color: AppColors.primary600, size: 20),
-                    const SizedBox(width: AppSizes.sm),
+                    Icon(Icons.info_outline_rounded, color: AppColors.primary600, size: 20),
+                    SizedBox(width: AppSizes.sm),
                     Expanded(
                       child: Text(
                         'يمكنك إضافة حتى 8 صور. الصورة الأولى ستكون صورة الغلاف الرئيسية. اسحب لإعادة الترتيب.',
@@ -255,7 +255,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.neutral100,
                 shape: BoxShape.circle,
               ),
@@ -395,7 +395,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
                                 color: AppColors.primary600.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'صورة الغلاف',
                                 style: TextStyle(
                                   fontFamily: 'Cairo',

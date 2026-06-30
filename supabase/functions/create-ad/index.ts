@@ -7,7 +7,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -20,7 +19,6 @@ serve(async (req) => {
       throw new Error("Supabase environment variables are not configured on the host.");
     }
 
-    // Initialize Supabase client using service role key (bypasses RLS to write records on behalf of user)
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -28,7 +26,6 @@ serve(async (req) => {
       },
     });
 
-    // Parse Authorization Header to authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(
@@ -46,7 +43,6 @@ serve(async (req) => {
       );
     }
 
-    // Parse Request Body
     const body = await req.json();
     const {
       temp_draft_id,
@@ -64,7 +60,6 @@ serve(async (req) => {
       dynamic_fields,
     } = body;
 
-    // Validate required fields
     if (!temp_draft_id || !category_id || !title || !description || !city_id) {
       return new Response(
         JSON.stringify({ error: "البيانات الأساسية للإعلان غير مكتملة." }),
@@ -72,7 +67,6 @@ serve(async (req) => {
       );
     }
 
-    // ── 1. Idempotency Check ──
     const { data: existingAd, error: checkErr } = await supabase
       .from("ads")
       .select("id")
@@ -87,7 +81,6 @@ serve(async (req) => {
       );
     }
 
-    // ── 2. AI Content Review ──
     let categoryName = "غير محدد";
     try {
       const { data: catData, error: catFetchErr } = await supabase
@@ -104,11 +97,12 @@ serve(async (req) => {
 
     let aiRiskLevel = "medium";
     let aiReviewNotes = "فشلت المراجعة التلقائية، تم تعيين مستوى الخطورة افتراضياً إلى متوسط.";
+    let aiLayerUsed = 0;
 
     try {
       const reviewUrl = `${supabaseUrl}/functions/v1/ai-content-review`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const reviewResponse = await fetch(reviewUrl, {
         method: "POST",
@@ -131,15 +125,14 @@ serve(async (req) => {
         const reviewData = await reviewResponse.json();
         aiRiskLevel = reviewData.ai_risk_level ?? "medium";
         aiReviewNotes = reviewData.ai_review_notes ?? "مراجعة الذكاء الاصطناعي اكتملت.";
+        aiLayerUsed = Number(reviewData.ai_layer_used ?? 0);
       } else {
         console.error("AI review function returned non-200 status:", reviewResponse.status);
       }
     } catch (err) {
       console.error("Error invoking AI review function or timeout reached:", err);
-      // Under failure, fallback to 'medium' is already set above
     }
 
-    // ── 3. Map Dynamic Field Names to DB Field IDs ──
     const { data: catFields, error: catFieldsErr } = await supabase
       .from("category_fields")
       .select("id, field_name, field_type")
@@ -164,16 +157,16 @@ serve(async (req) => {
           valNum = Number(val);
         } else if (field.field_type === "boolean") {
           valBool = Boolean(val);
-          valText = valBool ? "نعم" : "لا"; // Fallback text for backward compatibility
+          valText = valBool ? "نعم" : "لا";
         } else if (field.field_type === "range") {
-          valJson = val; // Expected to be Map/Object {min: x, max: y}
+          valJson = val;
           if (val.min !== undefined && val.max !== undefined) {
-            valText = `${val.min} - ${val.max}`; // Fallback text
+            valText = `${val.min} - ${val.max}`;
           }
         } else if (field.field_type === "multi_select") {
-          valJson = val; // Expected to be array of strings
+          valJson = val;
           if (Array.isArray(val)) {
-            valText = val.join(", "); // Fallback text
+            valText = val.join(", ");
           }
         }
 
@@ -187,7 +180,6 @@ serve(async (req) => {
       }
     }
 
-    // ── 4. Call DB Transaction Function ──
     const { data: adId, error: txErr } = await supabase.rpc("create_ad_transaction", {
       p_user_id: user.id,
       p_temp_draft_id: temp_draft_id,
@@ -203,11 +195,21 @@ serve(async (req) => {
       p_longitude: longitude ?? null,
       p_ai_risk_level: aiRiskLevel,
       p_ai_review_notes: aiReviewNotes,
+      p_ai_layer_used: aiLayerUsed,
       p_images: images ?? [],
       p_fields: fieldsToInsert,
     });
 
     if (txErr) throw txErr;
+
+    // ── Sprint 8: User Activity Logging ──
+    const ipAddress = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
+    await supabase.from("user_activity_log").insert({
+      user_id: user.id,
+      action_type: "ad_published",
+      ip_address: ipAddress,
+      metadata: { ad_id: adId, title: title }
+    });
 
     return new Response(
       JSON.stringify({ success: true, ad_id: adId, message: "تم نشر الإعلان بنجاح." }),

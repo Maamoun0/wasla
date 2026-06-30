@@ -1,24 +1,25 @@
+import 'package:easy_localization/easy_localization.dart';
 /// ثوابت التطبيق
 
 class AppStrings {
   AppStrings._();
 
   // App
-  static const String appName     = 'وصلة';
-  static const String appTagline  = 'منصة الإعلانات المبوّبة في مصر';
+  static String get appName => 'appName'.tr();
+  static String get appTagline => 'appTagline'.tr();
 
   // Auth
-  static const String welcome       = 'أهلاً في وصلة';
-  static const String enterPhone    = 'أدخل رقم هاتفك';
-  static const String phoneHint     = '01xxxxxxxxx';
-  static const String sendOtp       = 'أرسل رمز التحقق';
-  static const String verifyOtp     = 'أدخل رمز التحقق';
-  static const String otpSentTo     = 'تم إرسال رمز التحقق إلى';
-  static const String resendOtp     = 'إعادة إرسال';
-  static const String orContinueWith= 'أو تابع بـ';
-  static const String browseAsGuest = 'تصفح بدون تسجيل';
-  static const String continueWith  = 'تابع';
-  static const String confirm       = 'تأكيد';
+  static String get welcome => 'welcome'.tr();
+  static String get enterPhone => 'enterPhone'.tr();
+  static String get phoneHint => 'phoneHint'.tr();
+  static String get sendOtp => 'sendOtp'.tr();
+  static String get verifyOtp => 'verifyOtp'.tr();
+  static String get otpSentTo => 'otpSentTo'.tr();
+  static String get resendOtp => 'resendOtp'.tr();
+  static String get orContinueWith => 'orContinueWith'.tr();
+  static String get browseAsGuest => 'browseAsGuest'.tr();
+  static String get continueWith => 'continueWith'.tr();
+  static String get confirm => 'confirm'.tr();
 
   // Onboarding
   static const List<Map<String, String>> onboardingSlides = [
@@ -40,48 +41,48 @@ class AppStrings {
   ];
 
   // Navigation
-  static const String home         = 'الرئيسية';
-  static const String explore      = 'اكتشف';
-  static const String post         = 'أضف';
-  static const String saved        = 'المحفوظة';
-  static const String profile      = 'حسابي';
+  static String get home => 'home'.tr();
+  static String get explore => 'explore'.tr();
+  static String get post => 'post'.tr();
+  static String get saved => 'saved'.tr();
+  static String get profile => 'profile'.tr();
 
   // Ads
-  static const String offering     = 'معروض';
-  static const String seeking      = 'مطلوب';
-  static const String featured     = 'مميز';
-  static const String urgent       = 'عاجل';
-  static const String verified     = 'موثّق';
-  static const String free         = 'مجاناً';
-  static const String negotiable   = 'قابل للتفاوض';
-  static const String perHour      = 'في الساعة';
-  static const String perMonth     = 'شهرياً';
-  static const String egp          = 'ج.م';
-  static const String contact      = 'تواصل';
-  static const String call         = 'اتصال';
-  static const String whatsapp     = 'واتساب';
-  static const String save         = 'حفظ';
-  static const String report       = 'بلّغ';
-  static const String viewAll      = 'عرض الكل';
-  static const String noAdsFound   = 'لا توجد إعلانات';
-  static const String noAdsDesc    = 'كن أول من ينشر في هذه المنطقة!';
+  static String get offering => 'offering'.tr();
+  static String get seeking => 'seeking'.tr();
+  static String get featured => 'featured'.tr();
+  static String get urgent => 'urgent'.tr();
+  static String get verified => 'verified'.tr();
+  static String get free => 'free'.tr();
+  static String get negotiable => 'negotiable'.tr();
+  static String get perHour => 'perHour'.tr();
+  static String get perMonth => 'perMonth'.tr();
+  static String get egp => 'egp'.tr();
+  static String get contact => 'contact'.tr();
+  static String get call => 'call'.tr();
+  static String get whatsapp => 'whatsapp'.tr();
+  static String get save => 'save'.tr();
+  static String get report => 'report'.tr();
+  static String get viewAll => 'viewAll'.tr();
+  static String get noAdsFound => 'noAdsFound'.tr();
+  static String get noAdsDesc => 'noAdsDesc'.tr();
 
   // Post Ad Steps
-  static const String selectCategory = 'اختر القسم';
-  static const String adDetails      = 'تفاصيل الإعلان';
-  static const String addPhotos      = 'أضف الصور';
-  static const String locationPrice  = 'الموقع والسعر';
-  static const String preview        = 'معاينة';
-  static const String publish        = 'انشر الإعلان';
-  static const String adPending      = 'إعلانك قيد المراجعة!';
-  static const String adPendingDesc  = 'ستُخطَر خلال ساعة عند الموافقة';
+  static String get selectCategory => 'selectCategory'.tr();
+  static String get adDetails => 'adDetails'.tr();
+  static String get addPhotos => 'addPhotos'.tr();
+  static String get locationPrice => 'locationPrice'.tr();
+  static String get preview => 'preview'.tr();
+  static String get publish => 'publish'.tr();
+  static String get adPending => 'adPending'.tr();
+  static String get adPendingDesc => 'adPendingDesc'.tr();
 
   // Errors
-  static const String errorGeneral    = 'حدث خطأ. حاول مرة أخرى';
-  static const String errorNetwork    = 'تحقق من الاتصال بالإنترنت';
-  static const String errorInvalidPhone = 'رقم هاتف غير صحيح';
-  static const String errorInvalidOtp   = 'رمز التحقق غير صحيح';
-  static const String errorRequired     = 'هذا الحقل مطلوب';
+  static String get errorGeneral => 'errorGeneral'.tr();
+  static String get errorNetwork => 'errorNetwork'.tr();
+  static String get errorInvalidPhone => 'errorInvalidPhone'.tr();
+  static String get errorInvalidOtp => 'errorInvalidOtp'.tr();
+  static String get errorRequired => 'errorRequired'.tr();
 }
 
 class AppSizes {
@@ -129,31 +130,31 @@ class AppAssets {
   AppAssets._();
 
   // Animations
-  static const String splashAnim   = 'assets/animations/splash.json';
-  static const String searchAnim   = 'assets/animations/search.json';
-  static const String postAnim     = 'assets/animations/post.json';
-  static const String connectAnim  = 'assets/animations/connect.json';
-  static const String successAnim  = 'assets/animations/success.json';
-  static const String emptyAnim    = 'assets/animations/empty.json';
-  static const String loadingAnim  = 'assets/animations/loading.json';
+  static const String splashAnim = 'assets/animations/splash.json';
+  static const String searchAnim = 'assets/animations/search.json';
+  static const String postAnim = 'assets/animations/post.json';
+  static const String connectAnim = 'assets/animations/connect.json';
+  static const String successAnim = 'assets/animations/success.json';
+  static const String emptyAnim = 'assets/animations/empty.json';
+  static const String loadingAnim = 'assets/animations/loading.json';
 
   // Images
-  static const String logo         = 'assets/images/logo.png';
-  static const String placeholder  = 'assets/images/placeholder.png';
-  static const String avatar       = 'assets/images/default_avatar.png';
+  static const String logo = 'assets/images/logo.png';
+  static const String placeholder = 'assets/images/placeholder.png';
+  static const String avatar = 'assets/images/default_avatar.png';
 }
 
 class AppConfig {
   AppConfig._();
 
-  static const String supabaseUrl     = String.fromEnvironment('SUPABASE_URL');
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-  static const String mapsApiKey      = String.fromEnvironment('GOOGLE_MAPS_KEY');
-  static const String paymobApiKey    = String.fromEnvironment('PAYMOB_API_KEY');
-  static const String defaultCountry  = 'مصر';
-  static const String defaultCurrency = 'ج.م';
+  static const String supabaseUrl     = String.fromEnvironment('SUPABASE_URL',     defaultValue: 'https://fgvjjtbtlzjpzaqypzmz.supabase.co');
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZndmpqdGJ0bHpqcHphcXlwem16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTYxNDAsImV4cCI6MjA5NzE5MjE0MH0.nmBotexSVtSQ130EFTgZy1mNSGiLACEmNXv-AoxZ4H8');
+  static const String mapsApiKey      = String.fromEnvironment('GOOGLE_MAPS_KEY',   defaultValue: '');
+  static const String paymobApiKey    = String.fromEnvironment('PAYMOB_API_KEY', defaultValue: '');
+  static String get defaultCountry => 'defaultCountry'.tr();
+  static String get defaultCurrency => 'defaultCurrency'.tr();
   static const int    defaultAdExpiry = 30; // days
   static const int    maxPhotosPerAd  = 8;
   static const int    maxTitleChars   = 120;
-  static const String egyptPhoneCode  = '+20';
+  static String get egyptPhoneCode => 'egyptPhoneCode'.tr();
 }

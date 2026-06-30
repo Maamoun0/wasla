@@ -9,7 +9,7 @@ class BottomNavShell extends StatelessWidget {
   const BottomNavShell({super.key, required this.child});
   final Widget child;
 
-  static const _tabs = [
+  static final _tabs = [
     _NavTab(icon: Icons.home_rounded,       label: AppStrings.home,    route: AppRoutes.home),
     _NavTab(icon: Icons.search_rounded,     label: AppStrings.explore, route: AppRoutes.explore),
     _NavTab(icon: Icons.add,                label: AppStrings.post,    route: AppRoutes.postCategory, isCenter: true),

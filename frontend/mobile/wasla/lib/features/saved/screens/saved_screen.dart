@@ -1,11 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/supabase/push_notification_service.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
@@ -43,13 +44,13 @@ class _SavedScreenState extends ConsumerState<SavedScreen>
     return Scaffold(
       backgroundColor: AppColors.neutral50,
       appBar: AppBar(
-        title: const Text('المحفوظة'),
+        title: Text('saved'.tr()),
         backgroundColor: AppColors.white,
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: favs.maybeWhen(data: (d) => 'المفضلة (${d.length})', orElse: () => 'المفضلة')),
-            const Tab(text: 'تنبيهاتي'),
+            Tab(text: favs.maybeWhen(data: (d) => '${'favorites'.tr()} (${d.length})', orElse: () => 'favorites'.tr())),
+            Tab(text: 'myAlerts'.tr()),
           ],
         ),
       ),
@@ -64,7 +65,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen>
   }
 }
 
-// ── Favorites Tab ─────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
 class _FavoritesTab extends ConsumerWidget {
   const _FavoritesTab({required this.userId});
   final String userId;
@@ -88,11 +89,11 @@ class _FavoritesTab extends ConsumerWidget {
         final favs = snapshot.data ?? [];
         if (favs.isEmpty) {
           return EmptyState(
-            title: 'لا توجد إعلانات محفوظة',
-            subtitle: 'اضغط على ♡ في أي إعلان لحفظه هنا',
+            title: 'noSavedAds'.tr(),
+            subtitle: 'saveAdInstructions'.tr(),
             action: TextButton(
               onPressed: () => context.go(AppRoutes.explore),
-              child: const Text('تصفح الإعلانات'),
+              child: Text('browseAds'.tr()),
             ),
           );
         }
@@ -191,7 +192,7 @@ class _FavoriteCard extends StatelessWidget {
   }
 }
 
-// ── Watchlist Tab ──────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
 class _WatchlistTab extends ConsumerWidget {
   const _WatchlistTab({required this.userId});
   final String userId;
@@ -211,11 +212,11 @@ class _WatchlistTab extends ConsumerWidget {
         final list = snapshot.data ?? [];
         if (list.isEmpty) {
           return EmptyState(
-            title: 'لا توجد تنبيهات',
-            subtitle: 'احفظ بحثاً لتصلك إشعارات بالإعلانات الجديدة',
+            title: 'noAlerts'.tr(),
+            subtitle: 'saveSearchInstructions'.tr(),
             action: TextButton(
               onPressed: () => context.go(AppRoutes.explore),
-              child: const Text('ابدأ البحث'),
+              child: Text('startSearch'.tr()),
             ),
           );
         }
@@ -260,7 +261,7 @@ class _WatchlistCardState extends State<_WatchlistCard> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.item['name'] as String? ?? 'بحث محفوظ';
+    final name = widget.item['name'] as String? ?? 'savedSearch'.tr();
     final kw   = widget.item['keywords'] as String?;
 
     return Container(
@@ -295,7 +296,12 @@ class _WatchlistCardState extends State<_WatchlistCard> {
           Switch(
             value: _active,
             activeColor: AppColors.primary600,
-            onChanged: (v) {
+            onChanged: (v) async {
+              if (v) {
+                // Request permission when enabling notifications (Piece 1.2)
+                final granted = await PushNotificationService.requestPermission();
+                if (!granted) return;
+              }
               setState(() => _active = v);
               widget.onToggle();
             },
@@ -310,19 +316,19 @@ class _WatchlistCardState extends State<_WatchlistCard> {
   }
 }
 
-// ── Login Prompt ──────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
 class _LoginPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.neutral50,
-      appBar: AppBar(title: const Text('المحفوظة')),
+      appBar: AppBar(title: Text('saved'.tr())),
       body: EmptyState(
-        title: 'سجّل دخولك أولاً',
-        subtitle: 'لحفظ الإعلانات وإنشاء تنبيهات البحث',
+        title: 'loginFirst'.tr(),
+        subtitle: 'loginFirstDesc'.tr(),
         action: ElevatedButton(
           onPressed: () => context.push(AppRoutes.auth),
-          child: const Text('تسجيل الدخول'),
+          child: Text('login'.tr()),
         ),
       ),
     );

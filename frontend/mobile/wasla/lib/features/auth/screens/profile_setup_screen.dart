@@ -7,7 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
-import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/wasla_logo.dart';
 import '../providers/auth_provider.dart';
 
@@ -95,7 +94,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 const SizedBox(height: 40),
 
                 // Header
-                Center(child: WaslaLogoFull(size: 36)),
+                const Center(child: WaslaLogoFull(size: 36)),
                 const SizedBox(height: 32),
 
                 Text('أخبرنا عن نفسك', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),

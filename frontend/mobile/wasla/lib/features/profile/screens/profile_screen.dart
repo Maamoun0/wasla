@@ -1,9 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/widgets/trust_badge.dart';
@@ -26,7 +26,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-// ── Guest View ────────────────────────────────────────────────────
+// â”€â”€ Guest View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _GuestView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -39,9 +39,9 @@ class _GuestView extends StatelessWidget {
             children: [
               const Icon(Icons.person_outline_rounded, size: 80, color: AppColors.neutral300),
               const SizedBox(height: 20),
-              Text('سجّل دخولك', style: Theme.of(context).textTheme.headlineMedium),
+              Text('signIn'.tr(), style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 8),
-              Text('لإدارة إعلاناتك وتفضيلاتك',
+              Text('manageAdsDesc'.tr(),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.neutral500),
                 textAlign: TextAlign.center),
               const SizedBox(height: 32),
@@ -49,7 +49,7 @@ class _GuestView extends StatelessWidget {
                 width: 220,
                 child: ElevatedButton(
                   onPressed: () => context.push(AppRoutes.auth),
-                  child: const Text('تسجيل الدخول'),
+                  child: Text('login'.tr()),
                 ),
               ),
             ],
@@ -60,14 +60,14 @@ class _GuestView extends StatelessWidget {
   }
 }
 
-// ── Logged In View ────────────────────────────────────────────────
+// â”€â”€ Logged In View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _LoggedInView extends ConsumerWidget {
   const _LoggedInView({required this.user});
   final Map<String, dynamic> user;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final name       = user['full_name'] as String? ?? 'مستخدم';
+    final name       = user['full_name'] as String? ?? 'user'.tr();
     final avatar     = user['avatar_url'] as String?;
     final score      = (user['trust_score'] as num?)?.toDouble() ?? 0;
     final isVerified = user['is_id_verified'] == true;
@@ -75,7 +75,7 @@ class _LoggedInView extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
-        // ── Header ────────────────────────────────────────
+        // â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         SliverToBoxAdapter(
           child: Container(
             padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 24),
@@ -85,7 +85,7 @@ class _LoggedInView extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('حسابي', style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
+                    Text('myAccount'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
                     IconButton(
                       icon: const Icon(Icons.settings_outlined, color: Colors.white),
                       onPressed: () => context.push(AppRoutes.settings),
@@ -134,7 +134,7 @@ class _LoggedInView extends ConsumerWidget {
                               margin: const EdgeInsets.only(top: 6),
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(color: AppColors.accent500, borderRadius: BorderRadius.circular(6)),
-                              child: const Text('أعمال', style: TextStyle(fontFamily: 'Cairo', color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                              child: Text('business'.tr(), style: const TextStyle(fontFamily: 'Cairo', color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                             ),
                         ],
                       ),
@@ -146,7 +146,7 @@ class _LoggedInView extends ConsumerWidget {
           ),
         ),
 
-        // ── Verification Banner ───────────────────────────
+        // â”€â”€ Verification Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (!isVerified)
           SliverToBoxAdapter(
             child: GestureDetector(
@@ -162,7 +162,7 @@ class _LoggedInView extends ConsumerWidget {
                 child: Row(children: [
                   const Icon(Icons.verified_user_outlined, color: AppColors.accent600),
                   const SizedBox(width: 10),
-                  Expanded(child: Text('وثّق حسابك بالرقم القومي لزيادة ثقة العملاء',
+                  Expanded(child: Text('verifyAccountMsg'.tr(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.accent800))),
                   const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.accent600),
                 ]),
@@ -170,40 +170,40 @@ class _LoggedInView extends ConsumerWidget {
             ),
           ),
 
-        // ── Menu Items ────────────────────────────────────
+        // â”€â”€ Menu Items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
               children: [
-                _MenuSection(title: 'إعلاناتي', items: [
-                  _MenuItem(icon: Icons.campaign_outlined,    label: 'إعلاناتي',           route: AppRoutes.myAds),
-                  _MenuItem(icon: Icons.favorite_outline,     label: 'المفضلة',             route: AppRoutes.saved),
-                  _MenuItem(icon: Icons.notifications_none,   label: 'التنبيهات المحفوظة',  route: AppRoutes.saved),
+                _MenuSection(title: 'myAds'.tr(), items: [
+                  _MenuItem(icon: Icons.campaign_outlined,    label: 'myAds'.tr(),           route: AppRoutes.myAds),
+                  _MenuItem(icon: Icons.favorite_outline,     label: 'favorites'.tr(),             route: AppRoutes.saved),
+                  _MenuItem(icon: Icons.notifications_none,   label: 'savedAlerts'.tr(),  route: AppRoutes.saved),
                 ]),
                 const SizedBox(height: 12),
-                _MenuSection(title: 'الحساب', items: [
-                  _MenuItem(icon: Icons.workspace_premium_outlined, label: 'اشتراكي', route: AppRoutes.subscription),
-                  _MenuItem(icon: Icons.verified_outlined,          label: 'التحقق من الهوية', route: AppRoutes.verification),
-                  _MenuItem(icon: Icons.star_outline_rounded,       label: 'تقييماتي', route: AppRoutes.myReviews),
+                _MenuSection(title: 'account'.tr(), items: [
+                  _MenuItem(icon: Icons.workspace_premium_outlined, label: 'mySubscription'.tr(), route: AppRoutes.subscription),
+                  _MenuItem(icon: Icons.verified_outlined,          label: 'identityVerification'.tr(), route: AppRoutes.verification),
+                  _MenuItem(icon: Icons.star_outline_rounded,       label: 'myReviews'.tr(), route: AppRoutes.myReviews),
                 ]),
                 const SizedBox(height: 12),
-                _MenuSection(title: 'الإعدادات', items: [
-                  _MenuItem(icon: Icons.settings_outlined, label: 'الإعدادات', route: AppRoutes.settings),
+                _MenuSection(title: 'settings'.tr(), items: [
+                  _MenuItem(icon: Icons.settings_outlined, label: 'settings'.tr(), route: AppRoutes.settings),
                   _MenuItem(
                     icon: Icons.logout_rounded,
-                    label: 'تسجيل الخروج',
+                    label: 'logout'.tr(),
                     color: AppColors.error,
                     onTap: () async {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: const Text('تسجيل الخروج', style: TextStyle(fontFamily: 'Cairo')),
-                          content: const Text('هل تريد تسجيل الخروج؟', style: TextStyle(fontFamily: 'Cairo')),
+                          title: Text('logout'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                          content: Text('logoutConfirm'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
                           actions: [
-                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+                            TextButton(onPressed: () => Navigator.pop(context, false), child: Text('cancel'.tr())),
                             TextButton(onPressed: () => Navigator.pop(context, true),
-                              child: const Text('خروج', style: TextStyle(color: AppColors.error))),
+                              child: Text('exit'.tr(), style: const TextStyle(color: AppColors.error))),
                           ],
                         ),
                       );
@@ -217,7 +217,7 @@ class _LoggedInView extends ConsumerWidget {
                 const SizedBox(height: 32),
 
                 // App version
-                Text('وصلة v1.0.0', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.neutral300)),
+                Text('wasla_version'.tr(), style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.neutral300)),
                 const SizedBox(height: 24),
               ],
             ),
@@ -270,7 +270,7 @@ class _MenuItem extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: c, size: 22),
       title: Text(label, style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w600, fontSize: 14, color: c)),
-      trailing: Icon(Icons.arrow_forward_ios_rounded, size: 13, color: AppColors.neutral300),
+      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 13, color: AppColors.neutral300),
       onTap: onTap ?? (route != null ? () => context.push(route!) : null),
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),

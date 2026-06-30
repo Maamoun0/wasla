@@ -3,11 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/wasla_logo.dart';
-import '../../../shared/widgets/primary_button.dart';
 import '../providers/auth_provider.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -21,6 +22,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _agreedToTerms = true; // مُفعَّل افتراضياً لتسهيل الاختبار
 
   @override
   void dispose() {
@@ -36,6 +38,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   Future<void> _sendOtp() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_agreedToTerms) {
+      _showError('يجب الموافقة على شروط الاستخدام وسياسة الخصوصية للمتابعة');
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -57,12 +64,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg, style: const TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          '⚠️ خطأ',
+          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+          textAlign: TextAlign.right,
+        ),
+        content: Text(
+          msg,
+          style: const TextStyle(fontFamily: 'Cairo', fontSize: 14),
+          textDirection: TextDirection.rtl,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('حسناً', style: TextStyle(fontFamily: 'Cairo')),
+          ),
+        ],
       ),
     );
   }
@@ -82,7 +102,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 const SizedBox(height: 48),
 
                 // ── Logo ──────────────────────────────────────
-                Center(
+                const Center(
                   child: WaslaLogoFull(
                     size: 48,
                     variant: WaslaLogoVariant.color,
@@ -108,7 +128,86 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                 // ── Phone Field ───────────────────────────────
                 _PhoneField(controller: _phoneController),
-                const SizedBox(height: 20),
+                const SizedBox(height: 8),
+
+                // ── Test Mode Hint ────────────────────────────
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFCD34D)),
+                  ),
+                  child: const Text(
+                    '🧪 للاختبار: استخدم 01012345678 ورمز التحقق 123456',
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 11,
+                      color: Color(0xFF92400E),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // ── Terms Checkbox ─────────────────────────────────────
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: Checkbox(
+                        value: _agreedToTerms,
+                        onChanged: (val) => setState(() => _agreedToTerms = val ?? false),
+                        activeColor: AppColors.primary600,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            'أوافق على ',
+                            style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.neutral700),
+                          ),
+                          GestureDetector(
+                            onTap: () => launchUrl(Uri.parse('https://wasla.app/terms')),
+                            child: const Text(
+                              'شروط الاستخدام',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 13,
+                                color: AppColors.primary600,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            ' و ',
+                            style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.neutral700),
+                          ),
+                          GestureDetector(
+                            onTap: () => launchUrl(Uri.parse('https://wasla.app/privacy')),
+                            child: const Text(
+                              'سياسة الخصوصية',
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 13,
+                                color: AppColors.primary600,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
 
                 // ── Send OTP Button ───────────────────────────
                 PrimaryButton(

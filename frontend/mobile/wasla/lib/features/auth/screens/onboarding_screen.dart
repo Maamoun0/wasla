@@ -5,7 +5,6 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/wasla_logo.dart';
-import '../../../shared/widgets/primary_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -179,7 +178,7 @@ class _SlideWidget extends StatelessWidget {
           const SizedBox(height: 48),
 
           // Logo small
-          WaslaLogoFull(size: 28),
+          const WaslaLogoFull(size: 28),
           const SizedBox(height: 20),
 
           // Title

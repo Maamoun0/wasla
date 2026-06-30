@@ -195,7 +195,7 @@ class _MyReviewsScreenState extends ConsumerState<MyReviewsScreen> with SingleTi
           final rating = review['rating'] as int? ?? 5;
           final comment = review['comment'] as String? ?? '';
           final reviewer = review['reviewer'] as Map<String, dynamic>?;
-          final reviewerName = reviewer != null ? reviewer['full_name'] as String? ?? 'مستخدم وصلة' : 'مستخدم وصلة';
+          final reviewerName = reviewer != null ? reviewer['full_name'] as String? ?? 'مستخدم Wasla' : 'مستخدم Wasla';
           final reviewerAvatar = reviewer != null ? reviewer['avatar_url'] as String? : null;
 
           String dateStr = '';
@@ -275,8 +275,8 @@ class _MyReviewsScreenState extends ConsumerState<MyReviewsScreen> with SingleTi
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Icon(Icons.reply_rounded, size: 16, color: AppColors.primary600),
                               SizedBox(width: 6),
                               Text(
@@ -353,7 +353,7 @@ class _MyReviewsScreenState extends ConsumerState<MyReviewsScreen> with SingleTi
           final rating = review['rating'] as int? ?? 5;
           final comment = review['comment'] as String? ?? '';
           final reviewed = review['reviewed'] as Map<String, dynamic>?;
-          final reviewedName = reviewed != null ? reviewed['full_name'] as String? ?? 'مستخدم وصلة' : 'مستخدم وصلة';
+          final reviewedName = reviewed != null ? reviewed['full_name'] as String? ?? 'مستخدم Wasla' : 'مستخدم Wasla';
           final reviewedAvatar = reviewed != null ? reviewed['avatar_url'] as String? : null;
 
           String dateStr = '';
@@ -433,8 +433,8 @@ class _MyReviewsScreenState extends ConsumerState<MyReviewsScreen> with SingleTi
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Icon(Icons.reply_rounded, size: 16, color: AppColors.neutral500),
                               SizedBox(width: 6),
                               Text(

@@ -55,6 +55,21 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
       if (!mounted) return;
 
+      // Record Legal Acceptance (Piece 2.2)
+      try {
+        final client = ref.read(supabaseClientProvider);
+        final userId = ref.read(currentUserIdProvider);
+        if (userId != null) {
+          await client.from('legal_acceptances').upsert({
+            'user_id': userId,
+            'policy_version': 'v1.0',
+            'accepted_at': DateTime.now().toIso8601String(),
+          }, onConflict: 'user_id, policy_version');
+        }
+      } catch (e) {
+        debugPrint('Non-critical: Failed to record legal acceptance: $e');
+      }
+
       // Check if new user (needs profile setup)
       final profile = await ref.read(currentUserProvider.future);
       if (profile?['full_name'] == null || (profile!['full_name'] as String).isEmpty) {
@@ -237,7 +252,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         children: [
                           const TextSpan(text: 'إعادة الإرسال خلال '),
                           TextSpan(
-                            text: '${_secondsLeft}ث',
+                            text: '$_secondsLeftث',
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppColors.primary600,

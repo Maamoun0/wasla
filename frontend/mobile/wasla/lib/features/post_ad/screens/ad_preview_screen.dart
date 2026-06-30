@@ -93,8 +93,8 @@ class _AdPreviewScreenState extends ConsumerState<AdPreviewScreen> {
         backgroundColor: AppColors.neutral50,
         appBar: AppBar(
           title: const Text('معاينة الإعلان'),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(4),
             child: LinearProgressIndicator(
               value: 5 / 5,
               backgroundColor: AppColors.neutral100,
@@ -459,7 +459,7 @@ class _AdPreviewScreenState extends ConsumerState<AdPreviewScreen> {
   }
 
   Widget _buildSellerCard(Map<String, dynamic> user) {
-    final name = user['full_name'] as String? ?? 'مستخدم وصلة';
+    final name = user['full_name'] as String? ?? 'مستخدم Wasla';
     final avatar = user['avatar_url'] as String?;
     final score = (user['trust_score'] as num?)?.toDouble() ?? 5.0;
     final isVerified = user['is_id_verified'] == true;
@@ -515,9 +515,9 @@ class _EditStepBtn extends StatelessWidget {
           color: AppColors.primary50,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.edit_rounded, color: AppColors.primary600, size: 14),
             SizedBox(width: 4),
             Text(

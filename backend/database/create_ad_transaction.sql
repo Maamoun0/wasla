@@ -17,6 +17,7 @@ CREATE OR REPLACE FUNCTION public.create_ad_transaction(
   p_longitude DECIMAL(11,8),
   p_ai_risk_level VARCHAR(20),
   p_ai_review_notes TEXT,
+  p_ai_layer_used SMALLINT,
   p_images JSONB,
   p_fields JSONB
 ) RETURNS UUID AS $$
@@ -101,7 +102,8 @@ BEGIN
   SET search_attributes = jsonb_build_object(
     'ai_risk_level', p_ai_risk_level,
     'ai_review_notes', p_ai_review_notes
-  )
+  ),
+  ai_layer_used = p_ai_layer_used
   WHERE id = v_ad_id;
 
   RETURN v_ad_id;

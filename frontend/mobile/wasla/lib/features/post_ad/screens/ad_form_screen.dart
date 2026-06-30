@@ -93,9 +93,9 @@ class _AdFormScreenState extends ConsumerState<AdFormScreen> {
       child: Scaffold(
         backgroundColor: AppColors.neutral50,
         appBar: AppBar(
-          title: const Text(AppStrings.adDetails),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4),
+          title: Text(AppStrings.adDetails),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(4),
             child: LinearProgressIndicator(
               value: 2 / 5,
               backgroundColor: AppColors.neutral100,

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/router/app_router.dart';
 import '../../auth/providers/auth_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -24,11 +27,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return Directionality(
-              textDirection: TextDirection.rtl,
+              textDirection: Directionality.of(context),
               child: AlertDialog(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                title: Row(
-                  children: const [
+                title: const Row(
+                  children: [
                     Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 28),
                     SizedBox(width: 8),
                     Text(
@@ -191,7 +194,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         centerTitle: true,
       ),
       body: Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: Directionality.of(context),
         child: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(
@@ -226,15 +229,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           leading: const Icon(Icons.notifications_outlined, color: AppColors.primary600),
                           title: const Text('الإشعارات', style: TextStyle(fontFamily: 'Cairo', fontSize: 14)),
                           trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.neutral400),
-                          onTap: () {},
+                          onTap: () => context.push(AppRoutes.notificationSettings),
                         ),
                         const Divider(height: 1, indent: 56, endIndent: 16, color: AppColors.neutral200),
                         ListTile(
                           leading: const Icon(Icons.language_rounded, color: AppColors.primary600),
-                          title: const Text('لغة التطبيق', style: TextStyle(fontFamily: 'Cairo', fontSize: 14)),
-                          subtitle: const Text('العربية', style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.neutral500)),
+                          title: Text('language'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 14)),
+                          subtitle: Text(context.locale.languageCode == 'ar' ? 'العربية' : 'English', style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.neutral500)),
                           trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.neutral400),
-                          onTap: () {},
+                          onTap: () {
+                            if (context.locale.languageCode == 'ar') {
+                              context.setLocale(const Locale('en', 'US'));
+                            } else {
+                              context.setLocale(const Locale('ar', 'EG'));
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -312,7 +321,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ),
                       ),
                       subtitle: const Text(
-                        'حذف جميع بياناتك وحسابك نهائياً من منصة وصلة',
+                        'حذف جميع بياناتك وحسابك نهائياً من منصة Wasla',
                         style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: AppColors.neutral500),
                       ),
                       trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.error),

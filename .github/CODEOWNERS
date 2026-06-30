@@ -1,0 +1,7 @@
+# CODEOWNERS
+# These owners will be the default reviewers for pull requests in these directories.
+
+*       @Maamoun
+/frontend/mobile/wasla/lib/features/auth/   @Maamoun-Auth-Team
+/supabase/functions/                        @Maamoun-Backend-Team
+/database/                                  @Maamoun-DBA

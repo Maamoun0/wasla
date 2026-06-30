@@ -6,62 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
-
-// ── Post Ad Draft State ────────────────────────────────────────────
-class PostAdDraft {
-  final int? categoryId;
-  final String? categoryNameAr;
-  final String? adType;
-  final String? title;
-  final String? description;
-  final double? price;
-  final String priceType;
-  final int? cityId;
-  final int? districtId;
-  final double? latitude;
-  final double? longitude;
-  final List<String> photoUrls;
-  final Map<String, dynamic> dynamicFields;
-
-  const PostAdDraft({
-    this.categoryId,
-    this.categoryNameAr,
-    this.adType = 'offering',
-    this.title,
-    this.description,
-    this.price,
-    this.priceType = 'fixed',
-    this.cityId,
-    this.districtId,
-    this.latitude,
-    this.longitude,
-    this.photoUrls = const [],
-    this.dynamicFields = const {},
-  });
-
-  PostAdDraft copyWith({
-    int? categoryId, String? categoryNameAr, String? adType,
-    String? title, String? description, double? price, String? priceType,
-    int? cityId, int? districtId, double? latitude, double? longitude,
-    List<String>? photoUrls, Map<String, dynamic>? dynamicFields,
-  }) => PostAdDraft(
-    categoryId:    categoryId    ?? this.categoryId,
-    categoryNameAr:categoryNameAr?? this.categoryNameAr,
-    adType:        adType        ?? this.adType,
-    title:         title         ?? this.title,
-    description:   description   ?? this.description,
-    price:         price         ?? this.price,
-    priceType:     priceType     ?? this.priceType,
-    cityId:        cityId        ?? this.cityId,
-    districtId:    districtId    ?? this.districtId,
-    latitude:      latitude      ?? this.latitude,
-    longitude:     longitude     ?? this.longitude,
-    photoUrls:     photoUrls     ?? this.photoUrls,
-    dynamicFields: dynamicFields ?? this.dynamicFields,
-  );
-}
-
-final postAdDraftProvider = StateProvider<PostAdDraft>((ref) => const PostAdDraft());
+import '../providers/post_ad_wizard_provider.dart';
 
 // ── Select Category Screen ─────────────────────────────────────────
 class SelectCategoryScreen extends ConsumerStatefulWidget {
@@ -84,6 +29,9 @@ class _SelectCategoryScreenState extends ConsumerState<SelectCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch the wizard provider to keep its state alive during the wizard flow
+    ref.watch(postAdWizardProvider);
+    
     final categories    = ref.watch(categoriesProvider);
     final subCategories = _selectedMain != null
         ? ref.watch(subCategoriesProvider(_selectedMain!['id'] as int))
@@ -92,9 +40,9 @@ class _SelectCategoryScreenState extends ConsumerState<SelectCategoryScreen> {
     return Scaffold(
       backgroundColor: AppColors.neutral50,
       appBar: AppBar(
-        title: const Text(AppStrings.selectCategory),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4),
+        title: Text(AppStrings.selectCategory),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(4),
           child: _ProgressBar(step: 1, total: 5),
         ),
       ),
@@ -141,11 +89,11 @@ class _SelectCategoryScreenState extends ConsumerState<SelectCategoryScreen> {
                         mainCat: _selectedMain!,
                         colors: _catColors,
                         onSelect: (sub) {
-                          ref.read(postAdDraftProvider.notifier).state =
-                              ref.read(postAdDraftProvider).copyWith(
-                                categoryId: sub['id'] as int,
-                                categoryNameAr: sub['name_ar'] as String?,
-                              );
+                          // Update the wizard provider directly
+                          ref.read(postAdWizardProvider.notifier).setCategory(
+                            sub['id'] as int,
+                            sub['name_ar'] as String?,
+                          );
                           context.push(AppRoutes.postForm);
                         },
                       ),

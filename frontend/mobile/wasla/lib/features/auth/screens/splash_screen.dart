@@ -97,7 +97,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      WaslaLogoFull(size: 72, variant: WaslaLogoVariant.white),
+                      const WaslaLogoFull(size: 72, variant: WaslaLogoVariant.white),
                       const SizedBox(height: 16),
                       Text(
                         AppStrings.appTagline,

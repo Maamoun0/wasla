@@ -18,7 +18,7 @@ class SubscriptionScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFF9F7F3), // Egyptian Sand Background
       appBar: AppBar(
         title: const Text(
-          'خطط الاشتراكات التجارية',
+          'باقات الاشتراكات التجارية',
           style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -41,7 +41,7 @@ class SubscriptionScreen extends ConsumerWidget {
                   const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
                   Text(
-                    state.errorMessage ?? 'حدث خطأ في تحميل باقات الاشتراك',
+                    state.errorMessage ?? 'حدث خطأ في تحميل باقات الاشتراكات',
                     style: const TextStyle(fontFamily: 'Cairo', fontSize: 16),
                   ),
                   const SizedBox(height: 16),
@@ -69,7 +69,7 @@ class SubscriptionScreen extends ConsumerWidget {
                 // Active Sub Info Card
                 if (state.activeSubscription != null)
                   Container(
-                    margin: const EdgeInsets.bottom: 24,
+                    margin: const EdgeInsets.only(bottom: 24),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: AppColors.primary500.withOpacity(0.08),
@@ -85,7 +85,7 @@ class SubscriptionScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'خطتك الحالية: ${state.activeSubscription!['subscription_plans']?['name_ar'] ?? ''}',
+                                'باقتك الحالية: ${state.activeSubscription!['subscription_plans']?['name_ar'] ?? ''}',
                                 style: const TextStyle(
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.bold,
@@ -112,7 +112,7 @@ class SubscriptionScreen extends ConsumerWidget {
                   ),
 
                 const Text(
-                  'اختر باقة الاشتراك المناسبة لأعمالك',
+                  'اختر الباقة المناسبة لأعمالك',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 16,
@@ -204,7 +204,7 @@ class SubscriptionScreen extends ConsumerWidget {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: const Text(
-                                      'نشط حالياً',
+                                      'باقة نشطة حالياً',
                                       style: TextStyle(
                                         fontFamily: 'Cairo',
                                         fontSize: 10,
@@ -229,7 +229,7 @@ class SubscriptionScreen extends ConsumerWidget {
                                   textBaseline: TextBaseline.alphabetic,
                                   children: [
                                     Text(
-                                      price == 0 ? 'مجاناً' : '${price.toStringAsFixed(0)}',
+                                      price == 0 ? 'مجاناً' : price.toStringAsFixed(0),
                                       style: const TextStyle(
                                         fontFamily: 'Cairo',
                                         fontWeight: FontWeight.bold,
@@ -240,7 +240,7 @@ class SubscriptionScreen extends ConsumerWidget {
                                     if (price > 0) ...[
                                       const SizedBox(width: 4),
                                       const Text(
-                                        'ج.م / شهرياً',
+                                        'ج.م. / شهرياً',
                                         style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: Colors.grey),
                                       ),
                                     ],
@@ -254,9 +254,9 @@ class SubscriptionScreen extends ConsumerWidget {
                                 _buildFeatureItem(Icons.done_all_rounded, 'الحد الأقصى للإعلانات النشطة: ${maxAds == 999 ? 'غير محدود' : maxAds}'),
                                 _buildFeatureItem(Icons.done_all_rounded, 'الصور لكل إعلان: $maxImages صور'),
                                 if (features['can_boost'] == true)
-                                  _buildFeatureItem(Icons.flash_on_rounded, 'تفعيل تمويل وتعزيز الإعلانات', iconColor: AppColors.accent500),
+                                  _buildFeatureItem(Icons.flash_on_rounded, 'توفير تمويل وترقية الإعلانات', iconColor: AppColors.accent500),
                                 if (features['verified_badge'] == true)
-                                  _buildFeatureItem(Icons.verified_rounded, 'شارة الحساب الموثق التلقائية', iconColor: Colors.blue),
+                                  _buildFeatureItem(Icons.verified_rounded, 'شارة الحساب الموثق للناطقين', iconColor: Colors.blue),
                                 if (features['analytics'] == true)
                                   _buildFeatureItem(Icons.analytics_rounded, 'لوحة تحليلات وإحصائيات متقدمة لإعلاناتك'),
                                 if (features['priority_support'] == true)
@@ -287,10 +287,10 @@ class SubscriptionScreen extends ConsumerWidget {
                                           )
                                         : Text(
                                             isActive
-                                                ? 'خطة الاشتراك الحالية'
+                                                ? 'هذه باقتك الحالية'
                                                 : isFreePlan
-                                                    ? 'العودة للمجاني'
-                                                    : 'اشترك الآن',
+                                                    ? 'الرجوع للمجاني'
+                                                    : 'اشتراك الآن',
                                             style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
                                           ),
                                   ),
@@ -299,8 +299,9 @@ class SubscriptionScreen extends ConsumerWidget {
                             ),
                           ),
                         ],
-                      );
-                    },
+                      ),
+                    );
+                  },
                   ),
 
                 if (state.errorMessage != null) ...[
@@ -368,11 +369,11 @@ class SubscriptionScreen extends ConsumerWidget {
             children: [
               Icon(Icons.warning_amber_rounded, color: AppColors.accent500),
               SizedBox(width: 8),
-              Text('تنبيه ترقية الاشتراك', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+              Text('تغيير باقة الاشتراك', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
             ],
           ),
           content: const Text(
-            'سيتم تطبيق الخطة الجديدة فوراً، بدون استرداد للمدة المتبقية من خطتك الحالية.',
+            'سيتم تفعيل الباقة الجديدة فوراً وبدون استرداد للمدة المتبقية من باقتك الحالية.',
             style: TextStyle(fontFamily: 'Cairo'),
           ),
           actions: [
@@ -382,7 +383,7 @@ class SubscriptionScreen extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('موافق، استمر', style: TextStyle(fontFamily: 'Cairo', color: AppColors.primary500, fontWeight: FontWeight.bold)),
+              child: const Text('موافق واستمرار', style: TextStyle(fontFamily: 'Cairo', color: AppColors.primary500, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

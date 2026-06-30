@@ -95,16 +95,17 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
         event: PostgresChangeEvent.all,
         schema: 'public',
         table: 'transactions',
-        filter: 'id=eq.${widget.transactionId}',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'id',
+          value: widget.transactionId,
+        ),
         callback: (payload) {
-          final newRecord = payload.newRecord;
-          if (newRecord != null) {
-            final status = newRecord['status'] as String?;
-            if (status == 'completed') {
-              _handlePaymentSuccess();
-            } else if (status == 'failed') {
-              _handlePaymentFailure();
-            }
+          final status = payload.newRecord['status'] as String?;
+          if (status == 'completed') {
+            _handlePaymentSuccess();
+          } else if (status == 'failed') {
+            _handlePaymentFailure();
           }
         },
       )
@@ -226,8 +227,14 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
     _timeoutTimer?.cancel();
     _statusSubscription?.cancel();
     if (_realtimeChannel != null) {
-      final supabase = ref.read(supabaseClientProvider);
-      supabase.removeChannel(_realtimeChannel!);
+      final channel = _realtimeChannel!;
+      _realtimeChannel = null;
+      try {
+        final supabase = ref.read(supabaseClientProvider);
+        supabase.removeChannel(channel);
+      } catch (_) {
+        // Safe fallback if ref is already disposed
+      }
     }
   }
 

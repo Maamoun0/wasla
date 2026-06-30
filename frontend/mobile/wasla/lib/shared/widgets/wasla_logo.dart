@@ -1,14 +1,15 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/router/app_router.dart';
+import '../../core/utils/image_utils.dart';
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  WASLA LOGO
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 enum WaslaLogoVariant { color, white, dark }
 
 class WaslaLogoFull extends StatelessWidget {
@@ -55,67 +56,18 @@ class WaslaLogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final teal   = variant == WaslaLogoVariant.white ? Colors.white : AppColors.primary600;
-    final gold   = variant == WaslaLogoVariant.white ? Colors.white.withOpacity(0.85) : AppColors.accent500;
-    final ghost  = variant == WaslaLogoVariant.white ? Colors.white.withOpacity(0.25) : AppColors.primary200.withOpacity(0.6);
-    final h = size * 0.6;
-
-    return CustomPaint(
-      size: Size(size, h),
-      painter: _LogoPainter(teal: teal, gold: gold, ghost: ghost),
+    return Image.asset(
+      'assets/images/logo.png',
+      width: size,
+      height: size * 0.86,
+      fit: BoxFit.contain,
     );
   }
 }
 
-class _LogoPainter extends CustomPainter {
-  const _LogoPainter({required this.teal, required this.gold, required this.ghost});
-  final Color teal, gold, ghost;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width, h = size.height;
-
-    // Left node
-    canvas.drawCircle(
-      Offset(w * 0.15, h * 0.75),
-      w * 0.15,
-      Paint()..color = teal,
-    );
-    // Right node
-    canvas.drawCircle(
-      Offset(w * 0.85, h * 0.75),
-      w * 0.15,
-      Paint()..color = teal,
-    );
-
-    final arcPaint = Paint()
-      ..color = gold
-      ..strokeWidth = w * 0.055
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path()
-      ..moveTo(w * 0.29, h * 0.69)
-      ..cubicTo(w * 0.38, h * 0.12, w * 0.62, h * 0.12, w * 0.71, h * 0.69);
-    canvas.drawPath(path, arcPaint);
-
-    // Ghost lower arc
-    final ghostPath = Path()
-      ..moveTo(w * 0.29, h * 0.81)
-      ..cubicTo(w * 0.38, h * 1.08, w * 0.62, h * 1.08, w * 0.71, h * 0.81);
-    canvas.drawPath(ghostPath, Paint()..color = ghost..strokeWidth = w * 0.035..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
-
-    // Apex dot
-    canvas.drawCircle(Offset(w * 0.5, h * 0.27), w * 0.07, Paint()..color = gold);
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
-}
-
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  PRIMARY BUTTON
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
@@ -181,9 +133,9 @@ class AccentButton extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  AD CARD
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class AdCard extends StatelessWidget {
   const AdCard({super.key, required this.ad});
   final Map<String, dynamic> ad;
@@ -215,14 +167,14 @@ class AdCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Image ────────────────────────────────────────
+            // â”€â”€ Image â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSizes.adCardRadius)),
                   child: imageUrl != null
                       ? CachedNetworkImage(
-                          imageUrl: imageUrl,
+                          imageUrl: ImageUtils.thumbnail(imageUrl),
                           height: AppSizes.adCardImageHeight,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -237,15 +189,15 @@ class AdCard extends StatelessWidget {
                   right: 8,
                   child: Row(
                     children: [
-                      if (isFeatured) _Badge(label: '⭐ مميز', bg: AppColors.accent500),
-                      if (isUrgent)   ...[const SizedBox(width: 4), _Badge(label: '🔴 عاجل', bg: AppColors.error)],
+                      if (isFeatured) _Badge(label: '⭐ ${'featured'.tr()}', bg: AppColors.accent500),
+                      if (isUrgent)   ...[const SizedBox(width: 4), _Badge(label: '🔴 ${'urgent'.tr()}', bg: AppColors.error)],
                     ],
                   ),
                 ),
               ],
             ),
 
-            // ── Info ─────────────────────────────────────────
+            // â”€â”€ Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -330,9 +282,8 @@ class _PriceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (priceType == 'free') {
-      return const Text(
-        AppStrings.free,
-        style: TextStyle(
+      return Text(AppStrings.free,
+        style: const TextStyle(
           fontFamily: 'Cairo',
           fontWeight: FontWeight.w800,
           fontSize: 16,
@@ -341,9 +292,8 @@ class _PriceWidget extends StatelessWidget {
       );
     }
     if (priceType == 'negotiable' || price == null) {
-      return const Text(
-        AppStrings.negotiable,
-        style: TextStyle(fontFamily: 'Cairo', color: AppColors.neutral500, fontSize: 13),
+      return Text(AppStrings.negotiable,
+        style: const TextStyle(fontFamily: 'Cairo', color: AppColors.neutral500, fontSize: 13),
       );
     }
 
@@ -375,9 +325,9 @@ class _PriceWidget extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  SHIMMER LOADING
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class AdCardShimmer extends StatelessWidget {
   const AdCardShimmer({super.key});
 
@@ -394,8 +344,13 @@ class AdCardShimmer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(height: AppSizes.adCardImageHeight, color: AppColors.neutral200,
-              decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.adCardRadius)))),
+            Container(
+              height: AppSizes.adCardImageHeight,
+              decoration: const BoxDecoration(
+                color: AppColors.neutral200,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.adCardRadius)),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(children: [
@@ -411,9 +366,9 @@ class AdCardShimmer extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  EMPTY STATE
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class EmptyState extends StatelessWidget {
   const EmptyState({super.key, required this.title, this.subtitle, this.action});
   final String title;
@@ -443,9 +398,9 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  SECTION HEADER
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class SectionHeader extends StatelessWidget {
   const SectionHeader({super.key, required this.title, this.action, this.actionLabel});
   final String title;
@@ -471,9 +426,9 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  VERIFIED BADGE
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class VerifiedBadge extends StatelessWidget {
   const VerifiedBadge({super.key, this.size = 14});
   final double size;

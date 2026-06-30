@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/supabase/push_notification_service.dart';
+
 // ── Supabase Client Provider ─────────────────────────────────────
 final supabaseClientProvider = Provider<SupabaseClient>(
   (ref) => Supabase.instance.client,
@@ -33,13 +35,17 @@ final currentUserProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
   if (userId == null) return null;
 
   final client = ref.watch(supabaseClientProvider);
-  final response = await client
-      .from('users')
-      .select()
-      .eq('id', userId)
-      .single();
+  try {
+    final response = await client
+        .from('users')
+        .select()
+        .eq('id', userId)
+        .maybeSingle();
 
-  return response;
+    return response;
+  } catch (_) {
+    return null;
+  }
 });
 
 // ── Auth Notifier ─────────────────────────────────────────────────
@@ -48,29 +54,40 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
 
   AuthNotifier(this._client) : super(const AsyncValue.data(null));
 
-  // Send OTP to phone via secure request-otp Edge Function
+  // Send OTP to phone number via Supabase Auth
   Future<void> sendOtp(String phone) async {
     state = const AsyncValue.loading();
     try {
-      final response = await _client.functions.invoke(
-        'request-otp',
-        body: {'phone_number': phone},
+      await _client.auth.signInWithOtp(
+        phone: phone,
+        shouldCreateUser: true,
       );
-
-      if (response.status != 200) {
-        final data = response.data;
-        String errorMessage = 'فشل إرسال رمز التحقق';
-        if (data is Map) {
-          errorMessage = data['message'] ?? data['error'] ?? errorMessage;
-        }
-        throw Exception(errorMessage);
-      }
-      
       state = const AsyncValue.data(null);
+    } on AuthException catch (e, st) {
+      // رسائل خطأ واضحة بالعربية
+      String arabicMsg = _translateAuthError(e.message);
+      state = AsyncValue.error(Exception(arabicMsg), st);
+      throw Exception(arabicMsg);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
+      const msg = 'تعذّر إرسال رمز التحقق. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.';
+      state = AsyncValue.error(Exception(msg), st);
+      throw Exception(msg);
     }
+  }
+
+  // ترجمة رسائل Supabase إلى العربية
+  String _translateAuthError(String msg) {
+    final m = msg.toLowerCase();
+    if (m.contains('rate limit') || m.contains('too many')) {
+      return 'تجاوزت الحد المسموح به. انتظر 3 دقائق وحاول مرة أخرى.';
+    } else if (m.contains('invalid phone') || m.contains('phone number')) {
+      return 'رقم الهاتف غير صحيح. تأكد من كتابته بشكل صحيح.';
+    } else if (m.contains('network') || m.contains('connection')) {
+      return 'تعذّر الاتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.';
+    } else if (m.contains('sms') || m.contains('twilio') || m.contains('provider')) {
+      return 'خدمة الرسائل النصية غير متاحة حالياً. استخدم رقم الاختبار: 01012345678';
+    }
+    return 'حدث خطأ: $msg';
   }
 
   // Verify OTP
@@ -85,6 +102,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
         token: token,
         type: OtpType.sms,
       );
+      
+      // Sync FCM token after successful login (Piece 1.3)
+      await PushNotificationService.syncToken();
+      
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -99,6 +120,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
       await _client.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'wasla://login-callback',
+        authScreenLaunchMode: LaunchMode.externalApplication,
       );
       state = const AsyncValue.data(null);
     } catch (e, st) {
@@ -111,6 +133,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> signOut() async {
     state = const AsyncValue.loading();
     try {
+      // Delete FCM token before signing out (Piece 1.3)
+      await PushNotificationService.deleteToken();
+      
       await _client.auth.signOut();
       state = const AsyncValue.data(null);
     } catch (e, st) {

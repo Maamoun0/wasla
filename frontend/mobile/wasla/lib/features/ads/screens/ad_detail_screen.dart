@@ -11,7 +11,6 @@ import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../shared/widgets/trust_badge.dart';
-import '../../../shared/widgets/primary_button.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 
 class AdDetailScreen extends ConsumerStatefulWidget {
@@ -160,10 +159,10 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
                             )),
                           ),
                         ),
-                      if (isFeatured) Positioned(top: 12, right: 16,
+                      if (isFeatured) const Positioned(top: 12, right: 16,
                         child: _Badge(label: '⭐ مميز', bg: AppColors.accent500)),
                       if (isUrgent) Positioned(top: 12, right: isFeatured ? 90 : 16,
-                        child: _Badge(label: '🔴 عاجل', bg: AppColors.error)),
+                        child: const _Badge(label: '🔴 عاجل', bg: AppColors.error)),
                     ],
                   ),
                 ),
@@ -323,14 +322,14 @@ class _PriceRow extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         if (priceType == 'free')
-          const Text(AppStrings.free, style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.success))
+          Text(AppStrings.free, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 22, color: AppColors.success))
         else if (priceType == 'negotiable' || price == null)
-          const Text(AppStrings.negotiable, style: TextStyle(fontFamily: 'Cairo', color: AppColors.neutral500))
+          Text(AppStrings.negotiable, style: const TextStyle(fontFamily: 'Cairo', color: AppColors.neutral500))
         else
           RichText(text: TextSpan(style: const TextStyle(fontFamily: 'Cairo'), children: [
             TextSpan(text: '${(price as num).toStringAsFixed(0)} ',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.primary600)),
-            const TextSpan(text: AppStrings.egp, style: TextStyle(fontSize: 13, color: AppColors.neutral500)),
+            TextSpan(text: AppStrings.egp, style: const TextStyle(fontSize: 13, color: AppColors.neutral500)),
           ])),
       ],
     );
@@ -434,7 +433,7 @@ class _BottomActionBar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
       decoration: BoxDecoration(
         color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.neutral200)),
+        border: const Border(top: BorderSide(color: AppColors.neutral200)),
         boxShadow: [BoxShadow(color: AppColors.neutral900.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, -4))],
       ),
       child: Row(
@@ -541,7 +540,7 @@ class _ReportSheet extends ConsumerWidget {
                 );
               }
             },
-          )).toList(),
+          )),
         ],
       ),
     );

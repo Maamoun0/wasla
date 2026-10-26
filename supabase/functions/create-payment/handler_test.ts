@@ -5,6 +5,7 @@ const AD_ID = "aaaaaaaa-0000-0000-0000-000000000001";
 const PACKAGES: Record<string, PaymentPackage> = {
   boost_featured_7d: { id: "boost_featured_7d", kind: "ad_boost", price_egp: 60, boost_type: "featured" },
   sub_premium_monthly: { id: "sub_premium_monthly", kind: "subscription", price_egp: 199, boost_type: null },
+  credit_100: { id: "credit_100", kind: "credit_purchase", price_egp: 95, boost_type: null },
 };
 
 function fakeDeps(overrides: Partial<CreatePaymentDeps> = {}) {
@@ -128,4 +129,12 @@ Deno.test("Paymob order id is stored on the transaction", async () => {
   const { deps, attached } = fakeDeps();
   await handleCreatePayment(post({ package_id: "sub_premium_monthly" }), deps);
   assertEquals(attached, [["tx-1", "order-9"]]);
+});
+
+Deno.test("credit purchases are disabled until prices are set: 400 and nothing inserted", async () => {
+  const { deps, inserted, paymobCalls } = fakeDeps();
+  const res = await handleCreatePayment(post({ package_id: "credit_100" }), deps);
+  assertEquals(res.status, 400);
+  assertEquals(inserted.length, 0);
+  assertEquals(paymobCalls.length, 0);
 });

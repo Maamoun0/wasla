@@ -10,6 +10,9 @@ export const corsHeaders = {
 export const PAYMENT_METHODS = ["card", "fawry", "instapay", "vodafone_cash"] as const;
 type PaymentMethod = typeof PAYMENT_METHODS[number];
 
+// Credit purchases stay off until their prices are decided.
+const DISABLED_KINDS: ReadonlyArray<PaymentPackage["kind"]> = ["credit_purchase"];
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface PaymentPackage {
@@ -84,7 +87,7 @@ export async function handleCreatePayment(req: Request, deps: CreatePaymentDeps)
   if (!PAYMENT_METHODS.includes(method)) return json({ error: "طريقة الدفع المحددة غير مدعومة" }, 400);
 
   const pkg = await deps.getActivePackage(packageId);
-  if (!pkg) return json({ error: "الباقة المحددة غير متاحة" }, 400);
+  if (!pkg || DISABLED_KINDS.includes(pkg.kind)) return json({ error: "الباقة المحددة غير متاحة" }, 400);
 
   let referenceId: string | null = null;
   if (pkg.kind === "ad_boost") {

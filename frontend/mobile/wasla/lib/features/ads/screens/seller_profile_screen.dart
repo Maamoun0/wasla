@@ -503,7 +503,7 @@ class SellerProfileScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(AppSizes.md),
                         decoration: BoxDecoration(
-                          color: AppColors.accent50.withOpacity(0.6),
+                          color: AppColors.accent50.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: AppColors.accent100),
                         ),

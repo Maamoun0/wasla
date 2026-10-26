@@ -233,7 +233,7 @@ class _CategoriesSection extends StatelessWidget {
                         border: Border.all(color: AppColors.neutral200),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.neutral900.withOpacity(0.04),
+                            color: AppColors.neutral900.withValues(alpha: 0.04),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),

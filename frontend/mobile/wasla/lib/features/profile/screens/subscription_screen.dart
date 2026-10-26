@@ -72,9 +72,9 @@ class SubscriptionScreen extends ConsumerWidget {
                     margin: const EdgeInsets.only(bottom: 24),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary500.withOpacity(0.08),
+                      color: AppColors.primary500.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary500.withOpacity(0.2)),
+                      border: Border.all(color: AppColors.primary500.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [
@@ -154,7 +154,7 @@ class SubscriptionScreen extends ConsumerWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
+                            color: Colors.black.withValues(alpha: 0.02),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           )
@@ -167,7 +167,7 @@ class SubscriptionScreen extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: isActive ? AppColors.accent500.withOpacity(0.08) : Colors.transparent,
+                              color: isActive ? AppColors.accent500.withValues(alpha: 0.08) : Colors.transparent,
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(14),
                                 topRight: Radius.circular(14),

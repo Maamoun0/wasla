@@ -29,7 +29,6 @@ Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
 
 - `create-ad`
 - `submit-kyc-request`
-- `get-kyc-document`
 - `create-payment`
 - `payment-webhook`
 - `dispatch-notifications`

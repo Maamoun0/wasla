@@ -157,7 +157,7 @@ class _LoggedInView extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: AppColors.accent50,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.accent500.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.accent500.withValues(alpha: 0.3)),
                 ),
                 child: Row(children: [
                   const Icon(Icons.verified_user_outlined, color: AppColors.accent600),

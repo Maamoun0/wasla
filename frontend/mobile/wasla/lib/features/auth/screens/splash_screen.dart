@@ -83,7 +83,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.accent500.withOpacity(0.12),
+                  color: AppColors.accent500.withValues(alpha: 0.12),
                 ),
               ),
             ),
@@ -102,7 +102,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       Text(
                         AppStrings.appTagline,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 13,
                         ),
                       ),
@@ -125,7 +125,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                     ),
                   ),
                 ),
@@ -143,7 +143,7 @@ class _GridPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
+      ..color = Colors.white.withValues(alpha: 0.05)
       ..strokeWidth = 1;
 
     const step = 32.0;

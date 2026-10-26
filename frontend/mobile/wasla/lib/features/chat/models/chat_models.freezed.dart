@@ -21,14 +21,10 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ChatMessage {
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'conversation_id')
   String get conversationId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sender_id')
   String get senderId => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
-  @JsonKey(name: 'is_read')
   bool get isRead => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this ChatMessage to a JSON map.
@@ -49,11 +45,11 @@ abstract class $ChatMessageCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      @JsonKey(name: 'conversation_id') String conversationId,
-      @JsonKey(name: 'sender_id') String senderId,
+      String conversationId,
+      String senderId,
       String content,
-      @JsonKey(name: 'is_read') bool isRead,
-      @JsonKey(name: 'created_at') DateTime createdAt});
+      bool isRead,
+      DateTime createdAt});
 }
 
 /// @nodoc
@@ -117,11 +113,11 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      @JsonKey(name: 'conversation_id') String conversationId,
-      @JsonKey(name: 'sender_id') String senderId,
+      String conversationId,
+      String senderId,
       String content,
-      @JsonKey(name: 'is_read') bool isRead,
-      @JsonKey(name: 'created_at') DateTime createdAt});
+      bool isRead,
+      DateTime createdAt});
 }
 
 /// @nodoc
@@ -178,11 +174,11 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
 class _$ChatMessageImpl implements _ChatMessage {
   const _$ChatMessageImpl(
       {required this.id,
-      @JsonKey(name: 'conversation_id') required this.conversationId,
-      @JsonKey(name: 'sender_id') required this.senderId,
+      required this.conversationId,
+      required this.senderId,
       required this.content,
-      @JsonKey(name: 'is_read') required this.isRead,
-      @JsonKey(name: 'created_at') required this.createdAt});
+      required this.isRead,
+      required this.createdAt});
 
   factory _$ChatMessageImpl.fromJson(Map<String, dynamic> json) =>
       _$$ChatMessageImplFromJson(json);
@@ -190,18 +186,14 @@ class _$ChatMessageImpl implements _ChatMessage {
   @override
   final String id;
   @override
-  @JsonKey(name: 'conversation_id')
   final String conversationId;
   @override
-  @JsonKey(name: 'sender_id')
   final String senderId;
   @override
   final String content;
   @override
-  @JsonKey(name: 'is_read')
   final bool isRead;
   @override
-  @JsonKey(name: 'created_at')
   final DateTime createdAt;
 
   @override
@@ -249,11 +241,10 @@ class _$ChatMessageImpl implements _ChatMessage {
 abstract class _ChatMessage implements ChatMessage {
   const factory _ChatMessage(
       {required final String id,
-      @JsonKey(name: 'conversation_id') required final String conversationId,
-      @JsonKey(name: 'sender_id') required final String senderId,
+      required final String conversationId,
+      required final String senderId,
       required final String content,
-      @JsonKey(name: 'is_read') required final bool isRead,
-      @JsonKey(name: 'created_at')
+      required final bool isRead,
       required final DateTime createdAt}) = _$ChatMessageImpl;
 
   factory _ChatMessage.fromJson(Map<String, dynamic> json) =
@@ -262,18 +253,14 @@ abstract class _ChatMessage implements ChatMessage {
   @override
   String get id;
   @override
-  @JsonKey(name: 'conversation_id')
   String get conversationId;
   @override
-  @JsonKey(name: 'sender_id')
   String get senderId;
   @override
   String get content;
   @override
-  @JsonKey(name: 'is_read')
   bool get isRead;
   @override
-  @JsonKey(name: 'created_at')
   DateTime get createdAt;
 
   /// Create a copy of ChatMessage
@@ -291,23 +278,14 @@ Conversation _$ConversationFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Conversation {
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'ad_id')
   String get adId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'buyer_id')
   String get buyerId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'seller_id')
   String get sellerId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_message_at')
   DateTime get lastMessageAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_message_preview')
   String? get lastMessagePreview => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError; // Joined data
-  @JsonKey(name: 'ad_title')
   String? get adTitle => throw _privateConstructorUsedError;
-  @JsonKey(name: 'other_user_full_name')
   String? get otherUserFullName => throw _privateConstructorUsedError;
-  @JsonKey(name: 'other_user_avatar_url')
   String? get otherUserAvatarUrl => throw _privateConstructorUsedError;
 
   /// Serializes this Conversation to a JSON map.
@@ -328,15 +306,15 @@ abstract class $ConversationCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      @JsonKey(name: 'ad_id') String adId,
-      @JsonKey(name: 'buyer_id') String buyerId,
-      @JsonKey(name: 'seller_id') String sellerId,
-      @JsonKey(name: 'last_message_at') DateTime lastMessageAt,
-      @JsonKey(name: 'last_message_preview') String? lastMessagePreview,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'ad_title') String? adTitle,
-      @JsonKey(name: 'other_user_full_name') String? otherUserFullName,
-      @JsonKey(name: 'other_user_avatar_url') String? otherUserAvatarUrl});
+      String adId,
+      String buyerId,
+      String sellerId,
+      DateTime lastMessageAt,
+      String? lastMessagePreview,
+      DateTime createdAt,
+      String? adTitle,
+      String? otherUserFullName,
+      String? otherUserAvatarUrl});
 }
 
 /// @nodoc
@@ -420,15 +398,15 @@ abstract class _$$ConversationImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      @JsonKey(name: 'ad_id') String adId,
-      @JsonKey(name: 'buyer_id') String buyerId,
-      @JsonKey(name: 'seller_id') String sellerId,
-      @JsonKey(name: 'last_message_at') DateTime lastMessageAt,
-      @JsonKey(name: 'last_message_preview') String? lastMessagePreview,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'ad_title') String? adTitle,
-      @JsonKey(name: 'other_user_full_name') String? otherUserFullName,
-      @JsonKey(name: 'other_user_avatar_url') String? otherUserAvatarUrl});
+      String adId,
+      String buyerId,
+      String sellerId,
+      DateTime lastMessageAt,
+      String? lastMessagePreview,
+      DateTime createdAt,
+      String? adTitle,
+      String? otherUserFullName,
+      String? otherUserAvatarUrl});
 }
 
 /// @nodoc
@@ -505,15 +483,15 @@ class __$$ConversationImplCopyWithImpl<$Res>
 class _$ConversationImpl implements _Conversation {
   const _$ConversationImpl(
       {required this.id,
-      @JsonKey(name: 'ad_id') required this.adId,
-      @JsonKey(name: 'buyer_id') required this.buyerId,
-      @JsonKey(name: 'seller_id') required this.sellerId,
-      @JsonKey(name: 'last_message_at') required this.lastMessageAt,
-      @JsonKey(name: 'last_message_preview') this.lastMessagePreview,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'ad_title') this.adTitle,
-      @JsonKey(name: 'other_user_full_name') this.otherUserFullName,
-      @JsonKey(name: 'other_user_avatar_url') this.otherUserAvatarUrl});
+      required this.adId,
+      required this.buyerId,
+      required this.sellerId,
+      required this.lastMessageAt,
+      this.lastMessagePreview,
+      required this.createdAt,
+      this.adTitle,
+      this.otherUserFullName,
+      this.otherUserAvatarUrl});
 
   factory _$ConversationImpl.fromJson(Map<String, dynamic> json) =>
       _$$ConversationImplFromJson(json);
@@ -521,32 +499,23 @@ class _$ConversationImpl implements _Conversation {
   @override
   final String id;
   @override
-  @JsonKey(name: 'ad_id')
   final String adId;
   @override
-  @JsonKey(name: 'buyer_id')
   final String buyerId;
   @override
-  @JsonKey(name: 'seller_id')
   final String sellerId;
   @override
-  @JsonKey(name: 'last_message_at')
   final DateTime lastMessageAt;
   @override
-  @JsonKey(name: 'last_message_preview')
   final String? lastMessagePreview;
   @override
-  @JsonKey(name: 'created_at')
   final DateTime createdAt;
 // Joined data
   @override
-  @JsonKey(name: 'ad_title')
   final String? adTitle;
   @override
-  @JsonKey(name: 'other_user_full_name')
   final String? otherUserFullName;
   @override
-  @JsonKey(name: 'other_user_avatar_url')
   final String? otherUserAvatarUrl;
 
   @override
@@ -611,15 +580,14 @@ class _$ConversationImpl implements _Conversation {
 abstract class _Conversation implements Conversation {
   const factory _Conversation(
       {required final String id,
-      @JsonKey(name: 'ad_id') required final String adId,
-      @JsonKey(name: 'buyer_id') required final String buyerId,
-      @JsonKey(name: 'seller_id') required final String sellerId,
-      @JsonKey(name: 'last_message_at') required final DateTime lastMessageAt,
-      @JsonKey(name: 'last_message_preview') final String? lastMessagePreview,
-      @JsonKey(name: 'created_at') required final DateTime createdAt,
-      @JsonKey(name: 'ad_title') final String? adTitle,
-      @JsonKey(name: 'other_user_full_name') final String? otherUserFullName,
-      @JsonKey(name: 'other_user_avatar_url')
+      required final String adId,
+      required final String buyerId,
+      required final String sellerId,
+      required final DateTime lastMessageAt,
+      final String? lastMessagePreview,
+      required final DateTime createdAt,
+      final String? adTitle,
+      final String? otherUserFullName,
       final String? otherUserAvatarUrl}) = _$ConversationImpl;
 
   factory _Conversation.fromJson(Map<String, dynamic> json) =
@@ -628,31 +596,22 @@ abstract class _Conversation implements Conversation {
   @override
   String get id;
   @override
-  @JsonKey(name: 'ad_id')
   String get adId;
   @override
-  @JsonKey(name: 'buyer_id')
   String get buyerId;
   @override
-  @JsonKey(name: 'seller_id')
   String get sellerId;
   @override
-  @JsonKey(name: 'last_message_at')
   DateTime get lastMessageAt;
   @override
-  @JsonKey(name: 'last_message_preview')
   String? get lastMessagePreview;
   @override
-  @JsonKey(name: 'created_at')
   DateTime get createdAt; // Joined data
   @override
-  @JsonKey(name: 'ad_title')
   String? get adTitle;
   @override
-  @JsonKey(name: 'other_user_full_name')
   String? get otherUserFullName;
   @override
-  @JsonKey(name: 'other_user_avatar_url')
   String? get otherUserAvatarUrl;
 
   /// Create a copy of Conversation

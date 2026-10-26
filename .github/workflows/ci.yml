@@ -1,4 +1,4 @@
-name: Wasla Flutter CI
+name: Wasla CI
 
 on:
   pull_request:
@@ -9,53 +9,147 @@ on:
     branches:
       - develop
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SUPABASE_CLI_VERSION: 2.120.0
+  DENO_VERSION: v2.1.4
+  NODE_VERSION: '24'
+  FLUTTER_VERSION: 3.41.9
 
 jobs:
-  # Job 1: Secret Scanning
   secret-scan:
-    name: Secret Scanning (Gitleaks)
+    name: Secret scanning (gitleaks)
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Run Gitleaks Scan
-        uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Job 2: Flutter Analyze & Test
-  flutter-ci:
-    name: Flutter Analyze & Test
+  # Database tests (pgTAP) and the integration tests that need a real stack:
+  # Auth OTP limits, Storage policies, the KYC flow and the admin actions.
+  database:
+    name: Database (pgTAP) and integration tests
     runs-on: ubuntu-latest
-    needs: secret-scan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/admin/package-lock.json
+
+      - name: Start local Supabase (migrations applied from scratch)
+        run: supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
+
+      - name: pgTAP
+        run: supabase test db
+
+      # Local stack only: the test files refuse any URL that is not localhost.
+      - name: Export local stack credentials
+        run: |
+          supabase status -o env > "$RUNNER_TEMP/stack.env"
+          get() { grep "^$1=" "$RUNNER_TEMP/stack.env" | cut -d= -f2- | tr -d '"'; }
+          for name in ANON_KEY SERVICE_ROLE_KEY; do echo "::add-mask::$(get "$name")"; done
+          {
+            echo "WASLA_SUPABASE_URL=$(get API_URL)"
+            echo "WASLA_SUPABASE_ANON_KEY=$(get ANON_KEY)"
+            echo "WASLA_SUPABASE_SERVICE_ROLE_KEY=$(get SERVICE_ROLE_KEY)"
+          } >> "$GITHUB_ENV"
+
+      - name: Integration tests (Auth, Storage, KYC)
+        run: >-
+          deno test --config supabase/functions/deno.json --no-lock --no-check --allow-env --allow-net
+          supabase/tests/auth/otp_rate_limit.local.ts
+          supabase/tests/storage/buckets.local.ts
+          supabase/tests/kyc/kyc_flow.local.ts
+
+      - name: Admin integration tests
+        working-directory: frontend/admin
+        run: |
+          npm ci
+          npx vitest run tests/integration
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup
+
+  functions:
+    name: Edge Functions (deno check, lint, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase/functions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - name: Type check
+        run: deno check ./*/*.ts
+      - name: Lint
+        run: deno lint
+      - name: Unit tests
+        run: deno test --no-lock
+
+  admin:
+    name: Admin panel (typecheck, lint, build, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/admin
+    env:
+      # Inlined at build time; the real values come from the deploy environment.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-build-placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/admin/package-lock.json
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint (no warnings allowed)
+        run: npx next lint --max-warnings 0
+      - name: Build
+        run: npm run build
+      - name: Unit tests
+        run: npm test
+
+  flutter:
+    name: Flutter (analyze, test)
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend/mobile/wasla
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
-
-      - name: Install Dependencies
-        run: flutter pub get
-
-      - name: Run Flutter Analyzer
-        run: flutter analyze
-
-      - name: Run Unit Tests
+      - run: flutter pub get
+      - name: Analyze (fails on any info or warning)
+        run: flutter analyze --fatal-infos --fatal-warnings
+      - name: Tests
         run: flutter test

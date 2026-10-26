@@ -83,7 +83,7 @@ class VerificationScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 80, color: color),
@@ -162,7 +162,7 @@ class VerificationScreen extends ConsumerWidget {
         // Loading Overlay during submission
         if (state.status == VerificationStatus.loading)
           Container(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             child: Center(
               child: Card(
                 margin: const EdgeInsets.symmetric(horizontal: 40),
@@ -337,7 +337,7 @@ class VerificationScreen extends ConsumerWidget {
                             top: 8,
                             right: 8,
                             child: Material(
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withValues(alpha: 0.6),
                               shape: const CircleBorder(),
                               child: IconButton(
                                 icon: const Icon(Icons.delete_rounded, color: Colors.white),

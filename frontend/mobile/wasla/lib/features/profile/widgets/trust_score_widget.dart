@@ -30,9 +30,9 @@ class TrustScoreWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isLarge ? 16 : 8),
       decoration: BoxDecoration(
-        color: scoreColor.withOpacity(0.1),
+        color: scoreColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scoreColor.withOpacity(0.3)),
+        border: Border.all(color: scoreColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -64,13 +64,13 @@ class TrustScoreWidget extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Cairo',
                 fontSize: 12,
-                color: scoreColor.withOpacity(0.8),
+                color: scoreColor.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
               value: score / 100,
-              backgroundColor: scoreColor.withOpacity(0.2),
+              backgroundColor: scoreColor.withValues(alpha: 0.2),
               color: scoreColor,
               borderRadius: BorderRadius.circular(4),
             ),

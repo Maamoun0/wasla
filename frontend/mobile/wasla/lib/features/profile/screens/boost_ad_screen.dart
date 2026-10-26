@@ -219,7 +219,7 @@ class _BoostAdScreenState extends ConsumerState<BoostAdScreen> {
                           width: isSelected ? 2 : 1,
                         ),
                         boxShadow: isSelected
-                            ? [BoxShadow(color: AppColors.primary500.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))]
+                            ? [BoxShadow(color: AppColors.primary500.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 4))]
                             : null,
                       ),
                       child: InkWell(
@@ -308,9 +308,9 @@ class _BoostAdScreenState extends ConsumerState<BoostAdScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primary500.withOpacity(0.05),
+                      color: AppColors.primary500.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary500.withOpacity(0.15)),
+                      border: Border.all(color: AppColors.primary500.withValues(alpha: 0.15)),
                     ),
                     child: Column(
                       children: [
@@ -341,7 +341,7 @@ class _BoostAdScreenState extends ConsumerState<BoostAdScreen> {
                                 ? null
                                 : () async {
                                     final result = await notifier.verifyAndPreparePayment();
-                                    if (result != null && mounted) {
+                                    if (result != null && context.mounted) {
                                       // Transition to Payment WebView
                                       final success = await context.push<bool?>(
                                         AppRoutes.paymentWebView,
@@ -353,7 +353,7 @@ class _BoostAdScreenState extends ConsumerState<BoostAdScreen> {
                                         },
                                       );
 
-                                      if (success == true && mounted) {
+                                      if (success == true && context.mounted) {
                                         // Refresh eligible list
                                         notifier.fetchUserEligibleAds();
                                         notifier.selectAd(null);

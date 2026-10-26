@@ -152,7 +152,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
                   children: [
                     // Close circular button
                     Material(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.black.withValues(alpha: 0.5),
                       shape: const CircleBorder(),
                       child: IconButton(
                         icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
@@ -164,7 +164,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -190,7 +190,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
                   Positioned(
                     right: 8,
                     child: Material(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       shape: const CircleBorder(),
                       child: IconButton(
                         icon: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70),
@@ -205,7 +205,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
                   Positioned(
                     left: 8,
                     child: Material(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       shape: const CircleBorder(),
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.white70),

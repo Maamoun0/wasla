@@ -87,8 +87,10 @@ class DynamicFieldBuilder extends StatelessWidget {
       case 'select':
         final rawOptions = field['options'];
         final List<String> options = rawOptions != null ? List<String>.from(rawOptions) : [];
+        final selected = options.contains(currentValue) ? currentValue as String : null;
         return DropdownButtonFormField<String>(
-          value: options.contains(currentValue) ? currentValue as String : null,
+          key: ValueKey('${field['field_name']}:$selected'),
+          initialValue: selected,
           items: options
               .map((opt) => DropdownMenuItem(
                     value: opt,
@@ -130,7 +132,7 @@ class DynamicFieldBuilder extends StatelessWidget {
                 Switch.adaptive(
                   value: isChecked,
                   onChanged: onChanged,
-                  activeColor: AppColors.primary600,
+                  activeThumbColor: AppColors.primary600,
                 ),
               ],
             ),

@@ -246,14 +246,12 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (_isConfirming) {
-          // Prevent popping while confirming unless timeout occurred
-          return false;
-        }
+    return PopScope(
+      // Back never pops directly: it cancels the payment (not while confirming).
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || _isConfirming) return;
         _handlePaymentCancellation();
-        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -281,7 +279,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
               ),
             if (_isConfirming)
               Container(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 child: Center(
                   child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 32),

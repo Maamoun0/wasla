@@ -142,7 +142,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.primary600,
+        activeThumbColor: AppColors.primary600,
       ),
     );
   }

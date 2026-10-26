@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # JSON keys are the snake_case column names from Supabase.
+          field_rename: snake

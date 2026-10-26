@@ -44,7 +44,7 @@ class AdSuccessScreen extends ConsumerWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.green.withOpacity(0.2),
+                              color: Colors.green.withValues(alpha: 0.2),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),

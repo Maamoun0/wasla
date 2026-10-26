@@ -35,7 +35,7 @@ void main() async {
     // ── Supabase (يجب أن يكون أولاً) ─────────────────────────────
     await Supabase.initialize(
       url: AppConfig.supabaseUrl,
-      anonKey: AppConfig.supabaseAnonKey,
+      publishableKey: AppConfig.supabaseAnonKey,
       debug: kDebugMode,
     );
 

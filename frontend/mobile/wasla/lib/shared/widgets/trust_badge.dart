@@ -40,9 +40,9 @@ class TrustBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: badgeColor.withOpacity(0.12),
+            color: badgeColor.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: badgeColor.withOpacity(0.4), width: 1),
+            border: Border.all(color: badgeColor.withValues(alpha: 0.4), width: 1),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -71,9 +71,9 @@ class TrustBadge extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.12),
+              color: AppColors.success.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.success.withOpacity(0.4), width: 1),
+              border: Border.all(color: AppColors.success.withValues(alpha: 0.4), width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

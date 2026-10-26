@@ -176,7 +176,7 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
                               width: i == _currentPhoto ? 20 : 6,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: i == _currentPhoto ? AppColors.white : AppColors.white.withOpacity(0.5),
+                                color: i == _currentPhoto ? AppColors.white : AppColors.white.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             )),
@@ -297,7 +297,7 @@ class _CircleNavBtn extends StatelessWidget {
         child: Container(
           width: 36, height: 36,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color ?? Colors.white, size: 18),
@@ -457,7 +457,7 @@ class _BottomActionBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         border: const Border(top: BorderSide(color: AppColors.neutral200)),
-        boxShadow: [BoxShadow(color: AppColors.neutral900.withOpacity(0.05), blurRadius: 16, offset: const Offset(0, -4))],
+        boxShadow: [BoxShadow(color: AppColors.neutral900.withValues(alpha: 0.05), blurRadius: 16, offset: const Offset(0, -4))],
       ),
       child: Row(
         children: [

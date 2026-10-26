@@ -183,7 +183,9 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
                           error: (e, _) => Text('خطأ في تحميل المحافظات: $e', style: const TextStyle(fontFamily: 'Cairo')),
                           data: (govs) {
                             return DropdownButtonFormField<int>(
-                              value: _selectedGovId,
+                              // Keyed so the field resets when the selection changes elsewhere.
+                              key: ValueKey(_selectedGovId),
+                              initialValue: _selectedGovId,
                               hint: const Text('اختر المحافظة', style: TextStyle(fontFamily: 'Cairo')),
                               decoration: const InputDecoration(
                                 labelText: 'المحافظة',
@@ -218,9 +220,9 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
                                 return Container(
                                   padding: const EdgeInsets.all(AppSizes.sm),
                                   decoration: BoxDecoration(
-                                    color: AppColors.error.withOpacity(0.1),
+                                    color: AppColors.error.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: AppColors.error.withOpacity(0.5)),
+                                    border: Border.all(color: AppColors.error.withValues(alpha: 0.5)),
                                   ),
                                   child: const Row(
                                     children: [
@@ -237,7 +239,9 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
                                 );
                               }
                               return DropdownButtonFormField<int>(
-                                value: _selectedCityId,
+                                // Keyed so the field resets when the selection changes elsewhere.
+                                key: ValueKey(_selectedCityId),
+                                initialValue: _selectedCityId,
                                 hint: const Text('اختر المدينة', style: TextStyle(fontFamily: 'Cairo')),
                                 decoration: const InputDecoration(
                                   labelText: 'المدينة / المنطقة',
@@ -278,7 +282,9 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: AppSizes.md),
                                 child: DropdownButtonFormField<int>(
-                                  value: _selectedDistrictId,
+                                  // Keyed so the field resets when the selection changes elsewhere.
+                                  key: ValueKey(_selectedDistrictId),
+                                  initialValue: _selectedDistrictId,
                                   hint: const Text('اختر الحي (اختياري)', style: TextStyle(fontFamily: 'Cairo')),
                                   decoration: const InputDecoration(
                                     labelText: 'الحي التفصيلي',

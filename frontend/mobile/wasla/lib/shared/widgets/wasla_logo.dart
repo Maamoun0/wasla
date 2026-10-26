@@ -95,7 +95,7 @@ class PrimaryButton extends StatelessWidget {
         onPressed: (isLoading || isDisabled) ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color ?? AppColors.primary600,
-          disabledBackgroundColor: (color ?? AppColors.primary600).withOpacity(0.5),
+          disabledBackgroundColor: (color ?? AppColors.primary600).withValues(alpha: 0.5),
         ),
         child: isLoading
             ? const SizedBox(
@@ -161,7 +161,7 @@ class AdCard extends StatelessWidget {
             width: isFeatured ? 2 : 1,
           ),
           boxShadow: isFeatured
-              ? [BoxShadow(color: AppColors.accent500.withOpacity(0.15), blurRadius: 12, offset: const Offset(0, 4))]
+              ? [BoxShadow(color: AppColors.accent500.withValues(alpha: 0.15), blurRadius: 12, offset: const Offset(0, 4))]
               : null,
         ),
         child: Column(

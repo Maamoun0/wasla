@@ -309,7 +309,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       borderRadius: BorderRadius.circular(12),
                       side: const BorderSide(color: AppColors.errorBg),
                     ),
-                    color: AppColors.errorBg.withOpacity(0.5),
+                    color: AppColors.errorBg.withValues(alpha: 0.5),
                     child: ListTile(
                       leading: const Icon(Icons.delete_forever_rounded, color: AppColors.error),
                       title: const Text(

@@ -1,5 +1,9 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Cairo } from 'next/font/google';
+
+// Self-hosted at build time; exposed as --font-cairo for Tailwind and globals.css.
+const cairo = Cairo({ subsets: ['arabic', 'latin'], display: 'swap', variable: '--font-cairo' });
 
 export const metadata: Metadata = {
   title: 'لوحة تحكم وصلة | Wasla Admin',
@@ -12,12 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="ar" dir="rtl" className={cairo.variable}>
       <body>{children}</body>
     </html>
   );

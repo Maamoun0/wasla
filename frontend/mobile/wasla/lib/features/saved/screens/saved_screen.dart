@@ -295,7 +295,7 @@ class _WatchlistCardState extends State<_WatchlistCard> {
           ),
           Switch(
             value: _active,
-            activeColor: AppColors.primary600,
+            activeThumbColor: AppColors.primary600,
             onChanged: (v) async {
               if (v) {
                 // Request permission when enabling notifications (Piece 1.2)

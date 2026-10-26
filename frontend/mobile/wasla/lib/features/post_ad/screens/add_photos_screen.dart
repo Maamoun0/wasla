@@ -200,7 +200,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
               // Info Banner
               Container(
                 padding: const EdgeInsets.all(AppSizes.md),
-                color: AppColors.primary600.withOpacity(0.05),
+                color: AppColors.primary600.withValues(alpha: 0.05),
                 child: const Row(
                   children: [
                     Icon(Icons.info_outline_rounded, color: AppColors.primary600, size: 20),
@@ -375,7 +375,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -414,7 +414,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.primary600.withOpacity(0.1),
+                                color: AppColors.primary600.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(

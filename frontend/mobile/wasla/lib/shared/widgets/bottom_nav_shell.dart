@@ -36,7 +36,7 @@ class BottomNavShell extends StatelessWidget {
           color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              color: AppColors.neutral900.withOpacity(0.06),
+              color: AppColors.neutral900.withValues(alpha: 0.06),
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),
@@ -145,7 +145,7 @@ class _CenterAddButton extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary600.withOpacity(0.4),
+                  color: AppColors.primary600.withValues(alpha: 0.4),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),

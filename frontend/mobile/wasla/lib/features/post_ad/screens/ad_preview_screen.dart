@@ -122,7 +122,7 @@ class _AdPreviewScreenState extends ConsumerState<AdPreviewScreen> {
               // Error Banner
               if (state.errorMessage != null)
                 Container(
-                  color: AppColors.error.withOpacity(0.1),
+                  color: AppColors.error.withValues(alpha: 0.1),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     children: [
@@ -180,7 +180,7 @@ class _AdPreviewScreenState extends ConsumerState<AdPreviewScreen> {
                                     width: i == _currentPhoto ? 20 : 6,
                                     height: 6,
                                     decoration: BoxDecoration(
-                                      color: i == _currentPhoto ? AppColors.white : AppColors.white.withOpacity(0.5),
+                                      color: i == _currentPhoto ? AppColors.white : AppColors.white.withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                   ),

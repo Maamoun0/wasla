@@ -165,7 +165,7 @@ class _SlideWidget extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: slide.gradientColors.last.withOpacity(0.3),
+                  color: slide.gradientColors.last.withValues(alpha: 0.3),
                   blurRadius: 40,
                   offset: const Offset(0, 16),
                 ),

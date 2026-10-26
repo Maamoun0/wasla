@@ -50,7 +50,10 @@ export default function KYCImagePreview({
               </button>
             </div>
             <div className="flex-1 overflow-auto p-4 flex justify-center bg-gray-100">
-              <img 
+              {/* A 5-minute signed URL to a private ID document: next/image would
+                  proxy and cache it on the server, outliving the link. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={url} 
                 alt={label} 
                 className="max-w-full h-auto shadow-lg"

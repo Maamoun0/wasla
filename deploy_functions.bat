@@ -16,9 +16,6 @@ call npx supabase functions deploy create-ad --project-ref %PROJECT_REF%
 echo Deploying create-payment...
 call npx supabase functions deploy create-payment --project-ref %PROJECT_REF%
 
-echo Deploying get-kyc-document...
-call npx supabase functions deploy get-kyc-document --project-ref %PROJECT_REF%
-
 echo Deploying dispatch-notifications...
 call npx supabase functions deploy dispatch-notifications --project-ref %PROJECT_REF%
 

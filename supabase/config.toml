@@ -1,3 +1,65 @@
+# Local development configuration for the Supabase CLI.
+# Hosted projects are configured in the dashboard; keep the two in sync.
+project_id = "wasla"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+# Reference data (governorates, cities, categories, plans, prices) is part of
+# the migrations so every environment gets it; there is no dev-only seed yet.
+enabled = false
+
+[studio]
+enabled = false
+
+[local_smtp]
+enabled = false
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["wasla://login-callback"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[auth.sms]
+enable_signup = true
+
+# Admin panel staff must use TOTP (enforced server-side via aal2).
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[edge_runtime]
+enabled = false
+
+[analytics]
+enabled = false
+
 [functions.request-otp]
 verify_jwt = false
 

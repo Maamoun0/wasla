@@ -5,4 +5,3 @@ ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS phone text UNIQUE;
 ALTER TABLE storage.buckets ADD COLUMN IF NOT EXISTS public boolean DEFAULT false;
 ALTER TABLE storage.buckets ADD COLUMN IF NOT EXISTS file_size_limit bigint;
 ALTER TABLE storage.buckets ADD COLUMN IF NOT EXISTS allowed_mime_types text[];
-CREATE EXTENSION IF NOT EXISTS pgtap;

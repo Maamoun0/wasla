@@ -7,6 +7,7 @@ type Row = Record<string, unknown>;
 
 export interface FakeState {
   sessionUser: { id: string; user_metadata?: Row } | null;
+  aal: 'aal1' | 'aal2' | null;
   tables: Record<string, Row[]>;
   rpcResult: unknown;
   rpcCalls: { fn: string; args: Row }[];
@@ -18,6 +19,7 @@ export interface FakeState {
 
 export const state: FakeState = {
   sessionUser: null,
+  aal: null,
   tables: {},
   rpcResult: { success: true },
   rpcCalls: [],
@@ -29,6 +31,7 @@ export const state: FakeState = {
 
 export function resetState() {
   state.sessionUser = null;
+  state.aal = null;
   state.tables = {};
   state.rpcResult = { success: true };
   state.rpcCalls = [];
@@ -101,11 +104,19 @@ export const adminClient = {
 export const serverClient = {
   auth: {
     getUser: async () => ({ data: { user: state.sessionUser } }),
+    mfa: {
+      getAuthenticatorAssuranceLevel: async () => ({
+        data: state.sessionUser ? { currentLevel: state.aal, nextLevel: 'aal2' } : null,
+        error: null,
+      }),
+    },
   },
 };
 
-export function signInAs(id: string, profile: Row | null, userMetadata: Row = {}) {
+// Staff tests sign in with a verified TOTP factor (aal2) unless told otherwise.
+export function signInAs(id: string, profile: Row | null, userMetadata: Row = {}, aal: 'aal1' | 'aal2' = 'aal2') {
   state.sessionUser = { id, user_metadata: userMetadata };
+  state.aal = aal;
   if (profile) {
     state.tables.users = [...(state.tables.users ?? []).filter((u) => u.id !== id), { id, deleted_at: null, ...profile }];
   }

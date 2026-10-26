@@ -12,18 +12,22 @@ export async function middleware(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   let isStaff = false;
+  let hasMfa = false;
   if (user) {
     const { data: profile } = await supabase.rpc('get_my_profile').maybeSingle<{ user_type: string; status: string }>();
     isStaff = !!profile
       && (profile.user_type === 'admin' || profile.user_type === 'moderator')
       && profile.status !== 'suspended' && profile.status !== 'deleted';
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    hasMfa = aal?.currentLevel === 'aal2';
   }
 
-  if (req.nextUrl.pathname.startsWith('/dashboard') && !isStaff) {
-    return NextResponse.redirect(new URL(user ? '/login?denied=1' : '/login', req.url));
+  if (req.nextUrl.pathname.startsWith('/dashboard')) {
+    if (!isStaff) return NextResponse.redirect(new URL(user ? '/login?denied=1' : '/login', req.url));
+    if (!hasMfa) return NextResponse.redirect(new URL('/login?mfa=1', req.url));
   }
 
-  if (req.nextUrl.pathname.startsWith('/login') && isStaff) {
+  if (req.nextUrl.pathname.startsWith('/login') && isStaff && hasMfa) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 

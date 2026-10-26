@@ -55,6 +55,21 @@ describe('getStaff / requireStaff', () => {
     expect(await getStaff()).toBeNull();
   });
 
+  it('rejects staff who have not completed TOTP (aal1) and sends pages to the MFA step', async () => {
+    signInAs(ADMIN, { user_type: 'admin', status: 'active' }, {}, 'aal1');
+    expect(await getStaff()).toBeNull();
+    await expect(requireStaff()).rejects.toThrow('REDIRECT:/login?mfa=1');
+  });
+
+  it('refuses every server action at aal1', async () => {
+    signInAs(ADMIN, { user_type: 'admin', status: 'active' }, {}, 'aal1');
+    expect(await getKycDocumentUrl('ver-1', 'front')).toEqual(UNAUTHORIZED);
+    expect(await moderateAdAction('ad-1', 'approved')).toEqual(UNAUTHORIZED);
+    expect(await updateConfigAction('maintenance_mode', true)).toEqual(UNAUTHORIZED);
+    expect(state.signedUrls).toHaveLength(0);
+    expect(adminClient.rpc).not.toHaveBeenCalled();
+  });
+
   it('accepts an active moderator, but not for admin-only areas', async () => {
     signInAs(MOD, { user_type: 'moderator', status: 'pending_verification' });
     expect(await getStaff()).toEqual({ id: MOD, role: 'moderator' });

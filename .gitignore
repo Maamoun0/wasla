@@ -37,3 +37,4 @@ firebase-debug.log
 supabase/.temp/
 .temp/
 
+supabase/.branches/

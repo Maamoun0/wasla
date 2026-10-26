@@ -63,9 +63,10 @@ class SubscriptionController extends StateNotifier<SubscriptionState> {
   // Fetch plans from subscription_plans table ordered by sort_order
   Future<void> fetchPlans() async {
     try {
+      // Each plan carries its purchasable package (price charged by create-payment).
       final response = await _client
           .from('subscription_plans')
-          .select()
+          .select('*, payment_packages(id, price_egp, duration_days)')
           .eq('is_active', true)
           .order('sort_order', ascending: true);
 
@@ -110,16 +111,18 @@ class SubscriptionController extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isVerifying: true, errorMessage: () => null);
 
     try {
-      final price = (selectedPlan['price_monthly'] as num?)?.toDouble() ?? 0.0;
-      
+      final package = monthlyPackageOf(selectedPlan);
+      if (package == null) {
+        state = state.copyWith(
+          isVerifying: false,
+          errorMessage: () => 'هذه الباقة غير متاحة للشراء حالياً',
+        );
+        return null;
+      }
+
       final functionResponse = await _client.functions.invoke(
         'create-payment',
-        body: {
-          'type': 'subscription',
-          'reference_id': selectedPlan['id'].toString(),
-          'amount': price,
-          'payment_method': 'card', // default method for Sandbox
-        },
+        body: {'package_id': package['id']},
       );
 
       state = state.copyWith(isVerifying: false);
@@ -142,6 +145,15 @@ class SubscriptionController extends StateNotifier<SubscriptionState> {
       return null;
     }
   }
+}
+
+/// The active 30-day package attached to a plan row, if any.
+Map<String, dynamic>? monthlyPackageOf(Map<String, dynamic> plan) {
+  final packages = (plan['payment_packages'] as List?)?.cast<Map<String, dynamic>>() ?? const [];
+  for (final p in packages) {
+    if (p['duration_days'] == 30) return p;
+  }
+  return null;
 }
 
 final subscriptionControllerProvider = StateNotifierProvider.autoDispose<SubscriptionController, SubscriptionState>((ref) {

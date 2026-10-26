@@ -136,7 +136,9 @@ class SubscriptionScreen extends ConsumerWidget {
                     
                     // Check if this plan is the user's currently active subscription
                     final isActive = activePlanId == planId || (state.activeSubscription == null && isFreePlan);
-                    final price = (plan['price_monthly'] as num?)?.toDouble() ?? 0.0;
+                    final package = monthlyPackageOf(plan);
+                    final price = (package?['price_egp'] as num?)?.toDouble()
+                        ?? (plan['price_monthly'] as num?)?.toDouble() ?? 0.0;
                     final maxAds = plan['max_ads'] as int? ?? 5;
                     final maxImages = plan['max_images_per_ad'] as int? ?? 4;
                     final features = plan['features'] as Map<String, dynamic>? ?? {};

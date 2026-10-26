@@ -119,67 +119,24 @@ class BoostController extends StateNotifier<BoostState> {
     }
   }
 
-  // Fetch package configurations dynamically from public.app_configs
+  // Boost packages and their prices come from public.payment_packages,
+  // the same table create-payment charges from.
   Future<void> fetchPackages() async {
-    try {
-      final response = await _client
-          .from('app_configs')
-          .select()
-          .like('key', 'boost_%');
+    final response = await _client
+        .from('payment_packages')
+        .select('id, name_ar, price_egp, boost_type, duration_days')
+        .eq('kind', 'ad_boost')
+        .eq('is_active', true)
+        .order('price_egp', ascending: true);
 
-      final List<BoostPackage> parsedPackages = [];
-      
-      for (final item in response) {
-        final key = item['key'] as String;
-        final value = double.tryParse(item['value'] as String? ?? '0') ?? 0.0;
-
-        String nameAr = 'باقة الترقية';
-        String type = 'bump';
-        int durationDays = 1;
-
-        if (key == 'boost_featured_3d') {
-          nameAr = 'إعلان مميز (3 أيام)';
-          type = 'featured';
-          durationDays = 3;
-        } else if (key == 'boost_featured_7d') {
-          nameAr = 'إعلان مميز (7 أيام)';
-          type = 'featured';
-          durationDays = 7;
-        } else if (key == 'boost_featured_14d') {
-          nameAr = 'إعلان مميز (14 يوم)';
-          type = 'featured';
-          durationDays = 14;
-        } else if (key == 'boost_featured_30d') {
-          nameAr = 'إعلان مميز (30 يوم)';
-          type = 'featured';
-          durationDays = 30;
-        } else if (key == 'boost_urgent_7d') {
-          nameAr = 'إعلان عاجل (7 أيام)';
-          type = 'urgent';
-          durationDays = 7;
-        } else if (key == 'boost_bump') {
-          nameAr = 'تحديث الترتيب (Bump)';
-          type = 'bump';
-          durationDays = 1;
-        } else {
-          continue; // Skip other configurations
-        }
-
-        parsedPackages.add(BoostPackage(
-          key: key,
-          price: value,
-          nameAr: nameAr,
-          type: type,
-          durationDays: durationDays,
+    final packages = (response as List).map((item) => BoostPackage(
+          key: item['id'] as String,
+          price: (item['price_egp'] as num).toDouble(),
+          nameAr: item['name_ar'] as String,
+          type: item['boost_type'] as String,
+          durationDays: item['duration_days'] as int,
         ));
-      }
-
-      // Sort by price ascending
-      parsedPackages.sort((a, b) => a.price.compareTo(b.price));
-      state = state.copyWith(packages: parsedPackages);
-    } catch (e) {
-      rethrow;
-    }
+    state = state.copyWith(packages: packages.toList());
   }
 
   void selectAd(Map<String, dynamic>? ad) {
@@ -251,15 +208,8 @@ class BoostController extends StateNotifier<BoostState> {
       final functionResponse = await _client.functions.invoke(
         'create-payment',
         body: {
-          'type': 'ad_boost',
-          'reference_id': ad['id'],
-          'amount': package.price,
-          'payment_method': 'card', // default method for Sandbox
-          'metadata': {
-            'boost_package_key': package.key,
-            'boost_type': package.type,
-            'duration_days': package.durationDays,
-          }
+          'package_id': package.key,
+          'ad_id': ad['id'],
         },
       );
 

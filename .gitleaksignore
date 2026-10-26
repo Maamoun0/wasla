@@ -1,0 +1,23 @@
+# Reviewed gitleaks findings that are not secrets (2026-10-26, see docs/audit/AUDIT_REPORT.md §16).
+# Any new finding still fails CI.
+
+# test-only HMAC secret constant
+8d7bd92e1279ad075c28a669482731c90075a833:supabase/functions/submit-kyc-request/handler_test.ts:generic-api-key:5
+# fake payment key in a test fixture (base64 of a JWT header)
+efd45a28f8983b4e1f6b0d6e423d7cbfcbefe869:supabase/tests/database/12_transaction_retention.test.sql:generic-api-key:31
+# PEM header string only; the test generates a throwaway RSA key at runtime
+fb88070d354b7dae42668ffed0cd5d9c68960401:supabase/functions/dispatch-notifications/fcm_test.ts:private-key:14
+# Supabase anon key (role=anon, public by design, decoded during the audit)
+5d508bc02df7cfdc9b1a5e23d96321081e14d0b4:frontend/mobile/wasla/lib/core/constants/app_constants.dart:jwt:151
+# Supabase anon key (role=anon, public by design, decoded during the audit)
+5d508bc02df7cfdc9b1a5e23d96321081e14d0b4:scripts/check_db.py:jwt:10
+# Supabase anon key (role=anon, public by design, decoded during the audit)
+5d508bc02df7cfdc9b1a5e23d96321081e14d0b4:scripts/generate_inserts.py:jwt:10
+# Supabase anon key (role=anon, public by design, decoded during the audit)
+5d508bc02df7cfdc9b1a5e23d96321081e14d0b4:scripts/insert_all.py:jwt:6
+# Supabase anon key (role=anon, public by design, decoded during the audit)
+5d508bc02df7cfdc9b1a5e23d96321081e14d0b4:scripts/verify_ad_flow.py:jwt:12
+# Supabase anon key (role=anon, public by design, decoded during the audit)
+333e1e7dd871954512359d78195311cd39a9ad4c:frontend/mobile/wasla/lib/core/constants/app_constants.dart:jwt:151
+# truncated placeholder (eyJ...)
+e86498a88c075db3258f8332d322c3709c85f9ed:README.md:generic-api-key:33

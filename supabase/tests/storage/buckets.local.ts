@@ -1,9 +1,9 @@
-// Ad image storage through the real Storage API of a local stack
-// (supabase start). Covers what SQL tests cannot: delete/overwrite through
-// the API, MIME and size limits enforced by storage-api.
+// Public image buckets ("ads", "avatars") through the real Storage API of a
+// local stack (supabase start). Covers what SQL tests cannot: delete and
+// overwrite through the API, MIME and size limits enforced by storage-api.
 // Needs WASLA_SUPABASE_URL (localhost), WASLA_SUPABASE_ANON_KEY and
 // WASLA_SUPABASE_SERVICE_ROLE_KEY; never point it at a hosted project.
-//   deno test --no-lock --no-check --allow-env --allow-net supabase/tests/storage/ads_bucket.local.ts
+//   deno test --no-lock --no-check --allow-env --allow-net supabase/tests/storage/buckets.local.ts
 import { assert, assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -26,8 +26,9 @@ async function signedInUser(admin: SupabaseClient, label: string) {
   return { id: data.user.id, client };
 }
 
+function bucketSuite(bucket: string, maxBytes: number) {
 Deno.test({
-  name: "ads bucket: owner-only writes, public read, images only, 5 MB max (local Storage API)",
+  name: `${bucket} bucket: owner-only writes, public read, images only, ${maxBytes / 1024 / 1024} MB max (local Storage API)`,
   ignore: !enabled,
   sanitizeOps: false,
   sanitizeResources: false,
@@ -40,59 +41,63 @@ Deno.test({
 
     try {
       await t.step("owner uploads into own folder", async () => {
-        const { error } = await a.client.storage.from("ads").upload(aPath, JPEG, { contentType: "image/jpeg" });
+        const { error } = await a.client.storage.from(bucket).upload(aPath, JPEG, { contentType: "image/jpeg" });
         assertEquals(error, null);
       });
 
       await t.step("anyone can read it through the public URL", async () => {
-        const res = await fetch(admin.storage.from("ads").getPublicUrl(aPath).data.publicUrl);
+        const res = await fetch(admin.storage.from(bucket).getPublicUrl(aPath).data.publicUrl);
         await res.body?.cancel();
         assertEquals(res.status, 200);
       });
 
       await t.step("another user cannot overwrite it", async () => {
-        const { error } = await b.client.storage.from("ads").upload(aPath, JPEG, { contentType: "image/jpeg", upsert: true });
+        const { error } = await b.client.storage.from(bucket).upload(aPath, JPEG, { contentType: "image/jpeg", upsert: true });
         assert(error !== null, "overwrite must be refused");
       });
 
       await t.step("another user cannot delete it", async () => {
-        await b.client.storage.from("ads").remove([aPath]);
-        const { data } = await admin.storage.from("ads").list(`${a.id}/draft-1`);
+        await b.client.storage.from(bucket).remove([aPath]);
+        const { data } = await admin.storage.from(bucket).list(`${a.id}/draft-1`);
         assertEquals(data?.map((f) => f.name), ["img-1.jpg"]);
       });
 
       await t.step("another user cannot upload into the owner's folder", async () => {
-        const { error } = await b.client.storage.from("ads").upload(`${a.id}/draft-1/evil.jpg`, JPEG, { contentType: "image/jpeg" });
+        const { error } = await b.client.storage.from(bucket).upload(`${a.id}/draft-1/evil.jpg`, JPEG, { contentType: "image/jpeg" });
         assert(error !== null);
       });
 
       await t.step("anonymous upload is refused", async () => {
-        const { error } = await anon.storage.from("ads").upload(`${a.id}/anon.jpg`, JPEG, { contentType: "image/jpeg" });
+        const { error } = await anon.storage.from(bucket).upload(`${a.id}/anon.jpg`, JPEG, { contentType: "image/jpeg" });
         assert(error !== null);
       });
 
       await t.step("non-image content is refused", async () => {
-        const { error } = await a.client.storage.from("ads").upload(`${a.id}/draft-1/notes.txt`, new TextEncoder().encode("hi"), { contentType: "text/plain" });
+        const { error } = await a.client.storage.from(bucket).upload(`${a.id}/draft-1/notes.txt`, new TextEncoder().encode("hi"), { contentType: "text/plain" });
         assert(error !== null);
       });
 
-      await t.step("files over 5 MB are refused", async () => {
-        const big = new Uint8Array(5 * 1024 * 1024 + 1);
+      await t.step(`files over ${maxBytes / 1024 / 1024} MB are refused`, async () => {
+        const big = new Uint8Array(maxBytes + 1);
         big.set(JPEG);
-        const { error } = await a.client.storage.from("ads").upload(`${a.id}/draft-1/big.jpg`, big, { contentType: "image/jpeg" });
+        const { error } = await a.client.storage.from(bucket).upload(`${a.id}/draft-1/big.jpg`, big, { contentType: "image/jpeg" });
         assert(error !== null);
       });
 
       await t.step("owner can delete own image", async () => {
-        await a.client.storage.from("ads").remove([aPath]);
-        const { data } = await admin.storage.from("ads").list(`${a.id}/draft-1`);
+        await a.client.storage.from(bucket).remove([aPath]);
+        const { data } = await admin.storage.from(bucket).list(`${a.id}/draft-1`);
         assertEquals(data?.length ?? 0, 0);
       });
     } finally {
-      const { data: leftovers } = await admin.storage.from("ads").list(`${a.id}/draft-1`);
-      if (leftovers?.length) await admin.storage.from("ads").remove(leftovers.map((f) => `${a.id}/draft-1/${f.name}`));
+      const { data: leftovers } = await admin.storage.from(bucket).list(`${a.id}/draft-1`);
+      if (leftovers?.length) await admin.storage.from(bucket).remove(leftovers.map((f) => `${a.id}/draft-1/${f.name}`));
       await admin.auth.admin.deleteUser(a.id);
       await admin.auth.admin.deleteUser(b.id);
     }
   },
 });
+}
+
+bucketSuite("ads", 5 * 1024 * 1024);
+bucketSuite("avatars", 2 * 1024 * 1024);

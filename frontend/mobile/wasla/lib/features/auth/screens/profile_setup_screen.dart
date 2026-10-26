@@ -31,7 +31,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
   Future<void> _pickAndUploadAvatar() async {
     final picker = ImagePicker();
-    final image  = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    // Keep well under the bucket's 2 MB limit.
+    final image  = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80, maxWidth: 1024, maxHeight: 1024);
     if (image == null) return;
 
     final uid    = Supabase.instance.client.auth.currentUser?.id;
@@ -40,13 +41,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     setState(() => _isLoading = true);
     try {
       final bytes = await image.readAsBytes();
-      final path  = 'avatars/$uid/avatar.jpg';
+      // Storage policies only allow writes inside the user's own `{uid}/` folder.
+      final path  = '$uid/avatar.jpg';
 
       await Supabase.instance.client.storage
           .from('avatars')
-          .uploadBinary(path, bytes, fileOptions: const FileOptions(upsert: true));
+          .uploadBinary(path, bytes, fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true));
 
-      final url = Supabase.instance.client.storage.from('avatars').getPublicUrl(path);
+      // Same object name on every change: version the URL so caches pick up the new photo.
+      final url = '${Supabase.instance.client.storage.from('avatars').getPublicUrl(path)}?v=${DateTime.now().millisecondsSinceEpoch}';
       setState(() => _avatarUrl = url);
     } catch (e) {
       _showError('حدث خطأ في رفع الصورة');

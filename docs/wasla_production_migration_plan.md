@@ -62,6 +62,10 @@ Until both secrets exist, the `dispatch-notifications` and `purge-deleted-accoun
 - Enable TOTP MFA (Authentication → Multi-Factor). It is mandatory for admin-panel staff and enforced server-side at `aal2`.
 - Create the first admin with email and password, then set `public.users.user_type = 'admin'` with the service role. That user enrolls TOTP on first login.
 
-## 5. Flutter production config
+## 5. Data retention
+
+When an account is purged 30 days after a deletion request, its payment transactions are kept, anonymised: no `user_id`, no ad reference, and metadata reduced to non-personal gateway fields. Proposed retention is 5 years, to be confirmed by legal counsel. Automatic removal after that period is not implemented yet. See `docs/wasla_security_privacy_plan.md` §6.
+
+## 6. Flutter production config
 
 Build with `--dart-define=SUPABASE_URL=...` and `--dart-define=SUPABASE_ANON_KEY=...` for the new project. Use the production `google-services.json` and `GoogleService-Info.plist`.

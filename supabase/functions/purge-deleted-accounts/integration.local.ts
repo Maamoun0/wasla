@@ -36,6 +36,13 @@ Deno.test({
       await user.storage.from("ads").upload(`${userId}/draft-2/img-1.jpg`, JPEG, { contentType: "image/jpeg" });
       await user.storage.from("avatars").upload(`${userId}/avatar.jpg`, JPEG, { contentType: "image/jpeg" });
 
+      const { data: tx, error: txError } = await admin.from("transactions").insert({
+        user_id: userId, type: "ad_boost", amount: 60, payment_method: "card", payment_gateway: "paymob",
+        gateway_transaction_id: `order-${userId}`, status: "completed",
+        metadata: { billing: { userEmail: email }, gateway: { id: 4242, order_id: `order-${userId}`, amount_cents: 6000 } },
+      }).select("id").single();
+      if (txError) throw txError;
+
       const { data: req, error: reqError } = await user.rpc("request_account_deletion", { p_reason: "test" }).single<{ id: string }>();
       if (reqError) throw reqError;
 
@@ -64,6 +71,16 @@ Deno.test({
       assertEquals(avatars, []);
       const { data: closed } = await admin.from("account_deletion_requests").select("status, user_id").eq("id", req!.id).single();
       assertEquals(closed, { status: "completed", user_id: null });
+
+      // The payment record is kept, without anything linking it to the person.
+      const { data: kept } = await admin.from("transactions").select("user_id, amount, gateway_transaction_id, metadata").eq("id", tx!.id).single();
+      assertEquals(kept, {
+        user_id: null,
+        amount: 60,
+        gateway_transaction_id: `order-${userId}`,
+        metadata: { gateway: { id: 4242, order_id: `order-${userId}`, amount_cents: 6000 } },
+      });
+      await admin.from("transactions").delete().eq("id", tx!.id);
     } finally {
       await admin.auth.admin.deleteUser(userId).catch(() => {});
     }

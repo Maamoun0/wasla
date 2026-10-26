@@ -1,35 +1,66 @@
 # Wasla Production Migration Plan
 
-This document outlines the steps for migrating Wasla from Staging to Production for Sprint 10.
+Production will be a **new** Supabase project created at launch. The two existing projects are for development only.
 
-## 1. Database Schema Execution Order
-Execute the following scripts in order on the Production Supabase instance:
-1. `backend/database/wasla-schema.sql` (Core tables & initial seed)
-2. `backend/database/wasla-phase0-schema-additions.sql`
-3. `backend/database/sprint8_setup.sql` (Activity logging)
-4. `backend/database/sprint9_notifications.sql` (Push notification infra)
-5. `backend/database/sprint10_security_legal.sql` (Security hardening & legal table)
+## 1. Database
 
-## 2. Edge Functions Deployment
-Deploy the following functions using `supabase functions deploy [name] --project-ref [PROD_REF]`:
+The schema lives only in `supabase/migrations/` (starting with `0000_baseline.sql`), including reference data (governorates, cities, districts, categories and their dynamic fields, subscription plans, payment packages, app configs).
+
+> ⚠️ Never run the legacy scripts in `backend/database/` or `database/` against any live project. `wasla-schema.sql` starts with `DROP SCHEMA public CASCADE`.
+
+Verify locally first:
+
+```bash
+npx supabase@2.120.0 start
+npx supabase@2.120.0 db reset
+npx supabase@2.120.0 test db
+```
+
+Then link and push to the new project:
+
+```bash
+npx supabase@2.120.0 link --project-ref <PROD_REF>
+npx supabase@2.120.0 db push
+```
+
+## 2. Edge Functions
+
+Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
+
 - `request-otp`
-- `ai-content-review`
 - `create-ad`
+- `ai-content-review`
+- `analyze-ad-image`
 - `submit-kyc-request`
+- `get-kyc-document`
 - `create-payment`
 - `payment-webhook`
-- `notify-watchlist-match`
-- `notify-ad-status`
+- `dispatch-notifications`
 
-## 3. Production Secrets (Supabase Vault)
-The following secrets must be set in the Production project:
-- `SUPABASE_URL` & `SUPABASE_SERVICE_ROLE_KEY`
-- `PAYMOB_API_KEY`, `PAYMOB_IFRAME_ID`, `PAYMOB_HMAC_SECRET`
-- `FIREBASE_SERVICE_ACCOUNT` (JSON for FCM)
-- `POSTHOG_API_KEY`
-- `SENTRY_DSN`
+## 3. Secrets
 
-## 4. Flutter Production Config
-1. Create branch `feature/production-config`.
-2. Update `.env` with Production Supabase URL and Anon Key.
-3. Verify that `google-services.json` and `GoogleService-Info.plist` correspond to the Production Firebase project.
+Edge Function secrets (`supabase secrets set ...`):
+
+- `PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_HMAC_SECRET`
+- `FIREBASE_SERVICE_ACCOUNT`: the Firebase service-account JSON, used by `dispatch-notifications` for FCM HTTP v1
+- `ANTHROPIC_API_KEY`
+
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to Edge Functions by the platform.
+
+Vault secrets for the notification dispatcher cron job. Run these in the SQL editor of the new project:
+
+```sql
+select vault.create_secret('https://<PROD_REF>.supabase.co', 'project_url');
+select vault.create_secret('<service_role key>', 'service_role_key');
+```
+
+Until both secrets exist, the `dispatch-notifications` cron tick does nothing and notifications stay queued in `notifications_outbox`.
+
+## 4. Auth
+
+- Enable TOTP MFA (Authentication → Multi-Factor). It is mandatory for admin-panel staff and enforced server-side at `aal2`.
+- Create the first admin with email and password, then set `public.users.user_type = 'admin'` with the service role. That user enrolls TOTP on first login.
+
+## 5. Flutter production config
+
+Build with `--dart-define=SUPABASE_URL=...` and `--dart-define=SUPABASE_ANON_KEY=...` for the new project. Use the production `google-services.json` and `GoogleService-Info.plist`.

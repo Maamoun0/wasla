@@ -126,16 +126,16 @@
 | FR-2.3 | فلاتر: قسم، سعر، مدينة، حي، نوع، تاريخ | فهارس موجودة | — | `ads_provider.dart:137-142` | — | ❌ | ⚠️ | لا فلتر حي ولا تاريخ؛ فلتر القسم الرئيسي يرجع صفراً لأن الإعلانات تُحفظ بمعرّف فرعي |
 | FR-2.4 | عرض خريطة مع Clusters | — | — | — | — | ❌ | ❌ | `GoogleMap` يُستخدم فقط لاختيار الموقع (`location_price_screen.dart:504`)؛ مفتاح Maps placeholder في `AndroidManifest.xml`/`AppDelegate.swift` (تعديل غير مُرسَل) |
 | FR-3.1 | معالج 5 خطوات، حتى 8 صور | `ad_media` | `create-ad` | `post_ad/` (6 شاشات) | — | `post_ad_wizard_test.dart` | ⚠️ | حد 8 صور في العميل فقط (`add_photos_screen.dart:24`)؛ لا تحقق في الخادم؛ لا integration test |
-| FR-3.2 | حقول ديناميكية حسب القسم | `category_fields` | `create-ad` (بلا تحقق إلزامية/نوع) | `dynamic_field_builder.dart` | — | ❌ | 🐛 | Probe P9: 34 قسماً فرعياً = 0 حقول |
-| FR-3.3 | معلَّق → مراجعة → نشط 30 يوماً | `expire-ads` cron | `moderate_ad` | `my_ads_screen.dart` | `ads/` | ❌ | 🐛 | الاعتماد يفشل (trigger `pg_net`)؛ `expires_at` يُحسب من الإنشاء لا من الاعتماد؛ لا تمديد |
+| FR-3.2 | حقول ديناميكية حسب القسم | `category_fields`, `get_category_fields()` | `create-ad` (يتحقق من الإلزامي والقيم) | `category_fields_provider.dart` | — | pgTAP 14 + Deno 5 | ⚠️ | مُصلح (§10): كل الأقسام الفرعية لها حقول. متبقٍ: تجربة المعالج على جهاز فعلي |
+| FR-3.3 | معلَّق → مراجعة → نشط 30 يوماً | `expire-ads` cron | `moderate_ad` | `my_ads_screen.dart` | `ads/` | pgTAP 05 | ⚠️ | الاعتماد يعمل الآن (§10). متبقٍ: `expires_at` يُحسب من الإنشاء لا من الاعتماد، ولا يوجد تمديد |
 | FR-4.1 | مفضلة + ملاحظات | `favorites.notes` | — | `saved_screen.dart:79-163` | — | ❌ | ⚠️ | العرض موجود؛ لم أجد تحريراً للملاحظة؛ غير مختبر |
-| FR-4.2 | بحث محفوظ + إشعار فوري | `saved_searches`, trigger | `notify-watchlist-match` | `saved_screen.dart:205` | — | ❌ | 🐛 | الإرسال `console.log` فقط؛ الـ trigger يعتمد على `pg_net` و`app.settings` غير المعرّفين؛ الدالة بلا تحقق هوية |
+| FR-4.2 | بحث محفوظ + إشعار فوري | `saved_searches`, `notifications_outbox` | `dispatch-notifications` (FCM v1) | `saved_screen.dart` | — | pgTAP 29 + Deno 10 + تكامل محلي | ⚠️ | المطابقة والإرسال يعملان (§10). متبقٍ: لا توجد واجهة لإنشاء بحث محفوظ، والإرسال لـ FCM الحقيقي لم يُجرَّب (لا يوجد service account) |
 | FR-4.3 | تسجيل نقرات الاتصال/واتساب | `contact_logs` | — | `ads_provider.dart:253` | — | ❌ | ⚠️ | سياسة الإدراج `WITH CHECK (TRUE)` (`wasla-schema.sql:896`) → تزوير/إغراق الإحصائيات |
 | FR-4.4 | تقييم 1-5 + رد واحد للمعلن | `reviews`, `review_responses UNIQUE(review_id)` | — | `reviews_controller.dart`, `my_reviews_screen.dart` | — | `trust_score_calculation_test.dart` | ⚠️ | منطق الأهلية في trigger؛ غير مختبر ضد القاعدة |
 | FR-5.1 | Paymob (بطاقة، فوري، محفظة) | `transactions`, `payment_packages`, `fulfill_payment()` | `create-payment`, `payment-webhook` | `payment_webview_screen.dart` | — | pgTAP 26 + Deno 23 | ⚠️ | 🔴(ب) مُصلح ومختبر محلياً (§9). متبقٍ: تجربة Paymob Sandbox فعلية، وتكامل فوري/المحفظة (يوجد integration بطاقة واحد فقط) |
 | FR-5.2 | Featured / Urgent / Bump | `ad_boosts`, `payment_packages`, cron | `fulfill_payment()` | `boost_ad_screen.dart`, `boost_controller.dart` | — | pgTAP 26 | ⚠️ | النوع والمدة من الباقة على السيرفر (§9). متبقٍ: Sandbox + انتهاء الصلاحية عبر cron غير مختبر |
 | FR-5.3 | اشتراكات تجارية بحدود أعلى | `subscription_plans` (RLS معطّل) | webhook | `subscription_screen.dart` | — | `monetization_test.dart` | 🐛 | مدة ثابتة 30 يوماً؛ لا يوجد فرض لحدود الإعلانات في أي مكان؛ أي زائر يعدّل جدول الخطط |
-| FR-6.1 | مراجعة الإعلانات + سبب + إشعار | `ad_moderation_log` | `moderate_ad` | — | `ads/` | ❌ | 🐛 | اللوحة لا تُبنى؛ Server Action ترجع غير مصرح دائماً؛ الدالة بلا فحص مشرف (C3)؛ الإشعار غير مُرسَل |
+| FR-6.1 | مراجعة الإعلانات + سبب + إشعار | `ad_moderation_log` | `moderate_ad` + outbox | — | `ads/` | pgTAP + Vitest | ⚠️ | الاعتماد/الرفض والإشعار يعملان (§10). متبقٍ: تجربة اللوحة يدوياً من المتصفح |
 | FR-6.2 | بلاغات + حظر | `reports`, `audit_logs` | `handle_report` | بلاغ من `ad_detail_screen.dart:532` | `reports/`, `users/` | ❌ | 🐛 | نفس عيوب FR-6.1؛ enum الحالة لا يحتوي `banned` (`wasla-schema.sql:30`) واللوحة ترسل `banned` |
 | NFR-1.1 | الصفحة الرئيسية ≤ 2 ثانية | فهارس | — | pagination موجود | — | `scripts/wasla-load-test.js` لم يُشغَّل | ❌ | لا قياس |
 | NFR-1.2 | ضغط تلقائي وتحويل WebP على السيرفر | — | — | `imageQuality: 80, maxWidth: 1600` على العميل | — | ❌ | ❌ | `grep webp` = 0 |
@@ -146,7 +146,7 @@
 | NFR-4.1 | عربية كاملة RTL + خط Cairo | — | — | خطوط Cairo + `easy_localization` (`ar-EG.json`) | `dir="rtl"` | ❌ | ⚠️ | 104 نص عربي hardcoded في `Text('…')` مقابل 113 استخدام `.tr()` |
 | NFR-4.2 | Android 8+ / iOS 13+ | — | — | iOS target 13.0؛ Android `flutter.minSdkVersion` | — | ❌ | ⚠️ | لا اختبار على أجهزة |
 
-**الإجمالي (محدَّث بعد §9):** ✅ 0 — ⚠️ 14 — ❌ 6 — 🐛 8
+**الإجمالي (محدَّث بعد §10):** ✅ 0 — ⚠️ 18 — ❌ 6 — 🐛 4
 
 ---
 
@@ -295,3 +295,78 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 | Edge Functions | `deno test` 23/23 — `deno check` للدالتين المعدّلتين exit 0 — `deno lint` 10 مشاكل (كانت 17) |
 | Admin | Vitest 17/17 — tsc 0 — lint 0 — build 0 |
 | Flutter | `flutter test` 43/43 (كانت 41) — `flutter analyze` نفس الـ 15 مشكلة السابقة، لا جديد |
+
+---
+
+## 10. المرحلة الثالثة (تابع): القرارات الأربعة، ثم 🟠 (أ)(ب)
+
+**نقطة البداية:** التطبيق لم يُطلق ولا توجد بيانات. المرجع الآن هو `supabase/migrations/` فقط. Production سيكون مشروعاً جديداً.
+
+### الـ baseline: `supabase db reset` من الصفر
+```
+الملفات: supabase/migrations/0000_baseline.sql, supabase/config.toml, scripts/db/*
+الاختبار: npx supabase@2.120.0 db reset && npx supabase@2.120.0 test db
+الدليل: 6 migrations طُبّقت بلا أخطاء؛ Files=5, Tests=129, Result: PASS
+        بيانات مرجعية بعد الـ reset: 27 محافظة، 58 مدينة، 53 حياً، 39 قسماً، 4 خطط، 9 باقات دفع، 2 bucket، 7 cron jobs
+الـ commit: 3ad7a62
+```
+الـ baseline ناتج عن pg_dump للمخطط الذي تبنيه الملفات القديمة، بدون `DROP SCHEMA`. يتضمن: البيانات المرجعية، trigger على `auth.users`، الـ buckets وسياساتها، ومهام cron. أبقيته مطابقاً للواقع، بعيوبه، والإصلاحات في migrations لاحقة.
+
+### القرارات الأربعة
+| البند | الـ commit | الدليل |
+|---|---|---|
+| `reveal_seller_phone(ad_id)` للمسجّلين فقط. الحد 20 إعلاناً مختلفاً/ساعة و100/يوم (من `app_configs`)، وتكرار نفس الإعلان خلال 24 ساعة لا يُحسب. كل طلب يُسجَّل في `phone_reveal_log` (`revealed` / `rate_limited` / `not_available`). حلّت محل `get_ad_contact` | `c1f685a` | pgTAP 20/20، والاختبار فشل أولاً. Flutter 46/46 |
+| MFA بـ TOTP إجباري لكل staff. الفحص على السيرفر يتطلب `aal2` في كل صفحة وaction، وmiddleware يطبّق نفس القاعدة أولاً. حُذفت الخطوة الشكلية | `a912a24` | Vitest 22/22، منها 3 على GoTrue محلي حقيقي: enroll → aal2، دخول جديد → aal1، رمز خاطئ يُرفض |
+| `credit_purchase`: لا توجد واجهة في التطبيق أصلاً. أضفت رفضاً على السيرفر في `create-payment` | `77490da` | Deno 12/12 |
+
+### 🟠(أ) Post Ad Wizard
+```
+المهمة: الحقول الديناميكية لكل الأقسام الفرعية + "خدمات" و"سلع"، وتصحيح الاستعلام
+المتطلب المرتبط: FR-3.2, FR-3.1
+الملفات: supabase/migrations/20261027100000_category_fields_seed.sql, supabase/tests/database/04_category_fields.test.sql,
+         supabase/functions/create-ad/{fields.ts, fields_test.ts, index.ts},
+         frontend/mobile/wasla/lib/features/post_ad/providers/category_fields_provider.dart
+معيار القبول: كل قسم فرعي نشط له حقول؛ الحقول المشتركة من القسم الأب تظهر أولاً؛ create-ad يرفض الحقول الإلزامية الناقصة والقيم خارج الخيارات
+الاختبار: supabase test db — deno test create-ad
+الدليل: قبل الإصلاح الاختبار فشل (الدالة غير موجودة، و34 قسماً فرعياً بلا حقول).
+        بعده: 14/14. واستدعاء REST حقيقي بمفتاح anon لـ get_category_fields(شقق للإيجار) أرجع 6 حقول:
+        area_sqm من القسم الأب أولاً، ثم rooms, bathrooms, floor, furnished, rent_period
+الحالة: ✅ في قاعدة البيانات والسيرفر، ⚠️ لم يُجرَّب على جهاز
+الـ commit: 87d2091
+```
+
+### 🟠(ب) notifications_outbox + FCM
+```
+المهمة: استبدال triggers الـ pg_net بـ outbox + Edge Function، وتفعيل إرسال FCM فعلياً
+المتطلب المرتبط: FR-3.3, FR-4.2, FR-6.1
+الملفات: supabase/migrations/20261027110000_notifications_outbox.sql, supabase/tests/database/05_notifications.test.sql,
+         supabase/functions/dispatch-notifications/*, حذف notify-ad-status و notify-watchlist-match
+معيار القبول: الاعتماد والرفض لا يستدعيان الشبكة داخل الـ transaction؛ فشل الإشعار لا يلغي العملية؛ إرسال حقيقي عبر FCM HTTP v1؛ التوكنات الميتة تُعطَّل؛ إعادة المحاولة مع backoff
+الاختبار: supabase test db — deno test — deno test --no-check --allow-env --allow-net dispatch-notifications/integration.local.ts
+الدليل: قبل الإصلاح الاختبار فشل: "approving an ad succeeds" not ok.
+        بعده: 29/29، ومنها اعتماد ينجح والـ outbox مُعطَّل عمداً (إعادة تسمية الجدول).
+        Deno 10/10: توقيع JWT من نوع RS256 يُتحقق منه بالمفتاح العام المقابل، وشكل رسالة HTTP v1، وحالتا UNREGISTERED/404.
+        تكامل على Supabase المحلي: اعتماد → outbox → dispatcher → sent، والتوكن الميت صار is_active=false
+الحالة: ✅ محلياً، ⚠️ لم يُرسَل لـ FCM حقيقي
+الـ commit: fb88070
+```
+- الـ cron يستدعي الـ dispatcher كل دقيقة عبر `pg_net`. هذا هو الاستدعاء الشبكي الوحيد المتبقي، ويحدث خارج أي transaction للمستخدم. يقرأ `project_url` و`service_role_key` من Vault، وتعليمات الإعداد في `docs/wasla_production_migration_plan.md`.
+- تفضيلات المستخدم محترمة: إيقاف `ad_status_updates` أو `watchlist_matches` يمنع الـ push فقط، والإشعار داخل التطبيق يُسجَّل دائماً.
+
+### نتائج كل الحزم بعد §10
+| الحزمة | النتيجة |
+|---|---|
+| Supabase CLI | `db reset` بـ 6 migrations، و`test db` 129/129 |
+| Docker runner | 129/129 |
+| Edge Functions | `deno test` 39/39، وتكامل 1/1. `deno lint` فيه 8 مشاكل، كلها `any` في دوال لم تُلمس |
+| Admin | Vitest 22/22، tsc وlint وbuild كلها exit 0 |
+| Flutter | 46/46، و`analyze` فيه نفس الـ 15 مشكلة القديمة |
+
+### نتائج جديدة
+| # | المشكلة | الدليل | الأولوية |
+|---|---|---|---|
+| N7 | **أي مستخدم مسجَّل يقدر يعدّل أو يحذف أي صورة إعلان.** سياسات `Auth Users Update/Delete/Upload` على bucket `ads` تفحص `auth.role()='authenticated'` فقط، بدون مجلد المالك | `0000_baseline.sql` (سياسات storage.objects) | 🔴 |
+| N8 | مهمة cron `cleanup-stale-transactions` تضع `status='expired'` وهي ليست قيمة في `transaction_status_enum`، فتفشل كل ساعة | `cron.job` | 🟠 |
+| N9 | bucket `avatars` غير موجود، فرفع الصورة الشخصية يفشل (FR-1.3) | `storage.buckets` = `ads`, `id-documents` فقط | 🟠 |
+| N10 | لا توجد واجهة لحفظ بحث (FR-4.2)، وشاشة الإشعارات فارغة رغم أن جدول `notifications` يمتلئ الآن | `saved_searches` لا يُكتب من التطبيق؛ `notifications_screen.dart` | 🟡 |
+| N11 | الإرسال الفعلي لـ FCM لم يُجرَّب لعدم توفر Firebase service account | — | يحتاج `FIREBASE_SERVICE_ACCOUNT` |

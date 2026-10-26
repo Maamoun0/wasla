@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
+import { buildAdFields, FieldDefinition } from "./fields.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -133,51 +134,27 @@ serve(async (req) => {
       console.error("Error invoking AI review function or timeout reached:", err);
     }
 
+    // Effective fields for the chosen subcategory: the parent's shared fields plus its own.
     const { data: catFields, error: catFieldsErr } = await supabase
-      .from("category_fields")
-      .select("id, field_name, field_type")
-      .eq("category_id", category_id);
+      .rpc("get_category_fields", { p_category_id: category_id });
 
     if (catFieldsErr) throw catFieldsErr;
 
-    const fieldsToInsert = [];
-    if (dynamic_fields && typeof dynamic_fields === "object") {
-      for (const field of catFields) {
-        const val = dynamic_fields[field.field_name];
-        if (val === undefined || val === null) continue;
-
-        let valText = null;
-        let valNum = null;
-        let valBool = null;
-        let valJson = null;
-
-        if (field.field_type === "text" || field.field_type === "select") {
-          valText = String(val);
-        } else if (field.field_type === "number") {
-          valNum = Number(val);
-        } else if (field.field_type === "boolean") {
-          valBool = Boolean(val);
-          valText = valBool ? "نعم" : "لا";
-        } else if (field.field_type === "range") {
-          valJson = val;
-          if (val.min !== undefined && val.max !== undefined) {
-            valText = `${val.min} - ${val.max}`;
-          }
-        } else if (field.field_type === "multi_select") {
-          valJson = val;
-          if (Array.isArray(val)) {
-            valText = val.join(", ");
-          }
-        }
-
-        fieldsToInsert.push({
-          field_id: field.id,
-          value_text: valText,
-          value_number: valNum,
-          value_boolean: valBool,
-          value_json: valJson,
-        });
-      }
+    const { rows: fieldsToInsert, missingRequired, invalid } = buildAdFields(
+      (catFields ?? []) as FieldDefinition[],
+      dynamic_fields,
+    );
+    if (missingRequired.length > 0 || invalid.length > 0) {
+      return new Response(
+        JSON.stringify({
+          error: missingRequired.length > 0
+            ? `حقول مطلوبة غير مكتملة: ${missingRequired.join("، ")}`
+            : `قيم غير صالحة في: ${invalid.join("، ")}`,
+          missing_fields: missingRequired,
+          invalid_fields: invalid,
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const { data: adId, error: txErr } = await supabase.rpc("create_ad_transaction", {

@@ -2,7 +2,7 @@
 
 - **التاريخ:** 2026-10-26
 - **الفرع:** `develop` @ `333e1e7` + تعديلات غير مُرسَلة (uncommitted) في شجرة العمل
-- **النطاق:** قراءة فقط. لم يُعدَّل أي سطر كود. الملف الوحيد المُضاف هو هذا التقرير.
+- **النطاق:** §1–§8 = المرحلة الأولى (قراءة فقط). §9 = المرحلة الثالثة، البنود 🔴 (أ)(ب)(ج) على الفرع `fix/audit`.
 - **منهج الأدلة:** كل حكم مرفق إما بمخرجات أمر فعلي أو بمسار ملف + رقم سطر. الأدلة الحية لقاعدة البيانات جاءت من تطبيق ملفات SQL الموجودة في الريبو على حاوية `supabase/postgres:15.8.1.085` مؤقتة (التفاصيل في §3.4).
 
 ---
@@ -132,21 +132,21 @@
 | FR-4.2 | بحث محفوظ + إشعار فوري | `saved_searches`, trigger | `notify-watchlist-match` | `saved_screen.dart:205` | — | ❌ | 🐛 | الإرسال `console.log` فقط؛ الـ trigger يعتمد على `pg_net` و`app.settings` غير المعرّفين؛ الدالة بلا تحقق هوية |
 | FR-4.3 | تسجيل نقرات الاتصال/واتساب | `contact_logs` | — | `ads_provider.dart:253` | — | ❌ | ⚠️ | سياسة الإدراج `WITH CHECK (TRUE)` (`wasla-schema.sql:896`) → تزوير/إغراق الإحصائيات |
 | FR-4.4 | تقييم 1-5 + رد واحد للمعلن | `reviews`, `review_responses UNIQUE(review_id)` | — | `reviews_controller.dart`, `my_reviews_screen.dart` | — | `trust_score_calculation_test.dart` | ⚠️ | منطق الأهلية في trigger؛ غير مختبر ضد القاعدة |
-| FR-5.1 | Paymob (بطاقة، فوري، محفظة) | `transactions` | `create-payment`, `payment-webhook` | `payment_webview_screen.dart` | — | widget test فقط | 🐛 | C5؛ idempotency عبر check-then-update غير ذرّي؛ `credit_purchase` لا يضيف رصيداً عند النجاح؛ بيانات billing افتراضية `test@wasla.eg` / `+201000000000` (`create-payment/index.ts:455-456`) |
-| FR-5.2 | Featured / Urgent / Bump | `ad_boosts`, cron | webhook | `boost_ad_screen.dart`, `boost_controller.dart` | — | `monetization_test.dart` | 🐛 | النوع والمدة من `metadata` العميل |
+| FR-5.1 | Paymob (بطاقة، فوري، محفظة) | `transactions`, `payment_packages`, `fulfill_payment()` | `create-payment`, `payment-webhook` | `payment_webview_screen.dart` | — | pgTAP 26 + Deno 23 | ⚠️ | 🔴(ب) مُصلح ومختبر محلياً (§9). متبقٍ: تجربة Paymob Sandbox فعلية، وتكامل فوري/المحفظة (يوجد integration بطاقة واحد فقط) |
+| FR-5.2 | Featured / Urgent / Bump | `ad_boosts`, `payment_packages`, cron | `fulfill_payment()` | `boost_ad_screen.dart`, `boost_controller.dart` | — | pgTAP 26 | ⚠️ | النوع والمدة من الباقة على السيرفر (§9). متبقٍ: Sandbox + انتهاء الصلاحية عبر cron غير مختبر |
 | FR-5.3 | اشتراكات تجارية بحدود أعلى | `subscription_plans` (RLS معطّل) | webhook | `subscription_screen.dart` | — | `monetization_test.dart` | 🐛 | مدة ثابتة 30 يوماً؛ لا يوجد فرض لحدود الإعلانات في أي مكان؛ أي زائر يعدّل جدول الخطط |
 | FR-6.1 | مراجعة الإعلانات + سبب + إشعار | `ad_moderation_log` | `moderate_ad` | — | `ads/` | ❌ | 🐛 | اللوحة لا تُبنى؛ Server Action ترجع غير مصرح دائماً؛ الدالة بلا فحص مشرف (C3)؛ الإشعار غير مُرسَل |
 | FR-6.2 | بلاغات + حظر | `reports`, `audit_logs` | `handle_report` | بلاغ من `ad_detail_screen.dart:532` | `reports/`, `users/` | ❌ | 🐛 | نفس عيوب FR-6.1؛ enum الحالة لا يحتوي `banned` (`wasla-schema.sql:30`) واللوحة ترسل `banned` |
 | NFR-1.1 | الصفحة الرئيسية ≤ 2 ثانية | فهارس | — | pagination موجود | — | `scripts/wasla-load-test.js` لم يُشغَّل | ❌ | لا قياس |
 | NFR-1.2 | ضغط تلقائي وتحويل WebP على السيرفر | — | — | `imageQuality: 80, maxWidth: 1600` على العميل | — | ❌ | ❌ | `grep webp` = 0 |
 | NFR-2.1 | HTTPS/TLS | — | Supabase/Paymob https | — | — | ❌ | ⚠️ | الافتراضي https؛ لم يُتحقق من إعدادات الإنتاج |
-| NFR-2.2 | مستندات الهوية خاصة + روابط مؤقتة للمشرف | bucket خاص (P11) | `get-kyc-document` (300 ثانية) | — | `getSignedUrl` | ❌ | 🐛 | C6 (رابط بلا تحقق)؛ فحص المشرف يعتمد `user_type` القابل للتصعيد (C1)؛ الخطة تطلب حذف المستندات بعد القرار — غير منفّذ |
+| NFR-2.2 | مستندات الهوية خاصة + روابط مؤقتة للمشرف | bucket خاص (P11) | `get-kyc-document` (300 ثانية) | — | `getKycDocumentUrl` | Vitest 17 | ⚠️ | 🔴(ج) مُصلح (§9). متبقٍ: حذف المستندات بعد القرار، وتشفير الرقم القومي |
 | NFR-3.1 | توافرية 99.9% | — | — | — | — | — | ❌ | لا Sentry/Uptime/PostHog في الكود |
 | NFR-3.2 | Offline cache للإعلانات المحفوظة | — | — | — | — | — | ❌ | لا Hive/sqflite/cache |
 | NFR-4.1 | عربية كاملة RTL + خط Cairo | — | — | خطوط Cairo + `easy_localization` (`ar-EG.json`) | `dir="rtl"` | ❌ | ⚠️ | 104 نص عربي hardcoded في `Text('…')` مقابل 113 استخدام `.tr()` |
 | NFR-4.2 | Android 8+ / iOS 13+ | — | — | iOS target 13.0؛ Android `flutter.minSdkVersion` | — | ❌ | ⚠️ | لا اختبار على أجهزة |
 
-**الإجمالي:** ✅ 0 — ⚠️ 12 — ❌ 6 — 🐛 10
+**الإجمالي (محدَّث بعد §9):** ✅ 0 — ⚠️ 14 — ❌ 6 — 🐛 8
 
 ---
 
@@ -212,3 +212,86 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 - `flutter build apk --release` وبناء iOS.
 - أي اختبار end-to-end أو اختبار على مشروع Supabase حي أو على Paymob Sandbox.
 - اختبارات RLS لكل جدول بشكل منهجي — نُفِّذت 14 probe مستهدفة فقط.
+
+---
+
+## 9. المرحلة الثالثة — البنود 🔴 (أ)(ب)(ج)
+
+**الفروع:** `wip-before-audit` (`5d508bc`: التعديلات غير المُرسَلة كما هي) ← `fix/audit`.
+**تحفّظ مهم:** لم يصل الـ schema dump للإنتاج بعد، فلا يوجد baseline migration. الـ migrations الجديدة مكتوبة بحيث تتحمّل اختلاف أسماء السياسات والكائنات (حلقات على `pg_policy`/`pg_proc` و`to_regclass`)، واختُبرت على مخطط مُعاد بناؤه من ملفات SQL القديمة داخل حاوية مؤقتة (`LEGACY_BASELINE=1 scripts/db/run_db_tests.sh`). **يجب إعادة تشغيل الاختبارات نفسها فوق الـ baseline الحقيقي عند وصوله وقبل أي تطبيق على بيئة حية.** لم يُطبَّق شيء على أي مشروع Supabase.
+
+### (أ) SEC — قفل صلاحيات العميل
+```
+المهمة: SEC-02/03/04 — RLS على كل الجداول، سحب EXECUTE من دوال الإشراف، منع تعديل الدور/التوثيق/الرصيد، إخفاء phone/email
+المتطلب المرتبط: NFR-2.2, FR-1.4, FR-6.1, FR-6.2
+الملفات: supabase/migrations/20261026100000_sec_client_lockdown.sql
+         supabase/tests/database/01_rls_lockdown.test.sql
+         frontend/mobile/wasla/lib/{shared/providers/ads_provider.dart, features/ads/screens/ad_detail_screen.dart, features/auth/providers/auth_provider.dart}
+معيار القبول: كل probes المرحلة الأولى (P2, P3, P4, P8, P13, P14) تفشل بـ 42501؛ المالك يقرأ بياناته؛ service_role لا يتأثر
+الاختبار: LEGACY_BASELINE=1 scripts/db/run_db_tests.sh
+الدليل: قبل الـ migration: 14 من أول 15 تأكيداً فشلت (مثلاً "anon cannot read users.phone — caught: no exception")
+        بعد الـ migration: 01_rls_lockdown 40/40 ok
+الحالة: ✅ (على المخطط المُعاد بناؤه)
+الـ commit: 1393df3
+```
+- القراءة العامة لـ `users` صارت أعمدة محددة فقط؛ `phone/email/user_type/status` للمالك عبر `get_my_profile()`.
+- **قرار منتج نفّذته ويحتاج تأكيدك:** رقم البائع يُعطى عبر `get_ad_contact()` **لمستخدم مسجَّل فقط** (تسجيل التواصل يتم تلقائياً، ويمنع جمع الأرقام من زوار مجهولين). الزائر يُحوَّل لشاشة الدخول عند الضغط على اتصال/واتساب. يمكن فتحه للزوار إن أردت.
+- دوال الـ trust score صارت `SECURITY DEFINER` لأنها تكتب في صفوف مستخدمين آخرين.
+
+### (ب) PAY — التسعير على السيرفر
+```
+المهمة: PAY-01 — جدول أسعار، العميل يرسل package_id فقط، الـ webhook يتحقق من HMAC والمبلغ
+المتطلب المرتبط: FR-5.1, FR-5.2, FR-5.3
+الملفات: supabase/migrations/20261026110000_pay_server_side_pricing.sql
+         supabase/tests/database/02_payments.test.sql
+         supabase/functions/create-payment/{handler.ts, paymob.ts, index.ts, handler_test.ts}
+         supabase/functions/payment-webhook/{handler.ts, index.ts, handler_test.ts}
+         frontend/mobile/wasla/lib/features/profile/{providers/boost_controller.dart, providers/subscription_controller.dart, screens/subscription_screen.dart}
+         frontend/mobile/wasla/test/features/profile/subscription_package_test.dart
+معيار القبول: المبلغ/النوع/المدة من العميل تُتجاهل؛ دفع ناقص أو بعملة أخرى لا يفعّل شيئاً؛ الإشعار المكرر لا يفعّل مرتين؛ HMAC خاطئ أو مبلغ معدَّل بنفس HMAC = 401
+الاختبار: scripts/db/run_db_tests.sh (02_payments) — deno test --no-lock create-payment payment-webhook
+الدليل: 02_payments 26/26 ok — Deno 23 passed / 0 failed — HMAC مطابق لمتجه مرجعي محسوب مستقلاً بـ Python hmac/SHA-512
+الحالة: ✅ محلياً — ⚠️ لم يُجرَّب على Paymob Sandbox
+الـ commit: 65d7c2c
+```
+- `payment_packages` مُعبّأ من الأسعار الحالية: boosts من `app_configs` (30/60/100/180/40/10)، والاشتراكات الشهرية من `subscription_plans.price_monthly` (99/199/499).
+- `fulfill_payment()` يقفل الصف (`FOR UPDATE`) ويُرجع `completed | failed | amount_mismatch | already_processed | not_found`. المعالجة المتزامنة محمية بقفل الصف، لكن لم أكتب اختباراً بجلستين متوازيتين.
+- إصلاحات جانبية لازمة: `protect_ad_sensitive_fields` كان يمنع الـ webhook والإشراف من تعديل الإعلان (يعتمد `is_moderator()` = false لـ service_role)؛ صار يطبَّق على أدوار العميل فقط. شراء الرصيد لم يكن يضيف شيئاً وصار يعمل. الاشتراك كان يكتب رقم الخطة في عمود UUID (`reference_id`) فيفشل الإدراج.
+- **لم أُضِف باقات رصيد** (`credit_purchase`): لا توجد أسعار معرّفة لها — قرار تسعير لك.
+
+### (ج) ADM — صلاحيات الأدمن على السيرفر
+```
+المهمة: ADM-01 — بناء اللوحة، Next 14.2.35، فحص staff في كل صفحة وServer Action، getSignedUrl
+المتطلب المرتبط: FR-6.1, FR-6.2, NFR-2.2
+الملفات: frontend/admin/{lib/auth.ts, lib/supabase/server.ts, lib/supabase/browser.ts, middleware.ts,
+         app/dashboard/**/{page,actions}.ts(x), app/dashboard/layout.tsx, app/login/page.tsx,
+         components/KYCImagePreview.tsx, tsconfig.json, .eslintrc.json, tailwind.config.ts, postcss.config.js,
+         vitest.config.ts, tests/*, package.json, package-lock.json, .gitignore}
+معيار القبول: لا صفحة ولا action تعمل لغير staff؛ الدور من public.users لا من user_metadata؛ رابط مستند الهوية فقط لمسار مسجَّل على طلب توثيق، مع سجل تدقيق؛ مفتاح service_role لا يصل للمتصفح
+الاختبار: cd frontend/admin && npm test && npx tsc --noEmit && npx next lint && npx next build
+الدليل: Vitest 17/17 — tsc exit 0 — lint exit 0 (تحذيران في كود قديم) — next build exit 0
+        بناء بقيمة canary للمفتاح: 0 ظهور في .next/static (مقابل ظهور مفتاح anon كما هو متوقع)
+الحالة: ✅
+الـ commit: d1356aa
+```
+- `getSignedUrl(path)` حُذفت؛ البديل `getKycDocumentUrl(verificationId, side)` لا يقبل مساراً من العميل، ويستخدم bucket `id-documents` الصحيح (كانت `kyc-documents` فلم تكن تعمل أصلاً)، صلاحية 300 ثانية، ويُسجَّل في `audit_logs`.
+- المشرف لا يغيّر حالة حساب admin/moderator؛ الإعدادات للـ admin فقط؛ لا أحد يغيّر حالة حسابه.
+- صفحة الدخول كانت تستخدم عميلاً يخزّن الجلسة في localStorage فلا يراها السيرفر؛ صارت cookies.
+
+### نتائج جديدة اكتُشفت أثناء التنفيذ (لم تُصلح — خارج نطاق 🔴)
+| # | المشكلة | الدليل | الأولوية المقترحة |
+|---|---|---|---|
+| N1 | كل إدراج تقييم يفشل: `refresh_user_trust_score()` يقرأ `NEW.user_id` على جدول `reviews` | خطأ `42703: record "new" has no field "user_id"` أثناء اختبار (أ) | 🟠 |
+| N2 | "2FA" في دخول اللوحة شكلي: الرمز لا يُتحقق منه أبداً (`login/page.tsx`) | قراءة الكود | 🟠 — يحتاج قرارك: Supabase MFA (TOTP) أم إزالة الخطوة |
+| N3 | إعدادات اللوحة تكتب في `config_key/config_value` بينما الجدول `key/value` | `settings/actions.ts` مقابل `wasla-schema.sql:535` | 🟠 |
+| N4 | زر "حظر" يرسل `banned` وهي ليست قيمة في `user_status_enum`، و`signOut` لا يمنع الدخول مجدداً | `wasla-schema.sql:30` | 🟠 |
+| N5 | قراءة باقات الـ boost في التطبيق كانت تفشل (`value as String` على JSONB رقمي) — استُبدلت ضمن (ب) | `boost_controller.dart` القديم | مُصلح |
+| N6 | `deno lint`: بقي 10 مشاكل `no-explicit-any` في دوال لم تُلمس | `deno lint` | 🟢 |
+
+### نتائج كل الحزم بعد (أ)(ب)(ج)
+| الحزمة | النتيجة |
+|---|---|
+| DB (pgTAP) | 66/66 ok — `LEGACY_BASELINE=1 scripts/db/run_db_tests.sh` → `RESULT: PASS` |
+| Edge Functions | `deno test` 23/23 — `deno check` للدالتين المعدّلتين exit 0 — `deno lint` 10 مشاكل (كانت 17) |
+| Admin | Vitest 17/17 — tsc 0 — lint 0 — build 0 |
+| Flutter | `flutter test` 43/43 (كانت 41) — `flutter analyze` نفس الـ 15 مشكلة السابقة، لا جديد |

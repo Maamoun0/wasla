@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { buildAdFields, FieldDefinition } from "./fields.ts";
+import { validateAdImages } from "./images.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,6 +65,20 @@ serve(async (req) => {
     if (!temp_draft_id || !category_id || !title || !description || !city_id) {
       return new Response(
         JSON.stringify({ error: "البيانات الأساسية للإعلان غير مكتملة." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Images must come from the caller's own folder in the "ads" bucket. The app
+    // builds public URLs from the project URL; PUBLIC_SUPABASE_URL covers setups
+    // where the function sees an internal SUPABASE_URL (e.g. local development).
+    const allowedOrigins = [supabaseUrl, Deno.env.get("PUBLIC_SUPABASE_URL") ?? ""]
+      .filter(Boolean)
+      .map((u) => new URL(u).origin);
+    const imagesError = validateAdImages(images, user.id, allowedOrigins);
+    if (imagesError) {
+      return new Response(
+        JSON.stringify({ error: imagesError }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

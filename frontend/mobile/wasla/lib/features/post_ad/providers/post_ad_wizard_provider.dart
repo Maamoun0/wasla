@@ -39,15 +39,32 @@ class PostAdWizardState extends Equatable {
   }
 }
 
+/// Uploads one ad image and returns its public URL.
+/// Paths are `{userId}/{draftId}/{imageId}.jpg`: storage policies only allow
+/// writes inside the caller's own `{userId}/` folder.
+typedef AdImageUploader = Future<String> Function(String path, File file);
+
+AdImageUploader supabaseAdImageUploader(SupabaseClient client) => (path, file) async {
+      await client.storage.from('ads').upload(
+            path,
+            file,
+            fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+          );
+      return client.storage.from('ads').getPublicUrl(path);
+    };
+
 class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
   final SupabaseClient? _client;
   final String? _userId;
+  final AdImageUploader? _uploader;
 
   PostAdWizardNotifier({
     SupabaseClient? client,
     String? userId,
+    AdImageUploader? uploader,
   })  : _client = client,
         _userId = userId,
+        _uploader = uploader ?? (client != null ? supabaseAdImageUploader(client) : null),
         super(PostAdWizardState(
           draft: DraftAd(tempDraftId: const Uuid().v4()),
         ));
@@ -160,7 +177,7 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
 
   // Upload an image to Supabase storage bucket 'ads'
   Future<void> uploadImage(String imgId) async {
-    final client = _client;
+    final uploader = _uploader;
     final userId = _userId;
 
     final imageIndex = state.draft.images.indexWhere((img) => img.id == imgId);
@@ -170,6 +187,16 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
     final file = img.localFile;
     if (file == null) return;
 
+    if (uploader == null || userId == null) {
+      _updateImageState(
+        imgId,
+        isUploading: false,
+        uploadProgress: 0.0,
+        uploadError: () => 'يجب تسجيل الدخول لرفع الصور',
+      );
+      return;
+    }
+
     _updateImageState(
       imgId,
       isUploading: true,
@@ -177,10 +204,9 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
       uploadError: () => null,
     );
 
-    // Mock progress updates for a smoother UI (Supabase doesn't support progress stream out-of-box)
-    Timer? progressTimer;
+    // Approximate progress for the UI (the upload call does not report progress).
     double progress = 0.0;
-    progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    final progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (progress < 0.9) {
         progress += 0.1;
         _updateImageState(imgId, uploadProgress: progress);
@@ -189,35 +215,9 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
       }
     });
 
-    if (client == null || userId == null) {
-      // In test environment or unauthenticated, mock success
-      await Future.delayed(const Duration(milliseconds: 500));
-      progressTimer.cancel();
-      _updateImageState(
-        imgId,
-        isUploading: false,
-        uploadProgress: 1.0,
-        remoteUrl: () => 'https://mock.wasla.com/ads/$userId/${state.draft.tempDraftId}/$imgId.jpg',
-        uploadError: () => null,
-      );
-      return;
-    }
-
     try {
-      final path = '$userId/${state.draft.tempDraftId}/$imgId.jpg';
-
-      await client.storage.from('ads').upload(
-        path,
-        file,
-        fileOptions: const FileOptions(
-          contentType: 'image/jpeg',
-          upsert: true,
-        ),
-      );
-
+      final remoteUrl = await uploader('$userId/${state.draft.tempDraftId}/$imgId.jpg', file);
       progressTimer.cancel();
-      final remoteUrl = client.storage.from('ads').getPublicUrl(path);
-
       _updateImageState(
         imgId,
         isUploading: false,

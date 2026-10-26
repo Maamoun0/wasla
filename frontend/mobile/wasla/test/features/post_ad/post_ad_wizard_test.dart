@@ -164,16 +164,34 @@ void main() {
     });
 
     test('isStepValid() for Photos Step validation', () async {
-      notifier.setStep(WizardStep.photos);
-      expect(notifier.isStepValid(WizardStep.photos), false);
+      final uploaded = <String>[];
+      final signedIn = PostAdWizardNotifier(
+        userId: 'user-1',
+        uploader: (path, file) async {
+          uploaded.add(path);
+          return 'https://example.test/storage/v1/object/public/ads/$path';
+        },
+      );
+      signedIn.setStep(WizardStep.photos);
+      expect(signedIn.isStepValid(WizardStep.photos), false);
 
-      // Add image - in test mode (client is null) it completes in 500ms.
+      signedIn.addImage(File('test.jpg'));
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      expect(signedIn.isStepValid(WizardStep.photos), true);
+      // Images go into the uploader's own folder, which storage policies require.
+      expect(uploaded.single, startsWith('user-1/${signedIn.state.draft.tempDraftId}/'));
+      signedIn.dispose();
+    });
+
+    test('uploading without a signed-in user fails instead of faking success', () async {
       notifier.addImage(File('test.jpg'));
-      
-      // Wait for the async mock upload to complete
-      await Future.delayed(const Duration(milliseconds: 600));
-      
-      expect(notifier.isStepValid(WizardStep.photos), true);
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      final img = notifier.state.draft.images.single;
+      expect(img.remoteUrl, isNull);
+      expect(img.uploadError, isNotNull);
+      expect(notifier.isStepValid(WizardStep.photos), false);
     });
   });
 }

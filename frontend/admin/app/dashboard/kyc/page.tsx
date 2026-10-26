@@ -17,6 +17,7 @@ export default async function KYCPage() {
       document_url,
       document_back_url,
       selfie_url,
+      national_id_last4,
       status,
       created_at,
       users (full_name, phone)
@@ -52,6 +53,12 @@ export default async function KYCPage() {
                 <td className="px-6 py-4">
                   <div className="font-cairo text-sm font-bold text-gray-900">{v.users?.full_name}</div>
                   <div className="font-cairo text-xs text-gray-500">{v.users?.phone}</div>
+                  {/* Only the last 4 digits are stored; compare them with the card image. */}
+                  {v.national_id_last4 && (
+                    <div className="font-cairo text-xs text-gray-700 mt-1">
+                      الرقم القومي: <span dir="ltr">••••••••••{v.national_id_last4}</span>
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2">

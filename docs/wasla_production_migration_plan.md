@@ -42,6 +42,7 @@ Edge Function secrets (`supabase secrets set ...`):
 - `PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_HMAC_SECRET`
 - `FIREBASE_SERVICE_ACCOUNT`: the Firebase service-account JSON, used by `dispatch-notifications` for FCM HTTP v1
 - `ANTHROPIC_API_KEY`, `MODERATION_MODEL_FAST`, `MODERATION_MODEL_DEEP` (AI ad review inside `create-ad`; see `supabase/functions/.env.example`)
+- `KYC_NATIONAL_ID_HMAC_SECRET`: at least 32 random characters (`openssl rand -hex 32`). `submit-kyc-request` refuses every request without it. Generate it once for production and never reuse the dev value. **Do not rotate it casually:** requests hashed with the old secret no longer match new ones, so the same national ID could then be verified on a second account. If it must change (leak), run the rotation as a planned job and accept that duplicate detection covers only requests made after the change.
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to Edge Functions by the platform.
 

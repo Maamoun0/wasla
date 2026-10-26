@@ -1,22 +1,37 @@
 // Accepts a national-ID verification request: validates the ID, stores the
 // card images in the private id-documents bucket and opens a pending
 // verification for a moderator. Documents are deleted after the decision
-// (purge-kyc-documents).
+// (purge-kyc-documents). The ID itself is never stored: only its last 4
+// digits and an HMAC computed here (see national_id.ts).
+
+import { normalizeNationalId } from "./national_id.ts";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/** Thrown by createVerification when another live request already holds the ID. */
+export class DuplicateNationalIdError extends Error {}
+
+// Deliberately vague: it must not confirm that the ID belongs to another account.
+export const NATIONAL_ID_REJECTED = "تعذّر قبول طلب التحقق بهذه البيانات. إذا كنت تعتقد أن هذا خطأ، تواصل مع الدعم.";
+
 export interface SubmitKycDeps {
   authenticate(token: string): Promise<string | null>;
   hasPendingRequest(userId: string): Promise<boolean>;
+  /** HMAC-SHA256 of the normalized ID with the server-side secret. */
+  nationalIdHmac(normalizedId: string): Promise<string>;
+  /** True when a pending or approved request of another user has this HMAC. */
+  nationalIdInUse(hmac: string, userId: string): Promise<boolean>;
   uploadDocument(path: string, bytes: Uint8Array): Promise<void>;
+  removeDocuments(paths: string[]): Promise<void>;
   createVerification(row: {
     user_id: string;
     document_url: string;
     document_back_url: string;
-    national_id: string;
+    national_id_last4: string;
+    national_id_hmac: string;
   }): Promise<void>;
   updateFullName(userId: string, fullName: string): Promise<void>;
   now(): number;
@@ -109,7 +124,7 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   const fullName = typeof body.full_name === "string" ? body.full_name.trim() : "";
   if (!fullName) return json({ error: "الاسم الكامل مطلوب" }, 400);
 
-  const nationalId = typeof body.national_id === "string" ? body.national_id : "";
+  const nationalId = typeof body.national_id === "string" ? normalizeNationalId(body.national_id) : "";
   const idValidation = validateNationalId(nationalId);
   if (!idValidation.isValid) return json({ error: idValidation.error }, 400);
 
@@ -118,6 +133,9 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   }
 
   if (await deps.hasPendingRequest(userId)) return json({ error: "لديك طلب تحقق قيد المراجعة بالفعل" }, 400);
+
+  const hmac = await deps.nationalIdHmac(nationalId);
+  if (await deps.nationalIdInUse(hmac, userId)) return json({ error: NATIONAL_ID_REJECTED }, 400);
 
   let frontBytes: Uint8Array;
   let backBytes: Uint8Array;
@@ -131,15 +149,23 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   const folder = `${userId}/kyc/${deps.now()}`;
   const frontPath = `${folder}/front.jpg`;
   const backPath = `${folder}/back.jpg`;
-  await deps.uploadDocument(frontPath, frontBytes);
-  await deps.uploadDocument(backPath, backBytes);
-
-  await deps.createVerification({
-    user_id: userId,
-    document_url: frontPath,
-    document_back_url: backPath,
-    national_id: nationalId.trim(),
-  });
+  try {
+    await deps.uploadDocument(frontPath, frontBytes);
+    await deps.uploadDocument(backPath, backBytes);
+    await deps.createVerification({
+      user_id: userId,
+      document_url: frontPath,
+      document_back_url: backPath,
+      national_id_last4: nationalId.slice(-4),
+      national_id_hmac: hmac,
+    });
+  } catch (error) {
+    // No request row means nobody will ever review or purge these images.
+    await deps.removeDocuments([frontPath, backPath]).catch(() => {});
+    // A concurrent request took the ID between the check and the insert.
+    if (error instanceof DuplicateNationalIdError) return json({ error: NATIONAL_ID_REJECTED }, 400);
+    throw error;
+  }
   await deps.updateFullName(userId, fullName);
 
   return json({ success: true, message: "تم تقديم طلب التحقق بنجاح." }, 200);

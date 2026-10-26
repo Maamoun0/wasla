@@ -42,5 +42,12 @@ void main() {
       // Assuming today is 2026-06-24, future birth dates are invalid
       expect(NationalIdValidator.validate('39905280101234'), 'تاريخ الميلاد في الرقم القومي لا يمكن أن يكون في المستقبل');
     });
+
+    test('Arabic digits and spaces normalize to the same ID the server hashes', () {
+      for (final input in ['29505280101234', ' 2950 5280 101234 ', '٢٩٥٠٥٢٨٠١٠١٢٣٤', '۲۹۵۰۵۲۸۰۱۰۱۲۳۴']) {
+        expect(NationalIdValidator.normalize(input), '29505280101234', reason: input);
+        expect(NationalIdValidator.validate(input), isNull, reason: input);
+      }
+    });
   });
 }

@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders, handleSubmitKyc } from "./handler.ts";
 import { supabaseDeps } from "./deps.ts";
+import { hmacSecretFrom } from "./national_id.ts";
 
 serve(async (req) => {
   try {
@@ -13,7 +14,9 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
-    return await handleSubmitKyc(req, supabaseDeps(supabase));
+    // Fails closed: without the secret no request is accepted.
+    const hmacSecret = hmacSecretFrom(Deno.env.get("KYC_NATIONAL_ID_HMAC_SECRET"));
+    return await handleSubmitKyc(req, supabaseDeps(supabase, hmacSecret));
   } catch (error) {
     // Log without request data: it carries identity documents.
     console.error("submit-kyc-request: unhandled error", error instanceof Error ? error.message : error);

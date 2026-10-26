@@ -73,7 +73,8 @@ class VerificationController extends StateNotifier<VerificationState> {
     try {
       final response = await _client
           .from('user_verifications')
-          .select()
+          // Explicit columns: the HMAC and code hash are not readable by clients.
+          .select('id, status, created_at, decided_at, national_id_last4')
           .eq('user_id', _userId)
           .eq('type', 'national_id')
           .order('created_at', ascending: false)
@@ -191,7 +192,8 @@ class VerificationController extends StateNotifier<VerificationState> {
         'submit-kyc-request',
         body: {
           'full_name': state.fullName.trim(),
-          'national_id': state.nationalId.trim(),
+          // Plain ID over TLS; the server keeps only the last 4 digits and an HMAC.
+          'national_id': NationalIdValidator.normalize(state.nationalId),
           'front_image': base64Front,
           'back_image': base64Back,
         },

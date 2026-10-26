@@ -1,10 +1,21 @@
 class NationalIdValidator {
+  /// Removes whitespace and maps Arabic digits (٠-٩, ۰-۹) to ASCII, the same
+  /// way submit-kyc-request does before computing the HMAC.
+  static String normalize(String value) {
+    final noSpaces = value.replaceAll(RegExp(r'\s+'), '');
+    return String.fromCharCodes(noSpaces.runes.map((c) {
+      if (c >= 0x0660 && c <= 0x0669) return c - 0x0660 + 0x30;
+      if (c >= 0x06F0 && c <= 0x06F9) return c - 0x06F0 + 0x30;
+      return c;
+    }));
+  }
+
   static String? validate(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'الرقم القومي مطلوب';
     }
     
-    final id = value.trim();
+    final id = normalize(value);
     
     if (id.length != 14) {
       return 'يجب أن يتكون الرقم القومي من 14 رقماً';

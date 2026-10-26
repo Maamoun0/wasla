@@ -9,12 +9,9 @@ SELECT plan(26);
 INSERT INTO auth.users (id, email, phone, raw_user_meta_data, aud, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'a@test.local', '+201000000001', '{}', 'authenticated', 'authenticated');
 
--- Ads inserted with triggers off: the legacy watchlist trigger needs pg_net.
-SET LOCAL session_replication_role = replica;
 INSERT INTO public.ads (id, user_id, category_id, title, description, city_id, status) VALUES
   ('aaaaaaaa-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111',
    (SELECT id FROM public.categories WHERE slug = 'cars'), 'A ad', 'desc', (SELECT min(id) FROM public.cities), 'active');
-SET LOCAL session_replication_role = origin;
 
 INSERT INTO public.payment_packages (id, kind, name_ar, price_egp, credit_amount)
 VALUES ('test_credit_100', 'credit_purchase', 'رصيد 100', 95, 100);
@@ -62,9 +59,7 @@ SELECT throws_ok($$ UPDATE public.ads SET refreshed_at = now() WHERE id = 'aaaaa
 SELECT lives_ok($$ UPDATE public.ads SET status = 'paused' WHERE id = 'aaaaaaaa-0000-0000-0000-000000000001' $$,
   'A can still pause own ad');
 RESET ROLE;
-SET LOCAL session_replication_role = replica;
 UPDATE public.ads SET status = 'active' WHERE id = 'aaaaaaaa-0000-0000-0000-000000000001';
-SET LOCAL session_replication_role = origin;
 
 -- ── Fulfilment (as service_role, like the webhook) ───────────────
 SET LOCAL ROLE service_role;

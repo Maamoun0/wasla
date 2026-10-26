@@ -9,14 +9,11 @@ INSERT INTO auth.users (id, email, phone, raw_user_meta_data, aud, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'a@test.local', '+201000000001', '{}', 'authenticated', 'authenticated'),
   ('22222222-2222-2222-2222-222222222222', 'b@test.local', '+201000000002', '{}', 'authenticated', 'authenticated');
 
--- Triggers off for fixtures: the legacy notify triggers need pg_net.
-SET LOCAL session_replication_role = replica;
 INSERT INTO public.ads (id, user_id, category_id, title, description, city_id, status)
 SELECT ('aaaaaaaa-0000-0000-0000-00000000000' || n)::uuid, '22222222-2222-2222-2222-222222222222',
        (SELECT id FROM public.categories WHERE slug = 'cars'), 'B ad ' || n, 'desc',
        (SELECT min(id) FROM public.cities), CASE WHEN n = 9 THEN 'pending' ELSE 'active' END::public.ad_status_enum
 FROM generate_series(1, 9) AS n;
-SET LOCAL session_replication_role = origin;
 
 -- Tight limit for the test: 2 distinct ads per hour.
 UPDATE public.app_configs SET value = '2' WHERE key = 'phone_reveal_limit_per_hour';

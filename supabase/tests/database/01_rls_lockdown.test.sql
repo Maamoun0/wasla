@@ -11,9 +11,6 @@ INSERT INTO auth.users (id, email, phone, raw_user_meta_data, aud, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'a@test.local', '+201000000001', '{}', 'authenticated', 'authenticated'),
   ('22222222-2222-2222-2222-222222222222', 'b@test.local', '+201000000002', '{}', 'authenticated', 'authenticated');
 
--- Fixture ads are inserted with triggers off: the legacy watchlist trigger calls
--- net.http_post, which fails until the notifications_outbox replacement lands.
-SET LOCAL session_replication_role = replica;
 INSERT INTO public.ads (id, user_id, category_id, title, description, city_id, status) VALUES
   ('aaaaaaaa-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222',
    (SELECT id FROM public.categories WHERE slug = 'cars'), 'B active ad', 'desc',
@@ -21,7 +18,6 @@ INSERT INTO public.ads (id, user_id, category_id, title, description, city_id, s
   ('aaaaaaaa-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222',
    (SELECT id FROM public.categories WHERE slug = 'cars'), 'B pending ad', 'desc',
    (SELECT min(id) FROM public.cities), 'pending');
-SET LOCAL session_replication_role = origin;
 
 INSERT INTO public.user_verifications (id, user_id, type, status, expires_at) VALUES
   ('cccccccc-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111',

@@ -29,8 +29,6 @@ Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
 
 - `request-otp`
 - `create-ad`
-- `ai-content-review`
-- `analyze-ad-image`
 - `submit-kyc-request`
 - `get-kyc-document`
 - `create-payment`
@@ -44,7 +42,7 @@ Edge Function secrets (`supabase secrets set ...`):
 
 - `PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID`, `PAYMOB_IFRAME_ID`, `PAYMOB_HMAC_SECRET`
 - `FIREBASE_SERVICE_ACCOUNT`: the Firebase service-account JSON, used by `dispatch-notifications` for FCM HTTP v1
-- `ANTHROPIC_API_KEY`
+- `ANTHROPIC_API_KEY`, `MODERATION_MODEL_FAST`, `MODERATION_MODEL_DEEP` (AI ad review inside `create-ad`; see `supabase/functions/.env.example`)
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to Edge Functions by the platform.
 

@@ -3,6 +3,7 @@
 # Secrets and environment variables
 .env
 .env.*
+!.env.example
 *.env
 
 # Keystores and security keys

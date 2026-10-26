@@ -1,217 +1,99 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { buildAdFields, FieldDefinition } from "./fields.ts";
-import { validateAdImages } from "./images.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders, handleCreateAd } from "./handler.ts";
+import type { FieldDefinition } from "./fields.ts";
+import { anthropicClassifier, configFromEnv, moderateAd } from "./moderation.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
-
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error("Supabase environment variables are not configured on the host.");
+      throw new Error("create-ad: required environment variables are missing");
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
+      auth: { autoRefreshToken: false, persistSession: false },
     });
+    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    const classifier = apiKey ? anthropicClassifier(apiKey) : null;
+    const moderationConfig = configFromEnv((k) => Deno.env.get(k));
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "رأس المصادقة (Authorization Header) مفقود." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-
-    if (authErr || !user) {
-      return new Response(
-        JSON.stringify({ error: "غير مصرح: رمز الجلسة غير صالح أو منتهي الصلاحية." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const body = await req.json();
-    const {
-      temp_draft_id,
-      category_id,
-      title,
-      description,
-      ad_type,
-      price,
-      price_type,
-      city_id,
-      district_id,
-      latitude,
-      longitude,
-      images,
-      dynamic_fields,
-    } = body;
-
-    if (!temp_draft_id || !category_id || !title || !description || !city_id) {
-      return new Response(
-        JSON.stringify({ error: "البيانات الأساسية للإعلان غير مكتملة." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Images must come from the caller's own folder in the "ads" bucket. The app
-    // builds public URLs from the project URL; PUBLIC_SUPABASE_URL covers setups
-    // where the function sees an internal SUPABASE_URL (e.g. local development).
-    const allowedOrigins = [supabaseUrl, Deno.env.get("PUBLIC_SUPABASE_URL") ?? ""]
+    // The app builds image URLs from the project URL; PUBLIC_SUPABASE_URL covers
+    // setups where this function sees an internal SUPABASE_URL (local development).
+    const allowedImageOrigins = [supabaseUrl, Deno.env.get("PUBLIC_SUPABASE_URL") ?? ""]
       .filter(Boolean)
       .map((u) => new URL(u).origin);
-    const imagesError = validateAdImages(images, user.id, allowedOrigins);
-    if (imagesError) {
-      return new Response(
-        JSON.stringify({ error: imagesError }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
-    const { data: existingAd, error: checkErr } = await supabase
-      .from("ads")
-      .select("id")
-      .eq("temp_draft_id", temp_draft_id)
-      .maybeSingle();
-
-    if (checkErr) throw checkErr;
-    if (existingAd) {
-      return new Response(
-        JSON.stringify({ success: true, ad_id: existingAd.id, message: "تم نشر الإعلان مسبقاً بنجاح." }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    let categoryName = "غير محدد";
-    try {
-      const { data: catData, error: catFetchErr } = await supabase
-        .from("categories")
-        .select("name_ar")
-        .eq("id", category_id)
-        .single();
-      if (!catFetchErr && catData) {
-        categoryName = catData.name_ar;
-      }
-    } catch (e) {
-      console.warn("Could not fetch category name for review:", e);
-    }
-
-    let aiRiskLevel = "medium";
-    let aiReviewNotes = "فشلت المراجعة التلقائية، تم تعيين مستوى الخطورة افتراضياً إلى متوسط.";
-    let aiLayerUsed = 0;
-
-    try {
-      const reviewUrl = `${supabaseUrl}/functions/v1/ai-content-review`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-      const reviewResponse = await fetch(reviewUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          price,
-          category: categoryName
-        }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (reviewResponse.status === 200) {
-        const reviewData = await reviewResponse.json();
-        aiRiskLevel = reviewData.ai_risk_level ?? "medium";
-        aiReviewNotes = reviewData.ai_review_notes ?? "مراجعة الذكاء الاصطناعي اكتملت.";
-        aiLayerUsed = Number(reviewData.ai_layer_used ?? 0);
-      } else {
-        console.error("AI review function returned non-200 status:", reviewResponse.status);
-      }
-    } catch (err) {
-      console.error("Error invoking AI review function or timeout reached:", err);
-    }
-
-    // Effective fields for the chosen subcategory: the parent's shared fields plus its own.
-    const { data: catFields, error: catFieldsErr } = await supabase
-      .rpc("get_category_fields", { p_category_id: category_id });
-
-    if (catFieldsErr) throw catFieldsErr;
-
-    const { rows: fieldsToInsert, missingRequired, invalid } = buildAdFields(
-      (catFields ?? []) as FieldDefinition[],
-      dynamic_fields,
-    );
-    if (missingRequired.length > 0 || invalid.length > 0) {
-      return new Response(
-        JSON.stringify({
-          error: missingRequired.length > 0
-            ? `حقول مطلوبة غير مكتملة: ${missingRequired.join("، ")}`
-            : `قيم غير صالحة في: ${invalid.join("، ")}`,
-          missing_fields: missingRequired,
-          invalid_fields: invalid,
-        }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const { data: adId, error: txErr } = await supabase.rpc("create_ad_transaction", {
-      p_user_id: user.id,
-      p_temp_draft_id: temp_draft_id,
-      p_category_id: category_id,
-      p_title: title,
-      p_description: description,
-      p_ad_type: ad_type ?? "offering",
-      p_price: price,
-      p_price_type: price_type ?? "fixed",
-      p_city_id: city_id,
-      p_district_id: district_id ?? null,
-      p_latitude: latitude ?? null,
-      p_longitude: longitude ?? null,
-      p_ai_risk_level: aiRiskLevel,
-      p_ai_review_notes: aiReviewNotes,
-      p_ai_layer_used: aiLayerUsed,
-      p_images: images ?? [],
-      p_fields: fieldsToInsert,
+    return await handleCreateAd(req, {
+      allowedImageOrigins,
+      async authenticate(token) {
+        const { data, error } = await supabase.auth.getUser(token);
+        return error || !data.user ? null : data.user.id;
+      },
+      async findAdByDraft(tempDraftId, userId) {
+        const { data, error } = await supabase.from("ads").select("id")
+          .eq("temp_draft_id", tempDraftId).eq("user_id", userId).maybeSingle();
+        if (error) throw error;
+        return data?.id ?? null;
+      },
+      async getCategoryName(categoryId) {
+        const { data } = await supabase.from("categories").select("name_ar").eq("id", categoryId).maybeSingle();
+        return data?.name_ar ?? "غير محدد";
+      },
+      async getCategoryFields(categoryId) {
+        const { data, error } = await supabase.rpc("get_category_fields", { p_category_id: categoryId });
+        if (error) throw error;
+        return (data ?? []) as FieldDefinition[];
+      },
+      async moderationAllowed(userId) {
+        const { data, error } = await supabase.rpc("ai_moderation_allowed", { p_user_id: userId });
+        if (error) throw error;
+        return data === true;
+      },
+      moderate: (ad) => moderateAd(ad, classifier, moderationConfig),
+      async createAd(ad) {
+        const { data, error } = await supabase.rpc("create_ad_transaction", {
+          p_user_id: ad.userId,
+          p_temp_draft_id: ad.tempDraftId,
+          p_category_id: ad.categoryId,
+          p_title: ad.title,
+          p_description: ad.description,
+          p_ad_type: ad.adType,
+          p_price: ad.price,
+          p_price_type: ad.priceType,
+          p_city_id: ad.cityId,
+          p_district_id: ad.districtId,
+          p_latitude: ad.latitude,
+          p_longitude: ad.longitude,
+          p_ai_risk_level: ad.aiRiskLevel,
+          p_ai_review_notes: ad.aiNotes,
+          p_ai_layer_used: ad.aiLayer,
+          p_images: ad.images,
+          p_fields: ad.fields,
+        });
+        if (error) throw error;
+        return data as string;
+      },
+      async logModeration(userId, tempDraftId, result, adId) {
+        const { error } = await supabase.from("ai_moderation_log").insert({
+          user_id: userId,
+          ad_id: adId,
+          temp_draft_id: tempDraftId,
+          layer: result.layer,
+          risk_level: result.riskLevel,
+          notes: result.notes,
+          model: result.model,
+          error: result.error,
+        });
+        if (error) console.error("create-ad: moderation log insert failed:", error.code);
+      },
     });
-
-    if (txErr) throw txErr;
-
-    // ── Sprint 8: User Activity Logging ──
-    const ipAddress = req.headers.get("x-real-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
-    await supabase.from("user_activity_log").insert({
-      user_id: user.id,
-      action_type: "ad_published",
-      ip_address: ipAddress,
-      metadata: { ad_id: adId, title: title }
+  } catch (error) {
+    console.error("create-ad: unhandled error", error instanceof Error ? error.message : error);
+    return new Response(JSON.stringify({ error: "حدث خطأ أثناء معالجة طلب نشر الإعلان." }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
-    return new Response(
-      JSON.stringify({ success: true, ad_id: adId, message: "تم نشر الإعلان بنجاح." }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-
-  } catch (error: any) {
-    return new Response(
-      JSON.stringify({ error: error.message ?? "حدث خطأ أثناء معالجة طلب نشر الإعلان." }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
   }
 });

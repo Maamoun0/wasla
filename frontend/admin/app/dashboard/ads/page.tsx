@@ -7,7 +7,7 @@ export default async function AdsReviewPage() {
   await requireStaff();
   const supabase = createAdminClient();
 
-  // Fetch pending ads sorted by risk level (high first)
+  // Pending ads by AI risk: high, then unreviewed (AI did not run), medium, low
   const { data: ads } = await supabase
     .from('ads')
     .select(`
@@ -22,12 +22,14 @@ export default async function AdsReviewPage() {
       users (full_name)
     `)
     .eq('status', 'pending')
-    .order('ai_risk_level', { ascending: false });
+    .order('ai_risk_rank', { ascending: false })
+    .order('created_at', { ascending: true });
 
   const getRiskColor = (level: string) => {
     switch (level) {
       case 'high': return 'bg-red-100 text-red-700 border-red-200';
       case 'medium': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'unreviewed': return 'bg-purple-100 text-purple-700 border-purple-200';
       default: return 'bg-blue-100 text-blue-700 border-blue-200';
     }
   };
@@ -70,7 +72,9 @@ export default async function AdsReviewPage() {
                 <td className="px-6 py-4">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${getRiskColor(ad.ai_risk_level)}`}>
                     {ad.ai_risk_level === 'high' && <AlertTriangle size={12} className="ml-1" />}
-                    {ad.ai_risk_level === 'high' ? 'عالية' : ad.ai_risk_level === 'medium' ? 'متوسطة' : 'منخفضة'}
+                    {ad.ai_risk_level === 'high' ? 'عالية'
+                      : ad.ai_risk_level === 'medium' ? 'متوسطة'
+                      : ad.ai_risk_level === 'unreviewed' ? 'بدون مراجعة آلية' : 'منخفضة'}
                   </span>
                   {ad.ai_review_notes && (
                     <p className="text-[10px] text-gray-400 font-cairo mt-1 max-w-[200px] truncate" title={ad.ai_review_notes}>

@@ -117,10 +117,10 @@
 
 | Req | الوصف | DB | Backend/Edge | Flutter | Admin | Tests | الحالة | الدليل |
 |---|---|---|---|---|---|---|---|---|
-| FR-1.1 | تسجيل بالهاتف + OTP 6 أرقام | `otp_requests` | `request-otp` (حد لكل رقم فقط، لا IP) | `auth_provider.dart:57-127` | — | ❌ | ⚠️ | التطبيق يتجاوز الـ rate limit بالرجوع لـ `signInWithOtp` مباشرة (`auth_provider.dart:88`)؛ رسالة الخطأ تكشف رقم/كود اختبار للمستخدم (`:117`)؛ مزوّد SMS غير مُتحقق |
+| FR-1.1 | تسجيل بالهاتف + OTP 6 أرقام | Supabase Auth (`[auth.sms]` و`[auth.rate_limit]` في `config.toml`) | Supabase Auth مباشرة (حُذفت `request-otp`) | `auth_provider.dart:79-94`، `otp_screen.dart` | — | Flutter 3 + تكامل Auth محلي | ⚠️ | مُصلح (§14): الحد يفرضه Auth نفسه (رمز لكل رقم كل 60 ثانية، وحد للمشروع ولكل IP)، والتطبيق يعرض وقت الانتظار من السيرفر، ورقم الاختبار شِيل من الرسائل. متبقٍ: مزوّد SMS حقيقي لم يُجرَّب، والحدود لازم تتضبط يدوياً في لوحة مشروع الإنتاج |
 | FR-1.2 | تسجيل اجتماعي Google + Facebook | — | — | Google فقط `auth_provider.dart:147` | — | ❌ | ⚠️ | Facebook: 0 نتائج بحث |
 | FR-1.3 | إعداد الملف (مدينة، اسم، صورة) | `users.city_id`, bucket `avatars` | — | `profile_setup_screen.dart` | — | pgTAP 14 + Storage 9 | ⚠️ | رفع الصورة الشخصية يعمل (§11). متبقٍ: لا يوجد اختيار مدينة في الشاشة |
-| FR-1.4 | KYC: وجه/ظهر + سيلفي + مطابقة + شارة | `user_verifications` | `submit-kyc-request`, `get-kyc-document` | `verification_screen.dart` | `kyc/` | ❌ | 🐛 | لا سيلفي ولا مطابقة وجه؛ اعتماد ذاتي (P13/P14)؛ `moderate_kyc` لا يضبط `is_id_verified` (`rpc_moderate_kyc.sql:38-44`) فالشارة لا تظهر أبداً؛ اللوحة تقرأ bucket `kyc-documents` والدالة تكتب في `id-documents`؛ الرقم القومي يُخزَّن نصاً واضحاً (الخطة تطلب pgcrypto) |
+| FR-1.4 | KYC: وجه/ظهر + سيلفي + مطابقة + شارة | `user_verifications` (+`decided_at`, `documents_deleted_at`) | `submit-kyc-request`, `purge-kyc-documents`, `moderate_kyc` | `verification_screen.dart` | `kyc/` | pgTAP 18 + تكامل KYC محلي | ⚠️ | مُصلح (§14): الاعتماد يضبط شارة ✓ الظاهرة للكل، والمستندات تُحذف بعد 7 أيام من الاعتماد و30 يوماً من الرفض. متبقٍ: السيلفي (🟡 #20)، ولا مطابقة آلية حسب قرارك، والرقم القومي مخزّن نصاً واضحاً |
 | FR-2.1 | Feed حسب موقع GPS | `location_point` (elite_v3) | — | — | — | ❌ | ❌ | لا استخدام لـ `geolocator` في `lib/` |
 | FR-2.2 | بحث نصي عربي بالمرادفات والأخطاء | `normalize_arabic`, `search_ads()`, فهرس trigram | — | `ads_provider.dart` | — | pgTAP 17 + Flutter | ⚠️ | مُصلح (§11): توحيد الحروف، بحث بالبادئة، وتسامح مع الأخطاء الإملائية. متبقٍ: المرادفات غير منفّذة |
 | FR-2.3 | فلاتر: قسم، سعر، مدينة، حي، نوع، تاريخ | فهارس موجودة | — | `ads_provider.dart:137-142` | — | ❌ | ⚠️ | لا فلتر حي ولا تاريخ؛ فلتر القسم الرئيسي يرجع صفراً لأن الإعلانات تُحفظ بمعرّف فرعي |
@@ -140,13 +140,15 @@
 | NFR-1.1 | الصفحة الرئيسية ≤ 2 ثانية | فهارس | — | pagination موجود | — | `scripts/wasla-load-test.js` لم يُشغَّل | ❌ | لا قياس |
 | NFR-1.2 | ضغط تلقائي وتحويل WebP على السيرفر | — | — | `imageQuality: 80, maxWidth: 1600` على العميل | — | ❌ | ❌ | `grep webp` = 0 |
 | NFR-2.1 | HTTPS/TLS | — | Supabase/Paymob https | — | — | ❌ | ⚠️ | الافتراضي https؛ لم يُتحقق من إعدادات الإنتاج |
-| NFR-2.2 | مستندات الهوية خاصة + روابط مؤقتة للمشرف | bucket خاص (P11) | `get-kyc-document` (300 ثانية) | — | `getKycDocumentUrl` | Vitest 17 | ⚠️ | 🔴(ج) مُصلح (§9). متبقٍ: حذف المستندات بعد القرار، وتشفير الرقم القومي |
+| NFR-2.2 | مستندات الهوية خاصة + روابط مؤقتة للمشرف | bucket خاص `id-documents` | `purge-kyc-documents` (cron يومي) | — | `getKycDocumentUrl` (staff + aal2) | Vitest + pgTAP 18 + تكامل KYC | ⚠️ | 🔴(ج) و§14: الروابط تصدر من اللوحة فقط بعد aal2، وحُذفت `get-kyc-document` لأنها كانت تتجاوز الـ MFA، والمستندات تُحذف بعد القرار. متبقٍ: تشفير الرقم القومي |
 | NFR-3.1 | توافرية 99.9% | — | — | — | — | — | ❌ | لا Sentry/Uptime/PostHog في الكود |
 | NFR-3.2 | Offline cache للإعلانات المحفوظة | — | — | — | — | — | ❌ | لا Hive/sqflite/cache |
 | NFR-4.1 | عربية كاملة RTL + خط Cairo | — | — | خطوط Cairo + `easy_localization` (`ar-EG.json`) | `dir="rtl"` | ❌ | ⚠️ | 104 نص عربي hardcoded في `Text('…')` مقابل 113 استخدام `.tr()` |
 | NFR-4.2 | Android 8+ / iOS 13+ | — | — | iOS target 13.0؛ Android `flutter.minSdkVersion` | — | ❌ | ⚠️ | لا اختبار على أجهزة |
 
-**الإجمالي (محدَّث بعد §12):** ✅ 0 — ⚠️ 21 — ❌ 6 — 🐛 1 (FR-1.4 KYC)
+**الإجمالي (محدَّث بعد §14):** ✅ 0 — ⚠️ 21 — ❌ 6 — 🐛 1 (FR-5.3 الاشتراكات)
+
+> تصحيح: إجمالي §12 كان بيعدّ FR-1.4 بس كـ 🐛 وناسي FR-5.3، فكان فيه ⚠️ زيادة واحد. العدّ هنا محسوب من صفوف الجدول نفسها.
 
 > لا يوجد متطلب بحالة ✅ بعد. الإصلاحات مُتحقَّق منها على قاعدة البيانات والسيرفر وAPIs المحلية، لكن لم يُجرَّب أي متطلب end-to-end على جهاز أو على Paymob Sandbox أو FCM حقيقي، وهذا شرط ✅ حسب تعريف الاكتمال.
 
@@ -498,3 +500,51 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 | `flutter build apk --release` / iOS، وتجربة الرحلات الخمس end-to-end على جهاز | M |
 | التحقق الحقيقي: Paymob Sandbox، و FCM بـ service account، ومزوّد SMS | S لكل واحد، بعد توفّر المفاتيح |
 | تحديث README (التشغيل المحلي، متغيرات البيئة، النشر) و FINAL_REPORT | S |
+
+---
+
+## 14. آخر أربعة بنود 🟠: AI-01، OTP-01، KYC-01، QA-01
+
+| البند | الـ commit | الفشل قبل الإصلاح | بعد الإصلاح |
+|---|---|---|---|
+| AI-01 مراجعة الإعلانات بالذكاء الاصطناعي | `242ae3d` | النماذج متقاعدة فكل مراجعة كانت تسقط لـ "medium"، وأي حد بمفتاح anon يقدر يستهلك رصيد Anthropic | Deno 15 (moderation 9 + handler 6)، pgTAP 14 |
+| OTP-01 حدود رموز التحقق | `a90ce09` | التطبيق كان بيتخطى الحد بنداء `signInWithOtp` مباشرة، ورسالة الخطأ بتكشف رقم وكود الاختبار | تكامل Auth محلي: الطلب الثاني خلال دقيقة اترفض بـ 429 ووقت الانتظار. Flutter 3 |
+| KYC-01 الشارة والاحتفاظ بالمستندات | `8a2fb72` | الاعتماد مكانش بيضبط `is_id_verified` فالشارة مابتظهرش أبداً، والمستندات مابتتحذفش | pgTAP 18، وتكامل end-to-end: رفع حقيقي، اعتماد، شارة، حذف بعد 7 أيام، والمرفوض يفضل لحد 30 يوم |
+| QA-01 الـ CI والتحليل | `e2898be` | `flutter analyze` فيه 14 مشكلة + 58 تحذير deprecation مخفيين بـ ignore، و`deno lint` فيه `any`، وتحذيرين في lint اللوحة، والـ CI بيشغّل Flutter بس | كل الأدوات صفر مشاكل بالإعدادات الصارمة، والـ CI بيشغّل كل الحزم |
+
+- **AI-01:**
+  - المراجعة على السيرفر بس، جوه `create-ad`. حُذفت `ai-content-review` و`analyze-ad-image` ومزوّد Flutter اللي كان بينادي عليهم.
+  - 3 طبقات: regex، ثم نموذج سريع، ثم نموذج أعمق للحالات غير الواضحة. النماذج من متغيرات البيئة (`MODERATION_MODEL_FAST`/`DEEP`)، والافتراضي `claude-haiku-5-5` و`claude-sonnet-5-5`.
+  - نص الإعلان بيدخل كبيانات جوه `<ad>` مش كتعليمات، والرد structured output بـ zod schema.
+  - أي فشل (timeout، خطأ، رفض من النموذج، تجاوز 20 مراجعة يومياً للمستخدم) = `unreviewed`. الإعلان دايماً بيبدأ `pending` ويروح للمراجعة اليدوية، والـ AI مابيعتمدش إعلان لوحده.
+  - كل قرار متسجّل في `ai_moderation_log` بالطبقة والنموذج والسبب. اللوحة بترتّب حسب الخطورة.
+- **OTP-01:** الحدود اتنقلت لـ Supabase Auth نفسه. `config.toml` بيطبّقها محلياً بس، وقيم الإنتاج مكتوبة في production plan §4 ولازم تتضبط يدوياً في لوحة المشروع.
+- **KYC-01:** `moderate_kyc` بيقرر في الطلبات المعلّقة بس. الحذف بيتم بـ cron يومي (`purge-kyc-documents`)، والقرار نفسه بيفضل محفوظ مع وقت الحذف. السياسة مكتوبة في privacy plan.
+- **QA-01:**
+  - **Flutter:** `flutter analyze --fatal-infos --fatal-warnings` = **No issues found**. شلت الـ ignores من `analysis_options.yaml` وصلّحت اللي كانت بتخفيه: `withOpacity` (49)، `value` في Dropdown (4)، `activeColor` (3)، `WillPopScope`، `anonKey`. مفاتيح JSON للشات بقت من `build.yaml` (`field_rename: snake`)، والـ `.g.dart` الناتج نفس المفاتيح بالظبط.
+  - **Deno:** `deno lint` = 0 مشاكل على 35 ملف. مشكلة الـ `any` الوحيدة المتبقية كانت في `get-kyc-document`، واتحذفت بالكامل (انظر N13).
+  - **اللوحة:** `next lint --max-warnings 0` = 0. خط Cairo بقى self-hosted بـ `next/font`. الـ `<img>` في معاينة KYC متساب عن قصد مع تعليق: الرابط مؤقت 5 دقائق لمستند هوية، و`next/image` كان هيعمله proxy وcache على السيرفر.
+  - **CI** (`.github/workflows/ci.yml`، فحصه `actionlint` 1.7.7 بدون ملاحظات): gitleaks؛ pgTAP على `supabase start` من الصفر + تكامل Auth/Storage/KYC + تكامل اللوحة؛ deno check/lint/test؛ اللوحة typecheck/lint/build/vitest؛ Flutter analyze صارم + test. شغّلت خطوات التكامل محلياً بنفس الأوامر ونجحت. **الـ workflow نفسه لسه ماشتغلش على GitHub** لأن الفرع ماتعملوش push.
+
+### نتائج جديدة
+| # | النتيجة | الحالة |
+|---|---|---|
+| N13 | `get-kyc-document` كانت بتدّي رابط موقّع لمستند هوية لأي توكن مشرف بدون فحص `aal2`، يعني بتتخطى إلزام الـ MFA للـ staff. ومحدش بيستخدمها | اتحذفت (`e2898be`) ومن `deploy_functions.bat` وproduction plan |
+| N14 | الرقم القومي لسه مخزّن نصاً واضحاً في `user_verifications.national_id` | مفتوح. محتاج قرارك: pgcrypto بمفتاح في Vault، أو الاكتفاء بآخر 4 أرقام + hash |
+| N15 | لو النموذج رفض يصنّف إعلان، ماستخدمتش fallback لنموذج تاني. الرفض بيتعامل كـ `unreviewed` ويروح للمراجعة اليدوية | قرار تصميم، مش ثغرة |
+| N16 | `next build` في اللوحة محتاج `NEXT_PUBLIC_SUPABASE_URL/ANON_KEY` وقت البناء، لأن صفحة `/login` بتتعمل prerender. ده كان موجود قبل التعديل | الـ CI بيمرّر قيم placeholder. النشر لازم يمرّر القيم الحقيقية وقت البناء |
+
+### ما لم يُتحقق منه
+- نداء حقيقي لـ Anthropic (مفيش مفتاح على الجهاز). الكود مختبر بـ classifier وهمي ومطابق لتوثيق الـ SDK.
+- مزوّد SMS حقيقي، FCM حقيقي، Paymob Sandbox، وأي تجربة على جهاز.
+- تشغيل الـ CI على GitHub.
+
+### نتائج كل الحزم بعد §14
+| الحزمة | النتيجة |
+|---|---|
+| Supabase CLI | 16 migration، `test db` **283/283** |
+| Edge Functions | `deno check` و`deno lint` 0 مشاكل، `deno test` **65/65**. تكامل محلي (Auth OTP، Storage، KYC) 4 اختبارات / 18 خطوة كلها نجحت |
+| Admin | tsc 0، `next lint --max-warnings 0` 0، build نجح، Vitest **26/26** (منها 6 تكامل على Supabase محلي) |
+| Flutter | `analyze --fatal-infos --fatal-warnings` **0**، `flutter test` **52/52** |
+
+**كل بنود 🟠 خلصت.** قائمة 🟡 في §13 زي ما هي، ومابدأتش فيها.

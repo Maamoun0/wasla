@@ -36,11 +36,8 @@ final currentUserProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
 
   final client = ref.watch(supabaseClientProvider);
   try {
-    final response = await client
-        .from('users')
-        .select()
-        .eq('id', userId)
-        .maybeSingle();
+    // phone/email/user_type are only readable by the owner through this RPC.
+    final response = await client.rpc('get_my_profile').maybeSingle();
 
     return response;
   } catch (_) {

@@ -60,11 +60,23 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
   }
 
   Future<void> _contact(Map<String, dynamic> ad, String type) async {
-    final uid    = ref.read(currentUserIdProvider);
+    final uid = ref.read(currentUserIdProvider);
+    if (uid == null) { context.push(AppRoutes.auth); return; }
     final client = ref.read(supabaseClientProvider);
-    await logContact(client: client, adId: widget.adId, contactType: type, userId: uid);
 
-    final phone = (ad['users'] as Map?)?['phone'] as String? ?? '';
+    final String phone;
+    try {
+      phone = await fetchAdContact(client: client, adId: widget.adId, contactType: type);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تعذّر الوصول لبيانات التواصل. حاول مرة أخرى.')),
+        );
+      }
+      return;
+    }
+    if (phone.isEmpty) return;
+
     Uri uri;
     switch (type) {
       case 'whatsapp':

@@ -12,7 +12,7 @@ final adDetailProvider =
         *,
         ad_media(*),
         ad_fields(*, category_fields(label_ar, label_en, field_type)),
-        users(full_name, avatar_url, trust_score, is_id_verified, phone),
+        users(full_name, avatar_url, trust_score, is_id_verified),
         cities(name_ar),
         districts(name_ar),
         categories(name_ar, name_en)
@@ -243,18 +243,19 @@ Future<void> toggleFavorite({
   }
 }
 
-// ── Contact Log ────────────────────────────────────────────────────
-Future<void> logContact({
+// ── Seller Contact ─────────────────────────────────────────────────
+// The seller's phone is not readable from `users`; get_ad_contact returns
+// it for an active ad and records the contact in contact_logs.
+Future<String> fetchAdContact({
   required SupabaseClient client,
   required String adId,
   required String contactType,
-  String? userId,
 }) async {
-  await client.from('contact_logs').insert({
-    'ad_id': adId,
-    'contact_type': contactType,
-    if (userId != null) 'user_id': userId,
+  final res = await client.rpc('get_ad_contact', params: {
+    'p_ad_id': adId,
+    'p_contact_type': contactType,
   });
+  return (res as Map?)?['phone'] as String? ?? '';
 }
 
 // ── Notifications Provider ─────────────────────────────────────────

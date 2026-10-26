@@ -1,0 +1,26 @@
+# Ordered list of legacy SQL files used to reconstruct the schema in a throwaway
+# container until the production schema dump is committed as the baseline
+# migration. Paths are relative to the repo root. Test harness only.
+backend/database/wasla-schema.sql
+backend/database/fix_auth_registration.sql
+backend/database/upgrade_schema_v2.1.sql
+backend/database/alter_ads_temp_draft_id.sql
+backend/database/archive/sprint1_setup.sql
+backend/database/archive/sprint1_verification_mock.sql
+backend/database/archive/sprint4_updates.sql
+backend/database/archive/sprint7_pre_improvements.sql
+backend/database/archive/sprint8_setup.sql
+backend/database/archive/sprint9_notifications.sql
+backend/database/archive/sprint10_security_legal.sql
+backend/database/create_ad_transaction.sql
+backend/database/rpc_moderate_ad.sql
+backend/database/rpc_moderate_kyc.sql
+backend/database/rpc_handle_report.sql
+backend/database/search_rpc.sql
+backend/database/security_fix_ads_protection.sql
+backend/database/enhancements_v1.sql
+backend/database/elite_enhancements_v2.sql
+backend/database/elite_enhancements_v3.sql
+backend/database/insert_districts.sql
+database/seed_category_fields.sql
+database/setup_ads_bucket.sql

@@ -5,10 +5,10 @@ on:
     branches:
       - develop
       - main
+  # Every pushed branch gets the full suite, not only main/develop.
   push:
     branches:
-      - develop
-      - main
+      - '**'
   workflow_dispatch:
 
 permissions:

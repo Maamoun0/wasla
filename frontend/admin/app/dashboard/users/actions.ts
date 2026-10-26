@@ -51,12 +51,14 @@ export async function updateUserStatusAction(
     changes: { new_status: status, reason: reason || 'تحديث من لوحة الإدارة' }
   });
 
-  // 3. Force Sign Out (Invalidate Sessions) if suspending or banning
-  if (status === 'suspended' || status === 'banned') {
-    const { error: signOutError } = await supabase.auth.admin.signOut(userId);
-    if (signOutError) {
-      console.warn('Sign out error (non-fatal):', signOutError.code);
-    }
+  // 3. Block or restore sign-in in Supabase Auth. A ban stops new sign-ins and
+  // token refreshes; an already-issued access token expires within the hour.
+  const { error: banError } = await supabase.auth.admin.updateUserById(userId, {
+    ban_duration: status === 'active' ? 'none' : '876000h',
+  });
+  if (banError) {
+    console.error('updateUserStatusAction: auth ban failed:', banError.status);
+    return { success: false, error: 'تم تحديث الحالة لكن تعذّر تطبيقها على تسجيل الدخول' };
   }
 
   revalidatePath('/dashboard/users');

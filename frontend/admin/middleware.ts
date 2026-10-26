@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
     const { data: profile } = await supabase.rpc('get_my_profile').maybeSingle<{ user_type: string; status: string }>();
     isStaff = !!profile
       && (profile.user_type === 'admin' || profile.user_type === 'moderator')
-      && profile.status !== 'suspended' && profile.status !== 'deleted';
+      && !['suspended', 'banned', 'deleted'].includes(profile.status);
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     hasMfa = aal?.currentLevel === 'aal2';
   }

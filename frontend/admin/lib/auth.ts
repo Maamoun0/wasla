@@ -14,7 +14,7 @@ type StaffCheck =
   | { kind: 'needs_mfa' }
   | { kind: 'denied' };
 
-const BLOCKED_STATUSES = ['suspended', 'deleted'];
+const BLOCKED_STATUSES = ['suspended', 'banned', 'deleted'];
 
 /**
  * The session is verified with Supabase Auth (getUser, not getSession), the

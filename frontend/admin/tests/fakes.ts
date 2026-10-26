@@ -14,7 +14,7 @@ export interface FakeState {
   inserts: { table: string; row: Row }[];
   updates: { table: string; values: Row; filters: Row }[];
   signedUrls: { bucket: string; path: string; ttl: number }[];
-  signOuts: string[];
+  bans: { id: string; ban_duration: string }[];
 }
 
 export const state: FakeState = {
@@ -26,7 +26,7 @@ export const state: FakeState = {
   inserts: [],
   updates: [],
   signedUrls: [],
-  signOuts: [],
+  bans: [],
 };
 
 export function resetState() {
@@ -38,7 +38,7 @@ export function resetState() {
   state.inserts = [];
   state.updates = [];
   state.signedUrls = [];
-  state.signOuts = [];
+  state.bans = [];
 }
 
 function query(table: string) {
@@ -93,9 +93,9 @@ export const adminClient = {
   },
   auth: {
     admin: {
-      signOut: async (id: string) => {
-        state.signOuts.push(id);
-        return { error: null };
+      updateUserById: async (id: string, attrs: { ban_duration: string }) => {
+        state.bans.push({ id, ban_duration: attrs.ban_duration });
+        return { data: { user: { id } }, error: null };
       },
     },
   },

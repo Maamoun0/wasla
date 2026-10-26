@@ -48,8 +48,10 @@ describe('getStaff / requireStaff', () => {
     expect(await getStaff()).toBeNull();
   });
 
-  it('rejects suspended or deleted staff', async () => {
+  it('rejects suspended, banned or deleted staff', async () => {
     signInAs(MOD, { user_type: 'moderator', status: 'suspended' });
+    expect(await getStaff()).toBeNull();
+    signInAs(MOD, { user_type: 'moderator', status: 'banned' });
     expect(await getStaff()).toBeNull();
     signInAs(MOD, { user_type: 'moderator', status: 'active', deleted_at: '2026-01-01' });
     expect(await getStaff()).toBeNull();
@@ -153,7 +155,7 @@ describe('updateUserStatusAction', () => {
     expect(await updateUserStatusAction(USER, 'suspended')).toEqual({ success: true });
     expect(state.updates[0]).toMatchObject({ table: 'users', values: { status: 'suspended' }, filters: { id: USER } });
     expect(state.inserts).toContainEqual({ table: 'audit_logs', row: expect.objectContaining({ actor_id: MOD }) });
-    expect(state.signOuts).toEqual([USER]);
+    expect(state.bans).toEqual([{ id: USER, ban_duration: '876000h' }]);
   });
 
   it('does not let a moderator act on an admin, or anyone act on themselves', async () => {
@@ -161,6 +163,12 @@ describe('updateUserStatusAction', () => {
     expect(await updateUserStatusAction(ADMIN, 'suspended')).toEqual(UNAUTHORIZED);
     expect((await updateUserStatusAction(MOD, 'suspended')).success).toBe(false);
     expect(state.updates).toHaveLength(0);
+  });
+
+  it('reactivating lifts the Auth ban', async () => {
+    signInAs(ADMIN, { user_type: 'admin', status: 'active' });
+    expect(await updateUserStatusAction(USER, 'active')).toEqual({ success: true });
+    expect(state.bans).toEqual([{ id: USER, ban_duration: 'none' }]);
   });
 
   it('rejects unknown statuses', async () => {

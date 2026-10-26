@@ -15,18 +15,18 @@ export async function updateConfigAction(key: string, value: unknown) {
   // 1. Fetch old value for Audit Log
   const { data: oldConfig } = await supabase
     .from('app_configs')
-    .select('config_value')
-    .eq('config_key', key)
+    .select('value')
+    .eq('key', key)
     .maybeSingle();
 
   const { error } = await supabase
     .from('app_configs')
     .upsert({
-      config_key: key,
-      config_value: value,
+      key,
+      value,
       updated_by: staff.id,
       updated_at: new Date().toISOString()
-    }, { onConflict: 'config_key' });
+    }, { onConflict: 'key' });
 
   if (error) {
     console.error('updateConfigAction failed:', error.code);
@@ -40,7 +40,7 @@ export async function updateConfigAction(key: string, value: unknown) {
     target_type: 'app_config',
     changes: {
       key,
-      old_value: oldConfig?.config_value,
+      old_value: oldConfig?.value,
       new_value: value
     }
   });

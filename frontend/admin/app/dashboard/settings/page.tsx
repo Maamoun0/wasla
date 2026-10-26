@@ -13,7 +13,7 @@ export default async function SettingsPage() {
     .select('*');
 
   // Helper to get config value
-  const getConfig = (key: string) => configs?.find(c => c.config_key === key)?.config_value;
+  const getConfig = (key: string) => configs?.find(c => c.key === key)?.value;
 
   return (
     <div className="space-y-8">
@@ -33,20 +33,7 @@ export default async function SettingsPage() {
             <h2 className="font-bold font-cairo text-gray-800">إعدادات الأرباح (Monetization)</h2>
           </div>
           
-          <ConfigForm 
-            configKey="featured_ad_price" 
-            label="سعر الإعلان المميز (EGP)" 
-            initialValue={getConfig('featured_ad_price') || 50} 
-            type="number"
-          />
-
-          <ConfigForm 
-            configKey="urgent_ad_price" 
-            label="سعر إعلان عاجل (EGP)" 
-            initialValue={getConfig('urgent_ad_price') || 30} 
-            type="number"
-          />
-
+          {/* Boost and subscription prices live in payment_packages (charged by create-payment). */}
           <ConfigForm 
             configKey="enable_boost_feature" 
             label="تفعيل ميزة الترويج (Boost)" 

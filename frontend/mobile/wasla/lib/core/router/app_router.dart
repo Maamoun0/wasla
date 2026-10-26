@@ -103,6 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.otp,
         builder: (ctx, state) => OtpScreen(
           phone: state.uri.queryParameters['phone'] ?? '',
+          initialWaitSeconds: int.tryParse(state.uri.queryParameters['wait'] ?? ''),
         ),
       ),
       GoRoute(

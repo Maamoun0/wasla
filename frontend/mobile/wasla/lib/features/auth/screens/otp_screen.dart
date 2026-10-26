@@ -11,8 +11,11 @@ import '../../../shared/widgets/primary_button.dart';
 import '../providers/auth_provider.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
-  const OtpScreen({super.key, required this.phone});
+  const OtpScreen({super.key, required this.phone, this.initialWaitSeconds});
   final String phone;
+
+  /// Seconds before a new code may be requested (from the server's limit).
+  final int? initialWaitSeconds;
 
   @override
   ConsumerState<OtpScreen> createState() => _OtpScreenState();
@@ -21,19 +24,26 @@ class OtpScreen extends ConsumerStatefulWidget {
 class _OtpScreenState extends ConsumerState<OtpScreen> {
   final _otpController = TextEditingController();
   bool _isLoading = false;
-  int _secondsLeft = 60;
+  // Matches Auth's one-code-per-number-per-minute limit (supabase/config.toml).
+  static const _resendInterval = 60;
+  int _secondsLeft = _resendInterval;
   Timer? _timer;
   String _otpValue = '';
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    _secondsLeft = widget.initialWaitSeconds ?? _resendInterval;
+    _tick();
   }
 
-  void _startTimer() {
+  void _startTimer([int seconds = _resendInterval]) {
+    setState(() => _secondsLeft = seconds);
+    _tick();
+  }
+
+  void _tick() {
     _timer?.cancel();
-    setState(() => _secondsLeft = 60);
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_secondsLeft == 0) {
         t.cancel();
@@ -109,6 +119,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           SnackBar(
             content: const Text('تم إعادة إرسال الرمز', style: TextStyle(fontFamily: 'Cairo')),
             backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } on OtpRateLimitedException catch (e) {
+      // The server decides when the next code may be sent.
+      _startTimer(e.retryAfter?.inSeconds ?? _resendInterval);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message, style: const TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: AppColors.warning,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),

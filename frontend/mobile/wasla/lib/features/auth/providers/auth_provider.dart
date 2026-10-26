@@ -45,73 +45,65 @@ final currentUserProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
   }
 });
 
+// ── OTP rate limiting ────────────────────────────────────────────
+/// Thrown by [AuthNotifier.sendOtp] when Supabase Auth refuses to send another
+/// code yet. [retryAfter] is the server's wait time when it gives one.
+class OtpRateLimitedException implements Exception {
+  const OtpRateLimitedException(this.retryAfter);
+  final Duration? retryAfter;
+
+  String get message => retryAfter != null
+      ? 'تم إرسال رمز مؤخراً لهذا الرقم. يمكنك طلب رمز جديد بعد ${retryAfter!.inSeconds} ثانية.'
+      : 'تجاوزت الحد المسموح لطلب رموز التحقق. حاول مرة أخرى لاحقاً.';
+
+  @override
+  String toString() => message;
+}
+
+/// Maps Auth's 429 (e.g. "you can only request this after 37 seconds").
+OtpRateLimitedException? otpRateLimitFrom(AuthException e) {
+  final isRateLimited = e.statusCode == '429' || (e.code?.startsWith('over_') ?? false);
+  if (!isRateLimited) return null;
+  final seconds = RegExp(r'(\d+)\s*seconds?').firstMatch(e.message)?.group(1);
+  return OtpRateLimitedException(seconds != null ? Duration(seconds: int.parse(seconds)) : null);
+}
+
 // ── Auth Notifier ─────────────────────────────────────────────────
 class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   final SupabaseClient _client;
 
   AuthNotifier(this._client) : super(const AsyncValue.data(null));
 
-  // Send OTP to phone number via Supabase Auth & Edge Function
+  // Send an SMS OTP. Limits are enforced by Supabase Auth itself (one code per
+  // number per minute, hourly project cap, per-IP request limits).
   Future<void> sendOtp(String phone) async {
     state = const AsyncValue.loading();
     try {
-      // 1. Try requesting OTP via Edge Function (supports rate limiting & logging)
-      try {
-        final res = await _client.functions.invoke(
-          'request-otp',
-          body: {'phone_number': phone},
-        );
-        if (res.status == 200 && res.data != null && res.data['success'] == true) {
-          state = const AsyncValue.data(null);
-          return;
-        } else if (res.status == 429) {
-          final msg = res.data?['message'] ?? 'تجاوزت الحد المسموح به لطلب رمز التحقق.';
-          state = AsyncValue.error(Exception(msg), StackTrace.current);
-          throw Exception(msg);
-        } else if (res.data != null && res.data['error'] != null) {
-          final errorStr = res.data['error'].toString();
-          if (errorStr.contains('SMS provider') || errorStr.contains('not configured')) {
-            throw AuthException(errorStr);
-          }
-        }
-      } catch (fe) {
-        if (fe is AuthException || (fe is Exception && fe.toString().contains('تجاوزت'))) {
-          rethrow;
-        }
-        // Fallback to direct SDK call if Edge Function is not deployed
-      }
-
-      // 2. Direct Supabase Auth Call (Fallback)
-      await _client.auth.signInWithOtp(
-        phone: phone,
-        shouldCreateUser: true,
-      );
+      await _client.auth.signInWithOtp(phone: phone, shouldCreateUser: true);
       state = const AsyncValue.data(null);
     } on AuthException catch (e, st) {
-      String arabicMsg = _translateAuthError(e.message);
-      state = AsyncValue.error(Exception(arabicMsg), st);
-      throw Exception(arabicMsg);
+      final limited = otpRateLimitFrom(e);
+      final error = limited ?? Exception(_translateAuthError(e.message));
+      state = AsyncValue.error(error, st);
+      throw error;
     } catch (e, st) {
-      final rawMsg = e.toString().replaceFirst('Exception: ', '');
-      String arabicMsg = _translateAuthError(rawMsg);
-      state = AsyncValue.error(Exception(arabicMsg), st);
-      throw Exception(arabicMsg);
+      final error = Exception(_translateAuthError(e.toString()));
+      state = AsyncValue.error(error, st);
+      throw error;
     }
   }
 
   // ترجمة رسائل Supabase إلى العربية
   String _translateAuthError(String msg) {
     final m = msg.toLowerCase();
-    if (m.contains('rate limit') || m.contains('too many')) {
-      return 'تجاوزت الحد المسموح به. انتظر 3 دقائق وحاول مرة أخرى.';
-    } else if (m.contains('invalid phone') || m.contains('phone number')) {
+    if (m.contains('invalid phone') || m.contains('phone number')) {
       return 'رقم الهاتف غير صحيح. تأكد من كتابة رقم هاتف مصري صحيح (مثال: 01012345678).';
-    } else if (m.contains('network') || m.contains('connection')) {
+    } else if (m.contains('network') || m.contains('connection') || m.contains('socket')) {
       return 'تعذّر الاتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.';
-    } else if (m.contains('sms') || m.contains('twilio') || m.contains('provider') || m.contains('not configured')) {
-      return 'خدمة الرسائل النصية (SMS) غير مفعّلة في لوحة Supabase. لتجربة الأرقام الحقيقية يجب ربط حساب Twilio في Supabase Dashboard → Auth → Phone. يمكنك حالياً استخدام رقم الاختبار: 01012345678 برمز 123456.';
+    } else if (m.contains('sms') || m.contains('provider')) {
+      return 'خدمة الرسائل غير متاحة حالياً. حاول مرة أخرى بعد قليل.';
     }
-    return 'حدث خطأ: $msg';
+    return 'تعذّر إرسال رمز التحقق. حاول مرة أخرى.';
   }
 
   // Verify OTP

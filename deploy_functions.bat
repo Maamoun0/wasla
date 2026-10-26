@@ -28,9 +28,6 @@ call npx supabase functions deploy purge-deleted-accounts --project-ref %PROJECT
 echo Deploying payment-webhook...
 call npx supabase functions deploy payment-webhook --project-ref %PROJECT_REF%
 
-echo Deploying request-otp...
-call npx supabase functions deploy request-otp --project-ref %PROJECT_REF%
-
 echo Deploying submit-kyc-request...
 call npx supabase functions deploy submit-kyc-request --project-ref %PROJECT_REF%
 

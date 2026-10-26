@@ -27,7 +27,6 @@ npx supabase@2.120.0 db push
 
 Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
 
-- `request-otp`
 - `create-ad`
 - `submit-kyc-request`
 - `get-kyc-document`
@@ -58,6 +57,15 @@ Until both secrets exist, the `dispatch-notifications` and `purge-deleted-accoun
 ## 4. Auth
 
 - Enable TOTP MFA (Authentication → Multi-Factor). It is mandatory for admin-panel staff and enforced server-side at `aal2`.
+- **Phone OTP limits** (Authentication → Rate Limits and Authentication → Providers → Phone). These are the only server-side OTP controls; the app's countdown just mirrors them. Use the same values as `supabase/config.toml`:
+  - one SMS per number every 60 s (`max_frequency`);
+  - code length 6, expiry 300 s;
+  - SMS sent per hour for the project: 30 to start, raised with real traffic, since it caps SMS-pumping cost;
+  - sign-in/sign-up requests per 5 minutes per IP: 30;
+  - token verifications per 5 minutes per IP: 30.
+
+  Enabling CAPTCHA protection (hCaptcha or Turnstile) for phone sign-in is recommended before launch.
+- Never configure `test_otp` numbers or placeholder SMS credentials on a hosted project; those in `config.toml` are for local development only.
 - Create the first admin with email and password, then set `public.users.user_type = 'admin'` with the service role. That user enrolls TOTP on first login.
 
 ## 5. Data retention

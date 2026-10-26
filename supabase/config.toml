@@ -45,6 +45,37 @@ enable_confirmations = false
 
 [auth.sms]
 enable_signup = true
+# One OTP per phone number per minute (the app shows the same countdown).
+max_frequency = "60s"
+otp_length = 6
+otp_expiry = 300
+
+# Local development only. Auth needs a provider configured, but the test
+# number below never reaches it; these placeholders are not credentials.
+# Production SMS provider settings live in the hosted project's dashboard.
+[auth.sms.twilio]
+enabled = true
+account_sid = "local-dev-placeholder"
+message_service_sid = "local-dev-placeholder"
+auth_token = "local-dev-placeholder"
+
+# Local development only: fixed code for one number. Never configure test
+# numbers on a hosted project.
+[auth.sms.test_otp]
+201000000101 = "123456"
+
+# Server-side Auth limits. The hosted project's values are set in the dashboard
+# (Authentication -> Rate Limits); see docs/wasla_production_migration_plan.md.
+[auth.rate_limit]
+# SMS messages per hour for the whole project (caps SMS-pumping cost).
+sms_sent = 30
+# Sign-in / sign-up requests (incl. OTP requests) per 5 minutes per IP.
+sign_in_sign_ups = 30
+# OTP / token verifications per 5 minutes per IP (brute-forcing codes).
+token_verifications = 30
+token_refresh = 150
+email_sent = 2
+anonymous_users = 30
 
 # Admin panel staff must use TOTP (enforced server-side via aal2).
 [auth.mfa]
@@ -59,9 +90,6 @@ enabled = false
 
 [analytics]
 enabled = false
-
-[functions.request-otp]
-verify_jwt = false
 
 [functions.create-payment]
 verify_jwt = false

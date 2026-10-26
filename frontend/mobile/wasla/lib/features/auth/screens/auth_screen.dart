@@ -58,6 +58,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       if (mounted) {
         context.push('${AppRoutes.otp}?phone=${Uri.encodeComponent(phone)}');
       }
+    } on OtpRateLimitedException catch (e) {
+      // A code was sent to this number moments ago: continue to the code entry
+      // screen with the server's remaining wait instead of failing.
+      final wait = e.retryAfter;
+      if (mounted && wait != null) {
+        final phone = _formatPhone(_phoneController.text.trim());
+        context.push('${AppRoutes.otp}?phone=${Uri.encodeComponent(phone)}&wait=${wait.inSeconds}');
+      } else if (mounted) {
+        _showError(e.message);
+      }
     } catch (e) {
       if (mounted) {
         final msg = e.toString().replaceFirst('Exception: ', '');

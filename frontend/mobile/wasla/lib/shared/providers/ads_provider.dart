@@ -103,6 +103,22 @@ class AdsState {
   }
 }
 
+/// Parameters for the search_ads RPC.
+Map<String, dynamic> searchAdsParams(AdsFilter f, {required int offset}) {
+  final query = f.query?.trim();
+  return {
+    if (query != null && query.isNotEmpty) 'p_query': query,
+    if (f.categoryId != null) 'p_category_id': int.tryParse(f.categoryId!),
+    if (f.cityId != null) 'p_city_id': f.cityId,
+    if (f.adType != null) 'p_ad_type': f.adType,
+    if (f.minPrice != null) 'p_min_price': f.minPrice,
+    if (f.maxPrice != null) 'p_max_price': f.maxPrice,
+    'p_featured_only': f.featuredOnly,
+    'p_limit': f.limit,
+    'p_offset': offset,
+  };
+}
+
 class AdsNotifier extends StateNotifier<AdsState> {
   final SupabaseClient _client;
 
@@ -129,25 +145,12 @@ class AdsNotifier extends StateNotifier<AdsState> {
     );
 
     try {
-      var query = _client
-          .from('ads')
-          .select(_adSelect)
-          .eq('status', 'active');
-
-      if (f.categoryId != null) query = query.eq('category_id', f.categoryId!);
-      if (f.cityId != null)     query = query.eq('city_id', f.cityId!);
-      if (f.adType != null)     query = query.eq('ad_type', f.adType!);
-      if (f.featuredOnly)       query = query.eq('is_featured', true);
-      if (f.minPrice != null)   query = query.gte('price', f.minPrice!);
-      if (f.maxPrice != null)   query = query.lte('price', f.maxPrice!);
-
-      final List<dynamic> results = await query
-          .order('is_featured', ascending: false)
-          .order('created_at', ascending: false)
-          .range(
-            refresh ? 0 : state.ads.length,
-            refresh ? f.limit - 1 : state.ads.length + f.limit - 1,
-          );
+      // search_ads applies the text query (Arabic-normalised, prefix and
+      // typo tolerant) and every filter, and orders featured ads first.
+      final offset = refresh ? 0 : state.ads.length;
+      final List<dynamic> results = await _client
+          .rpc('search_ads', params: searchAdsParams(f, offset: offset))
+          .select(_adSelect);
       final newAds = results.cast<Map<String, dynamic>>();
 
       state = state.copyWith(

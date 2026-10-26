@@ -122,7 +122,7 @@
 | FR-1.3 | إعداد الملف (مدينة، اسم، صورة) | `users.city_id` | — | `profile_setup_screen.dart` | — | ❌ | ⚠️ | لا يوجد اختيار مدينة في الشاشة (`grep city` = 0)؛ bucket `avatars` غير مُنشأ في أي SQL |
 | FR-1.4 | KYC: وجه/ظهر + سيلفي + مطابقة + شارة | `user_verifications` | `submit-kyc-request`, `get-kyc-document` | `verification_screen.dart` | `kyc/` | ❌ | 🐛 | لا سيلفي ولا مطابقة وجه؛ اعتماد ذاتي (P13/P14)؛ `moderate_kyc` لا يضبط `is_id_verified` (`rpc_moderate_kyc.sql:38-44`) فالشارة لا تظهر أبداً؛ اللوحة تقرأ bucket `kyc-documents` والدالة تكتب في `id-documents`؛ الرقم القومي يُخزَّن نصاً واضحاً (الخطة تطلب pgcrypto) |
 | FR-2.1 | Feed حسب موقع GPS | `location_point` (elite_v3) | — | — | — | ❌ | ❌ | لا استخدام لـ `geolocator` في `lib/` |
-| FR-2.2 | بحث نصي عربي بالمرادفات والأخطاء | `advanced_search_ads` | — | `explore_screen.dart:33` | — | ❌ | 🐛 | `AdsFilter.query` لا يُطبَّق على الاستعلام أبداً (`ads_provider.dart:132-142`) → مربع البحث لا يفعل شيئاً؛ `normalize_arabic` فشلت (syntax error) |
+| FR-2.2 | بحث نصي عربي بالمرادفات والأخطاء | `normalize_arabic`, `search_ads()`, فهرس trigram | — | `ads_provider.dart` | — | pgTAP 17 + Flutter | ⚠️ | مُصلح (§11): توحيد الحروف، بحث بالبادئة، وتسامح مع الأخطاء الإملائية. متبقٍ: المرادفات غير منفّذة |
 | FR-2.3 | فلاتر: قسم، سعر، مدينة، حي، نوع، تاريخ | فهارس موجودة | — | `ads_provider.dart:137-142` | — | ❌ | ⚠️ | لا فلتر حي ولا تاريخ؛ فلتر القسم الرئيسي يرجع صفراً لأن الإعلانات تُحفظ بمعرّف فرعي |
 | FR-2.4 | عرض خريطة مع Clusters | — | — | — | — | ❌ | ❌ | `GoogleMap` يُستخدم فقط لاختيار الموقع (`location_price_screen.dart:504`)؛ مفتاح Maps placeholder في `AndroidManifest.xml`/`AppDelegate.swift` (تعديل غير مُرسَل) |
 | FR-3.1 | معالج 5 خطوات، حتى 8 صور | `ad_media` | `create-ad` | `post_ad/` (6 شاشات) | — | `post_ad_wizard_test.dart` | ⚠️ | حد 8 صور في العميل فقط (`add_photos_screen.dart:24`)؛ لا تحقق في الخادم؛ لا integration test |
@@ -131,7 +131,7 @@
 | FR-4.1 | مفضلة + ملاحظات | `favorites.notes` | — | `saved_screen.dart:79-163` | — | ❌ | ⚠️ | العرض موجود؛ لم أجد تحريراً للملاحظة؛ غير مختبر |
 | FR-4.2 | بحث محفوظ + إشعار فوري | `saved_searches`, `notifications_outbox` | `dispatch-notifications` (FCM v1) | `saved_screen.dart` | — | pgTAP 29 + Deno 10 + تكامل محلي | ⚠️ | المطابقة والإرسال يعملان (§10). متبقٍ: لا توجد واجهة لإنشاء بحث محفوظ، والإرسال لـ FCM الحقيقي لم يُجرَّب (لا يوجد service account) |
 | FR-4.3 | تسجيل نقرات الاتصال/واتساب | `contact_logs` | — | `ads_provider.dart:253` | — | ❌ | ⚠️ | سياسة الإدراج `WITH CHECK (TRUE)` (`wasla-schema.sql:896`) → تزوير/إغراق الإحصائيات |
-| FR-4.4 | تقييم 1-5 + رد واحد للمعلن | `reviews`, `review_responses UNIQUE(review_id)` | — | `reviews_controller.dart`, `my_reviews_screen.dart` | — | `trust_score_calculation_test.dart` | ⚠️ | منطق الأهلية في trigger؛ غير مختبر ضد القاعدة |
+| FR-4.4 | تقييم 1-5 + رد واحد للمعلن | `reviews`, `review_responses` | — | `reviews_controller.dart` | — | pgTAP 13 | ⚠️ | مُصلح (§11): الإدراج يعمل وصيغة الثقة موحّدة. متبقٍ: N12 (المقيِّم يقدر يعدّل حالة تقييمه) |
 | FR-5.1 | Paymob (بطاقة، فوري، محفظة) | `transactions`, `payment_packages`, `fulfill_payment()` | `create-payment`, `payment-webhook` | `payment_webview_screen.dart` | — | pgTAP 26 + Deno 23 | ⚠️ | 🔴(ب) مُصلح ومختبر محلياً (§9). متبقٍ: تجربة Paymob Sandbox فعلية، وتكامل فوري/المحفظة (يوجد integration بطاقة واحد فقط) |
 | FR-5.2 | Featured / Urgent / Bump | `ad_boosts`, `payment_packages`, cron | `fulfill_payment()` | `boost_ad_screen.dart`, `boost_controller.dart` | — | pgTAP 26 | ⚠️ | النوع والمدة من الباقة على السيرفر (§9). متبقٍ: Sandbox + انتهاء الصلاحية عبر cron غير مختبر |
 | FR-5.3 | اشتراكات تجارية بحدود أعلى | `subscription_plans` (RLS معطّل) | webhook | `subscription_screen.dart` | — | `monetization_test.dart` | 🐛 | مدة ثابتة 30 يوماً؛ لا يوجد فرض لحدود الإعلانات في أي مكان؛ أي زائر يعدّل جدول الخطط |
@@ -146,7 +146,7 @@
 | NFR-4.1 | عربية كاملة RTL + خط Cairo | — | — | خطوط Cairo + `easy_localization` (`ar-EG.json`) | `dir="rtl"` | ❌ | ⚠️ | 104 نص عربي hardcoded في `Text('…')` مقابل 113 استخدام `.tr()` |
 | NFR-4.2 | Android 8+ / iOS 13+ | — | — | iOS target 13.0؛ Android `flutter.minSdkVersion` | — | ❌ | ⚠️ | لا اختبار على أجهزة |
 
-**الإجمالي (محدَّث بعد §10):** ✅ 0 — ⚠️ 18 — ❌ 6 — 🐛 4
+**الإجمالي (محدَّث بعد §11):** ✅ 0 — ⚠️ 20 — ❌ 6 — 🐛 2
 
 ---
 
@@ -370,3 +370,52 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 | N9 | bucket `avatars` غير موجود، فرفع الصورة الشخصية يفشل (FR-1.3) | `storage.buckets` = `ads`, `id-documents` فقط | 🟠 |
 | N10 | لا توجد واجهة لحفظ بحث (FR-4.2)، وشاشة الإشعارات فارغة رغم أن جدول `notifications` يمتلئ الآن | `saved_searches` لا يُكتب من التطبيق؛ `notifications_screen.dart` | 🟡 |
 | N11 | الإرسال الفعلي لـ FCM لم يُجرَّب لعدم توفر Firebase service account | — | يحتاج `FIREBASE_SERVICE_ACCOUNT` |
+
+---
+
+## 11. N7، cron، الصور الشخصية، و🟠 (ج)(د)(هـ)
+
+كل بند في commit منفصل. في كل بند كتبت الاختبار وشغّلته فشل أولاً، وبعدين الإصلاح.
+
+| البند | الـ commit | الفشل قبل الإصلاح | بعد الإصلاح |
+|---|---|---|---|
+| **N7** صور الإعلانات | `a73ef3f` | pgTAP: مستخدم B نقل صورة A، ورفع ملفات في مجلد A وخارج أي مجلد. Storage API: B كتب فوق صورة A وحذفها، وملف نصي وملف أكبر من 5MB اتقبلوا | pgTAP 13/13، Storage API 9/9 خطوات |
+| مهمة cron | `c9ae97c` | `22P02 invalid input value for enum ... "expired"` | كل أوامر cron الـ 8 بتتنفذ من `cron.job` بدون أخطاء، 12/12 |
+| bucket الصور الشخصية | `c9011a2` | الـ bucket غير موجود | pgTAP 14/14، Storage API 9/9 خطوات |
+| 🟠(ج) التقييمات | `b5e7834` | `42703 NEW.user_id`، triggerان للثقة، والدرجة ثابتة على 0 | 13/13 |
+| 🟠(د) حذف الحساب | `66ebf98` | الدالة غير موجودة، وحذف أي مشرف كان مستحيلاً (P12 في المرحلة الأولى) | pgTAP 26/26، Deno 3/3، تكامل كامل 1/1 |
+| 🟠(هـ) البحث | `9a3413d` | دالة البحث غير موجودة، ونص البحث مش بيتطبّق أصلاً | pgTAP 17/17، Flutter 2/2، واستدعاء REST حقيقي |
+
+**تفاصيل تستحق الانتباه:**
+- **N7:**
+  - السياسات القديمة الثلاث على bucket `ads` اتحذفت كلها. الكتابة والتعديل والحذف بقت مشروطة بـ `storage.foldername(name)[1] = auth.uid()`.
+  - الأنواع المسموحة JPEG/PNG/WebP، والحد الأقصى 5MB.
+  - `create-ad` بقى يرفض أي رابط صورة من خارج مجلد المستخدم، ويرفض أكثر من 8 صور (Deno 10/10).
+  - شلت من المعالج رابط `mock.wasla.com` اللي كان بيظهر كنجاح وهمي لما المستخدم مش مسجّل.
+- **الصور الشخصية:** المسار القديم في التطبيق `avatars/{uid}/...` كان مخالفاً لقاعدة المجلد، فاتغيّر إلى `{uid}/avatar.jpg`. الحد 2MB.
+- **(ج):** ظهر في الاختبار bugان إضافيان واتصلحا:
+  - التوثيق ماكانش بيضيف الـ 30 نقطة أبداً، لأن الـ trigger كان بيقرأ القيمة القديمة.
+  - فحص أهلية التقييم كان بيعتمد على مين اللي بيسأل، لأن RLS كانت بتخفي عنه سجلات تواصل الآخرين.
+- **(د):** اختبار التكامل كشف إن `banned_until = 'infinity'` بيخلّي GoTrue يفشل في تحميل المستخدم ("Database error loading user")، فالحذف النهائي كان هيفشل دائماً. استبدلته بتاريخ بعيد. التكامل يثبت دلوقتي:
+  - تسجيل الدخول بيترفض برسالة "banned".
+  - الحذف بعد 30 يوماً بيمسح 3 ملفات، والمستخدم من Auth، والملف الشخصي.
+- **(هـ):**
+  - حد التشابه 0.5. خطأ إملائي من كلمتين حقق 0.69، وكلمة واحدة 0.50، والكلمات غير المرتبطة 0.14.
+  - القسم الرئيسي بقى يشمل أقسامه الفرعية، وده يصلح كمان مشكلة فلتر القسم في FR-2.3.
+
+### نتائج كل الحزم بعد §11
+| الحزمة | النتيجة |
+|---|---|
+| Supabase CLI | `db reset` بـ 12 migration، و`test db` 224/224 |
+| Docker runner | 224/224 |
+| Edge Functions | `deno test` 47/47. تكامل: dispatcher 1/1، purge 1/1، storage 2/2 (18 خطوة). `deno lint` فيه 8 مشاكل، كلها في دوال لم تُلمس |
+| Admin | Vitest 22/22 |
+| Flutter | 49/49، و`analyze` فيه نفس الـ 15 مشكلة القديمة |
+
+### نتائج وقرارات جديدة
+| # | البند | الأولوية |
+|---|---|---|
+| N12 | سياسة `reviews_update_own` بتسمح للمقيِّم يعدّل أي عمود في تقييمه، ومنها `status`. يعني يقدر يرجّع تقييماً أخفاه المشرف. اكتشفته بقراءة الكود ولم أختبره | 🟠 |
+| D1 | الحذف النهائي بيمسح معاملات الدفع بسبب `ON DELETE CASCADE`. **قرار احتفاظ بالسجلات المالية يحتاج موافقتك**: حذف، أو إخفاء الهوية مع الاحتفاظ بالمعاملة | قرار |
+| 🟡 | واجهة حفظ البحث (FR-4.2)، وشاشة الإشعارات داخل التطبيق | 🟡 |
+| متبقٍ من 🟠 | (و): إعدادات اللوحة (`config_key`) وقيمة الحظر (enum) | 🟠 التالي |

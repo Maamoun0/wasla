@@ -244,18 +244,50 @@ Future<void> toggleFavorite({
 }
 
 // ── Seller Contact ─────────────────────────────────────────────────
-// The seller's phone is not readable from `users`; get_ad_contact returns
-// it for an active ad and records the contact in contact_logs.
-Future<String> fetchAdContact({
+// The seller's phone is not readable from `users`. reveal_seller_phone
+// returns it to signed-in users for active ads, rate-limited per user,
+// and records the contact.
+sealed class SellerPhoneResult {
+  const SellerPhoneResult();
+}
+
+class SellerPhoneRevealed extends SellerPhoneResult {
+  const SellerPhoneRevealed(this.phone);
+  final String phone;
+}
+
+class SellerPhoneRateLimited extends SellerPhoneResult {
+  const SellerPhoneRateLimited(this.retryAfter);
+  final Duration retryAfter;
+}
+
+class SellerPhoneUnavailable extends SellerPhoneResult {
+  const SellerPhoneUnavailable();
+}
+
+SellerPhoneResult parseSellerPhoneResponse(Object? res) {
+  final map = res is Map ? res : const {};
+  switch (map['status']) {
+    case 'ok':
+      final phone = map['phone'] as String? ?? '';
+      return phone.isEmpty ? const SellerPhoneUnavailable() : SellerPhoneRevealed(phone);
+    case 'rate_limited':
+      return SellerPhoneRateLimited(Duration(seconds: (map['retry_after_seconds'] as num?)?.toInt() ?? 60));
+    default:
+      return const SellerPhoneUnavailable();
+  }
+}
+
+Future<SellerPhoneResult> revealSellerPhone({
   required SupabaseClient client,
   required String adId,
   required String contactType,
 }) async {
-  final res = await client.rpc('get_ad_contact', params: {
+  final res = await client.rpc('reveal_seller_phone', params: {
     'p_ad_id': adId,
     'p_contact_type': contactType,
   });
-  return (res as Map?)?['phone'] as String? ?? '';
+  return parseSellerPhoneResponse(res);
 }
 
 // ── Notifications Provider ─────────────────────────────────────────

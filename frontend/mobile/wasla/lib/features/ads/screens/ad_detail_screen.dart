@@ -64,18 +64,29 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
     if (uid == null) { context.push(AppRoutes.auth); return; }
     final client = ref.read(supabaseClientProvider);
 
-    final String phone;
+    void notify(String msg) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+
+    final SellerPhoneResult result;
     try {
-      phone = await fetchAdContact(client: client, adId: widget.adId, contactType: type);
+      result = await revealSellerPhone(client: client, adId: widget.adId, contactType: type);
     } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذّر الوصول لبيانات التواصل. حاول مرة أخرى.')),
-        );
-      }
+      notify('تعذّر الوصول لبيانات التواصل. حاول مرة أخرى.');
       return;
     }
-    if (phone.isEmpty) return;
+
+    final String phone;
+    switch (result) {
+      case SellerPhoneRevealed(phone: final p):
+        phone = p;
+      case SellerPhoneRateLimited(retryAfter: final wait):
+        notify('وصلت للحد المسموح لعرض أرقام البائعين. حاول بعد ${(wait.inMinutes + 1)} دقيقة.');
+        return;
+      case SellerPhoneUnavailable():
+        notify('هذا الإعلان غير متاح للتواصل حالياً.');
+        return;
+    }
 
     Uri uri;
     switch (type) {

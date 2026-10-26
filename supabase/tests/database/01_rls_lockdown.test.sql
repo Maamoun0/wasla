@@ -66,8 +66,8 @@ SELECT throws_ok($$ UPDATE public.category_fields SET label_ar = 'x' $$, '42501'
 SELECT throws_ok($$ SELECT public.moderate_ad('aaaaaaaa-0000-0000-0000-000000000002',
                      '11111111-1111-1111-1111-111111111111', 'approved', NULL) $$,
   '42501', NULL, 'anon cannot call moderate_ad');
-SELECT throws_ok($$ SELECT public.get_ad_contact('aaaaaaaa-0000-0000-0000-000000000001', 'phone') $$,
-  '42501', NULL, 'anon cannot call get_ad_contact');
+SELECT throws_ok($$ SELECT public.reveal_seller_phone('aaaaaaaa-0000-0000-0000-000000000001') $$,
+  '42501', NULL, 'anon cannot call reveal_seller_phone');
 SELECT throws_ok($$ INSERT INTO public.users (id) VALUES ('22222222-2222-2222-2222-222222222222') $$,
   '42501', NULL, 'anon cannot insert users');
 RESET ROLE;
@@ -126,13 +126,13 @@ SELECT throws_ok($$ SELECT public.create_ad_transaction('22222222-2222-2222-2222
 SELECT throws_ok($$ INSERT INTO public.contact_logs (ad_id, user_id, contact_type)
                     VALUES ('aaaaaaaa-0000-0000-0000-000000000001', auth.uid(), 'phone') $$,
   '42501', NULL, 'A cannot write contact_logs directly');
-SELECT is((public.get_ad_contact('aaaaaaaa-0000-0000-0000-000000000001', 'whatsapp') ->> 'phone'),
-  '+201000000002', 'A gets seller phone for an active ad via get_ad_contact');
+SELECT is((public.reveal_seller_phone('aaaaaaaa-0000-0000-0000-000000000001', 'whatsapp') ->> 'phone'),
+  '+201000000002', 'A gets seller phone for an active ad via reveal_seller_phone');
 SELECT is((SELECT count(*)::int FROM public.contact_logs
             WHERE user_id = auth.uid() AND ad_id = 'aaaaaaaa-0000-0000-0000-000000000001'),
-  1, 'get_ad_contact logged exactly one contact');
-SELECT throws_ok($$ SELECT public.get_ad_contact('aaaaaaaa-0000-0000-0000-000000000002', 'phone') $$,
-  'P0002', NULL, 'get_ad_contact refuses non-active ads');
+  1, 'reveal_seller_phone logged exactly one contact');
+SELECT is((public.reveal_seller_phone('aaaaaaaa-0000-0000-0000-000000000002') ->> 'status'),
+  'not_available', 'reveal_seller_phone refuses non-active ads');
 
 RESET ROLE;
 

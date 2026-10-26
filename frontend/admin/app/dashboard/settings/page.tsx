@@ -1,8 +1,10 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import { Settings, Save, ShieldAlert, BadgePercent, Zap } from 'lucide-react';
 import ConfigForm from '@/components/ConfigForm';
 
 export default async function SettingsPage() {
+  await requireStaff(['admin']);
   const supabase = createAdminClient();
 
   // Fetch current configs

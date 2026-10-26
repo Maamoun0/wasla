@@ -1,32 +1,30 @@
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import type { NextRequest } from 'next/server';
 
+// First line of defence only: every dashboard page, layout and server action
+// re-checks staff access on the server (lib/auth.ts).
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // getUser() validates the token with Supabase Auth; getSession() only reads the cookie.
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // 1. If trying to access dashboard without session, redirect to login
-  if (req.nextUrl.pathname.startsWith('/dashboard') && !session) {
-    return NextResponse.redirect(new URL('/login', req.url));
+  let isStaff = false;
+  if (user) {
+    const { data: profile } = await supabase.rpc('get_my_profile').maybeSingle<{ user_type: string; status: string }>();
+    isStaff = !!profile
+      && (profile.user_type === 'admin' || profile.user_type === 'moderator')
+      && profile.status !== 'suspended' && profile.status !== 'deleted';
   }
 
-  // 2. If logged in but accessing login page, redirect to dashboard
-  if (req.nextUrl.pathname.startsWith('/login') && session) {
+  if (req.nextUrl.pathname.startsWith('/dashboard') && !isStaff) {
+    return NextResponse.redirect(new URL(user ? '/login?denied=1' : '/login', req.url));
+  }
+
+  if (req.nextUrl.pathname.startsWith('/login') && isStaff) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
-
-  // 3. Role check (simple check for metadata, more robust in server components)
-  if (session && req.nextUrl.pathname.startsWith('/dashboard')) {
-    const userRole = session.user.user_metadata?.role;
-    if (userRole !== 'admin' && userRole !== 'moderator') {
-       // Ideally sign out or show access denied
-       // For now, let's allow and let server components handle granular access
-    }
   }
 
   return res;

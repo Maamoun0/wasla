@@ -1,8 +1,10 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import { AlertCircle, CheckCircle2, XCircle, ExternalLink } from 'lucide-react';
 import ReportActions from '@/components/ReportActions';
 
 export default async function ReportsPage() {
+  await requireStaff();
   const supabase = createAdminClient();
 
   // Fetch pending reports with reporter and target details

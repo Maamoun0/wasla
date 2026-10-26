@@ -1,8 +1,10 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import { AlertTriangle } from 'lucide-react';
 import AdReviewActions from '@/components/AdReviewActions';
 
 export default async function AdsReviewPage() {
+  await requireStaff();
   const supabase = createAdminClient();
 
   // Fetch pending ads sorted by risk level (high first)

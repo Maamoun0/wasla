@@ -1,4 +1,5 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import { 
   Users, 
   Clock, 
@@ -8,6 +9,7 @@ import {
 } from 'lucide-react';
 
 export default async function DashboardPage() {
+  await requireStaff();
   const supabase = createAdminClient();
 
   // Fetch Stats (Piece 1.3 & 2.1)

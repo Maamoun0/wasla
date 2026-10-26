@@ -1,4 +1,5 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import { 
   Activity, 
   MapPin, 
@@ -15,6 +16,7 @@ export default async function UserActivityPage({
 }: {
   params: { id: string };
 }) {
+  await requireStaff();
   const supabase = createAdminClient();
 
   // Fetch user profile and logs

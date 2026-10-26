@@ -1,27 +1,27 @@
 'use server';
 
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { getStaff, UNAUTHORIZED } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
 export async function handleReportAction(
-  reportId: string, 
-  status: 'resolved' | 'dismissed', 
+  reportId: string,
+  status: 'resolved' | 'dismissed',
   actionTaken?: string
 ) {
-  const supabase = createAdminClient();
+  const staff = await getStaff();
+  if (!staff) return UNAUTHORIZED;
+  if (status !== 'resolved' && status !== 'dismissed') return { success: false, error: 'إجراء غير صالح' };
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'غير مصرح لك' };
-
-  const { data, error } = await supabase.rpc('handle_report', {
+  const { data, error } = await createAdminClient().rpc('handle_report', {
     p_report_id: reportId,
-    p_moderator_id: user.id,
+    p_moderator_id: staff.id,
     p_status: status,
-    p_action_taken: actionTaken || null,
+    p_action_taken: actionTaken?.trim() || null,
   });
 
   if (error) {
-    console.error('Report Handling Error:', error);
+    console.error('handleReportAction failed:', error.code);
     return { success: false, error: 'حدث خطأ أثناء معالجة البلاغ' };
   }
 

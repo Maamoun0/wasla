@@ -1,38 +1,50 @@
 'use server';
 
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { getStaff, UNAUTHORIZED } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
+const STATUSES = ['active', 'suspended', 'banned'] as const;
+
 /**
- * Suspends or Bans a user account
+ * Suspends or Bans a user account.
+ * Moderators may act on regular accounts only; staff accounts need an admin.
  */
 export async function updateUserStatusAction(
-  userId: string, 
+  userId: string,
   status: 'active' | 'suspended' | 'banned',
   reason?: string
 ) {
+  const staff = await getStaff();
+  if (!staff) return UNAUTHORIZED;
+  if (!STATUSES.includes(status)) return { success: false, error: 'حالة غير صالحة' };
+  if (userId === staff.id) return { success: false, error: 'لا يمكنك تغيير حالة حسابك' };
+
   const supabase = createAdminClient();
 
-  const { data: { user: adminUser } } = await supabase.auth.getUser();
-  if (!adminUser) return { success: false, error: 'غير مصرح لك' };
+  const { data: target } = await supabase.from('users').select('user_type').eq('id', userId).maybeSingle();
+  if (!target) return { success: false, error: 'المستخدم غير موجود' };
+  if (staff.role !== 'admin' && (target.user_type === 'admin' || target.user_type === 'moderator')) {
+    return UNAUTHORIZED;
+  }
 
   // 1. Update user status in public.users
   const { error: updateError } = await supabase
     .from('users')
-    .update({ 
-      status, 
-      updated_at: new Date().toISOString() 
+    .update({
+      status,
+      updated_at: new Date().toISOString()
     })
     .eq('id', userId);
 
   if (updateError) {
-    console.error('Status Update Error:', updateError);
+    console.error('updateUserStatusAction failed:', updateError.code);
     return { success: false, error: 'حدث خطأ أثناء تحديث حالة المستخدم' };
   }
 
   // 2. Log action in Audit Log
   await supabase.from('audit_logs').insert({
-    actor_id: adminUser.id,
+    actor_id: staff.id,
     action: `user_${status}`,
     target_type: 'user',
     target_id: userId,
@@ -40,11 +52,10 @@ export async function updateUserStatusAction(
   });
 
   // 3. Force Sign Out (Invalidate Sessions) if suspending or banning
-  // Note: auth.admin requires Service Role, which our createAdminClient uses.
   if (status === 'suspended' || status === 'banned') {
     const { error: signOutError } = await supabase.auth.admin.signOut(userId);
     if (signOutError) {
-      console.warn('Sign out error (non-fatal):', signOutError);
+      console.warn('Sign out error (non-fatal):', signOutError.code);
     }
   }
 

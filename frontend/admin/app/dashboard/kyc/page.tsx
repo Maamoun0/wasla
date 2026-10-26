@@ -1,9 +1,11 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import KYCImagePreview from '@/components/KYCImagePreview';
 import KYCActions from '@/components/KYCActions';
 import { UserCheck, Shield } from 'lucide-react';
 
 export default async function KYCPage() {
+  await requireStaff();
   const supabase = createAdminClient();
 
   // Fetch pending verifications with user details
@@ -54,13 +56,13 @@ export default async function KYCPage() {
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-2">
                     {v.document_url && (
-                      <KYCImagePreview path={v.document_url} label="أمامية البطاقة" />
+                      <KYCImagePreview verificationId={v.id} side="front" label="أمامية البطاقة" />
                     )}
                     {v.document_back_url && (
-                      <KYCImagePreview path={v.document_back_url} label="خلفية البطاقة" />
+                      <KYCImagePreview verificationId={v.id} side="back" label="خلفية البطاقة" />
                     )}
                     {v.selfie_url && (
-                      <KYCImagePreview path={v.selfie_url} label="صورة السيلفي" />
+                      <KYCImagePreview verificationId={v.id} side="selfie" label="صورة السيلفي" />
                     )}
                   </div>
                 </td>

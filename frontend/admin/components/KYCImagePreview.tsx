@@ -1,22 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import { getSignedUrl } from '@/app/dashboard/kyc/actions';
+import { getKycDocumentUrl, type KycDocumentSide } from '@/app/dashboard/kyc/actions';
 import { Eye, X } from 'lucide-react';
 
-export default function KYCImagePreview({ path, label }: { path: string, label: string }) {
+export default function KYCImagePreview({
+  verificationId,
+  side,
+  label,
+}: {
+  verificationId: string;
+  side: KycDocumentSide;
+  label: string;
+}) {
   const [url, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const handlePreview = async () => {
     setLoading(true);
-    const signedUrl = await getSignedUrl(path);
-    if (signedUrl) {
-      setUrl(signedUrl);
+    const result = await getKycDocumentUrl(verificationId, side);
+    if (result.success) {
+      setUrl(result.url);
       setShowModal(true);
     } else {
-      alert('فشل جلب الرابط الآمن للصورة');
+      alert(result.error);
     }
     setLoading(false);
   };

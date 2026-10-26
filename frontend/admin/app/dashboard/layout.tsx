@@ -9,8 +9,14 @@ import {
   Settings, 
   LogOut 
 } from 'lucide-react';
+import { requireStaff } from '@/lib/auth';
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+// Every dashboard request is per-user and access-checked; never prerender.
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  await requireStaff();
+
   const menuItems = [
     { name: 'الرئيسية', icon: LayoutDashboard, href: '/dashboard' },
     { name: 'مراجعة الإعلانات', icon: ClipboardList, href: '/dashboard/ads' },

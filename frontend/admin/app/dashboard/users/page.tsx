@@ -1,4 +1,5 @@
-import { createAdminClient } from '@/lib/supabase';
+import { createAdminClient } from '@/lib/supabase/server';
+import { requireStaff } from '@/lib/auth';
 import { 
   User, 
   Search, 
@@ -14,6 +15,7 @@ export default async function UsersPage({
 }: {
   searchParams: { q?: string };
 }) {
+  await requireStaff();
   const supabase = createAdminClient();
   const query = searchParams.q || '';
 

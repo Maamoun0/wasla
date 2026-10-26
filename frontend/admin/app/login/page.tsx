@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClientClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/browser';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClientClient();
+  const supabase = createBrowserClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +41,10 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     
-    // In Sprint 7, we verify the user is an admin/moderator
-    const { data: { user } } = await supabase.auth.getUser();
-    const role = user?.user_metadata?.role;
+    // The role comes from public.users (server-managed), not user_metadata,
+    // which users can edit. This check is UX only; the server enforces access.
+    const { data: profile } = await supabase.rpc('get_my_profile').maybeSingle<{ user_type: string }>();
+    const role = profile?.user_type;
 
     if (role === 'admin' || role === 'moderator') {
       router.push('/dashboard');

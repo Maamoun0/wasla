@@ -36,6 +36,7 @@ Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
 - `create-payment`
 - `payment-webhook`
 - `dispatch-notifications`
+- `purge-deleted-accounts`
 
 ## 3. Secrets
 
@@ -54,7 +55,7 @@ select vault.create_secret('https://<PROD_REF>.supabase.co', 'project_url');
 select vault.create_secret('<service_role key>', 'service_role_key');
 ```
 
-Until both secrets exist, the `dispatch-notifications` cron tick does nothing and notifications stay queued in `notifications_outbox`.
+Until both secrets exist, the `dispatch-notifications` and `purge-deleted-accounts` cron ticks do nothing: notifications stay queued in `notifications_outbox`, and due account deletions stay pending.
 
 ## 4. Auth
 

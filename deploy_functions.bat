@@ -28,6 +28,9 @@ call npx supabase functions deploy get-kyc-document --project-ref %PROJECT_REF%
 echo Deploying dispatch-notifications...
 call npx supabase functions deploy dispatch-notifications --project-ref %PROJECT_REF%
 
+echo Deploying purge-deleted-accounts...
+call npx supabase functions deploy purge-deleted-accounts --project-ref %PROJECT_REF%
+
 echo Deploying payment-webhook...
 call npx supabase functions deploy payment-webhook --project-ref %PROJECT_REF%
 

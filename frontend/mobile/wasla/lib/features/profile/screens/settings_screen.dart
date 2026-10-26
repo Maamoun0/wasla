@@ -119,9 +119,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               final reason = reasonController.text.trim();
 
                               if (userId != null) {
-                                await client.from('account_deletion_requests').insert({
-                                  'user_id': userId,
-                                  'reason': reason.isNotEmpty ? reason : null,
+                                // Hides the account and its ads now, blocks sign-in,
+                                // and schedules the permanent purge 30 days later.
+                                await client.rpc('request_account_deletion', params: {
+                                  'p_reason': reason.isNotEmpty ? reason : null,
                                 });
 
                                 if (ctx.mounted) {

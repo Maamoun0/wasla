@@ -147,8 +147,8 @@ class AppAssets {
 class AppConfig {
   AppConfig._();
 
-  static const String supabaseUrl     = String.fromEnvironment('SUPABASE_URL',     defaultValue: 'https://fgvjjtbtlzjpzaqypzmz.supabase.co');
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZndmpqdGJ0bHpqcHphcXlwem16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MTYxNDAsImV4cCI6MjA5NzE5MjE0MH0.nmBotexSVtSQ130EFTgZy1mNSGiLACEmNXv-AoxZ4H8');
+  static const String supabaseUrl     = String.fromEnvironment('SUPABASE_URL',     defaultValue: 'https://bizikadaucsyevdoagmm.supabase.co');
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpemlrYWRhdWNzeWV2ZG9hZ21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MDUwNTUsImV4cCI6MjA5OTE4MTA1NX0.f-0cxoeh_h9r3PkJ1D_C0q7-JTFXg50zzrmY6enZG3Q');
   static const String mapsApiKey      = String.fromEnvironment('GOOGLE_MAPS_KEY',   defaultValue: '');
   static const String paymobApiKey    = String.fromEnvironment('PAYMOB_API_KEY', defaultValue: '');
   static String get defaultCountry => 'defaultCountry'.tr();

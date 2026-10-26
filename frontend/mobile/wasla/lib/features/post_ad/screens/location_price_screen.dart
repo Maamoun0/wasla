@@ -214,6 +214,28 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
                             loading: () => const LinearProgressIndicator(),
                             error: (e, _) => Text('خطأ في تحميل المدن: $e', style: const TextStyle(fontFamily: 'Cairo')),
                             data: (cities) {
+                              if (cities.isEmpty) {
+                                return Container(
+                                  padding: const EdgeInsets.all(AppSizes.sm),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.error.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: AppColors.error.withOpacity(0.5)),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.info_outline_rounded, color: AppColors.error, size: 20),
+                                      SizedBox(width: AppSizes.sm),
+                                      Expanded(
+                                        child: Text(
+                                          'عفواً، لا توجد مدن متاحة لهذه المحافظة حالياً في قاعدة البيانات. يرجى اختيار محافظة أخرى.',
+                                          style: TextStyle(fontFamily: 'Cairo', color: AppColors.error, fontSize: 13),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
                               return DropdownButtonFormField<int>(
                                 value: _selectedCityId,
                                 hint: const Text('اختر المدينة', style: TextStyle(fontFamily: 'Cairo')),

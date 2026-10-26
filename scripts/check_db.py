@@ -6,8 +6,8 @@ import codecs
 
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
-URL = "https://fgvjjtbtlzjpzaqypzmz.supabase.co/rest/v1"
-ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "<YOUR_ANON_KEY>")
+URL = "https://bizikadaucsyevdoagmm.supabase.co/rest/v1"
+ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpemlrYWRhdWNzeWV2ZG9hZ21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MDUwNTUsImV4cCI6MjA5OTE4MTA1NX0.f-0cxoeh_h9r3PkJ1D_C0q7-JTFXg50zzrmY6enZG3Q")
 
 headers = {
     "apikey": ANON_KEY,

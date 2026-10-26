@@ -72,6 +72,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
       // Check if new user (needs profile setup)
       final profile = await ref.read(currentUserProvider.future);
+      if (!mounted) return;
+
       if (profile?['full_name'] == null || (profile!['full_name'] as String).isEmpty) {
         context.go(AppRoutes.profileSetup);
       } else {

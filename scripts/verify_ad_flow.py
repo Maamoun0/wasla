@@ -8,8 +8,8 @@ import codecs
 
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
-URL = "https://fgvjjtbtlzjpzaqypzmz.supabase.co"
-ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "<YOUR_ANON_KEY>")
+URL = "https://bizikadaucsyevdoagmm.supabase.co"
+ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpemlrYWRhdWNzeWV2ZG9hZ21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MDUwNTUsImV4cCI6MjA5OTE4MTA1NX0.f-0cxoeh_h9r3PkJ1D_C0q7-JTFXg50zzrmY6enZG3Q")
 
 print("1. Creating test user...")
 email = f"test_publisher_{int(time.time())}@gmail.com"
@@ -90,7 +90,10 @@ print(f"4. Verifying ad {ad_id} in active feed...")
 time.sleep(1) # wait for the transaction to fully commit
 ads_res = requests.get(
     f"{URL}/rest/v1/ads?select=id,title,status&id=eq.{ad_id}", 
-    headers={"apikey": ANON_KEY}
+    headers={
+        "apikey": ANON_KEY,
+        "Authorization": f"Bearer {token}"
+    }
 )
 
 print("DB Check Status:", ads_res.status_code)

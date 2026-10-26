@@ -54,24 +54,51 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
 
   AuthNotifier(this._client) : super(const AsyncValue.data(null));
 
-  // Send OTP to phone number via Supabase Auth
+  // Send OTP to phone number via Supabase Auth & Edge Function
   Future<void> sendOtp(String phone) async {
     state = const AsyncValue.loading();
     try {
+      // 1. Try requesting OTP via Edge Function (supports rate limiting & logging)
+      try {
+        final res = await _client.functions.invoke(
+          'request-otp',
+          body: {'phone_number': phone},
+        );
+        if (res.status == 200 && res.data != null && res.data['success'] == true) {
+          state = const AsyncValue.data(null);
+          return;
+        } else if (res.status == 429) {
+          final msg = res.data?['message'] ?? 'تجاوزت الحد المسموح به لطلب رمز التحقق.';
+          state = AsyncValue.error(Exception(msg), StackTrace.current);
+          throw Exception(msg);
+        } else if (res.data != null && res.data['error'] != null) {
+          final errorStr = res.data['error'].toString();
+          if (errorStr.contains('SMS provider') || errorStr.contains('not configured')) {
+            throw AuthException(errorStr);
+          }
+        }
+      } catch (fe) {
+        if (fe is AuthException || (fe is Exception && fe.toString().contains('تجاوزت'))) {
+          rethrow;
+        }
+        // Fallback to direct SDK call if Edge Function is not deployed
+      }
+
+      // 2. Direct Supabase Auth Call (Fallback)
       await _client.auth.signInWithOtp(
         phone: phone,
         shouldCreateUser: true,
       );
       state = const AsyncValue.data(null);
     } on AuthException catch (e, st) {
-      // رسائل خطأ واضحة بالعربية
       String arabicMsg = _translateAuthError(e.message);
       state = AsyncValue.error(Exception(arabicMsg), st);
       throw Exception(arabicMsg);
     } catch (e, st) {
-      const msg = 'تعذّر إرسال رمز التحقق. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.';
-      state = AsyncValue.error(Exception(msg), st);
-      throw Exception(msg);
+      final rawMsg = e.toString().replaceFirst('Exception: ', '');
+      String arabicMsg = _translateAuthError(rawMsg);
+      state = AsyncValue.error(Exception(arabicMsg), st);
+      throw Exception(arabicMsg);
     }
   }
 
@@ -81,11 +108,11 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
     if (m.contains('rate limit') || m.contains('too many')) {
       return 'تجاوزت الحد المسموح به. انتظر 3 دقائق وحاول مرة أخرى.';
     } else if (m.contains('invalid phone') || m.contains('phone number')) {
-      return 'رقم الهاتف غير صحيح. تأكد من كتابته بشكل صحيح.';
+      return 'رقم الهاتف غير صحيح. تأكد من كتابة رقم هاتف مصري صحيح (مثال: 01012345678).';
     } else if (m.contains('network') || m.contains('connection')) {
       return 'تعذّر الاتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.';
-    } else if (m.contains('sms') || m.contains('twilio') || m.contains('provider')) {
-      return 'خدمة الرسائل النصية غير متاحة حالياً. استخدم رقم الاختبار: 01012345678';
+    } else if (m.contains('sms') || m.contains('twilio') || m.contains('provider') || m.contains('not configured')) {
+      return 'خدمة الرسائل النصية (SMS) غير مفعّلة في لوحة Supabase. لتجربة الأرقام الحقيقية يجب ربط حساب Twilio في Supabase Dashboard → Auth → Phone. يمكنك حالياً استخدام رقم الاختبار: 01012345678 برمز 123456.';
     }
     return 'حدث خطأ: $msg';
   }

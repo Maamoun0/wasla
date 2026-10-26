@@ -27,27 +27,49 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
     }
 
     try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 80,
-        maxWidth: 1600,
-        maxHeight: 1600,
-      );
-
-      if (pickedFile != null) {
-        // Double check size in a simple way
-        final file = File(pickedFile.path);
-        final length = await file.length();
-        if (length > 1024 * 1024 * 5) {
-          // If larger than 5MB even after Picker compression (unlikely)
-          _showErrorSnackBar('حجم الصورة كبير جداً، يرجى اختيار صورة أخرى.');
-          return;
+      if (source == ImageSource.gallery) {
+        final List<XFile> pickedFiles = await _picker.pickMultiImage(
+          imageQuality: 80,
+          maxWidth: 1600,
+          maxHeight: 1600,
+        );
+        
+        if (pickedFiles.isNotEmpty) {
+          int remainingSlots = 8 - state.draft.images.length;
+          int filesToAdd = pickedFiles.length > remainingSlots ? remainingSlots : pickedFiles.length;
+          
+          for (int i = 0; i < filesToAdd; i++) {
+            final file = File(pickedFiles[i].path);
+            final length = await file.length();
+            if (length <= 1024 * 1024 * 5) {
+              ref.read(postAdWizardProvider.notifier).addImage(file);
+            }
+          }
+          
+          if (pickedFiles.length > remainingSlots) {
+            _showErrorSnackBar('تمت إضافة $remainingSlots صور فقط للوصول للحد الأقصى (8 صور).');
+          }
         }
+      } else {
+        final XFile? pickedFile = await _picker.pickImage(
+          source: source,
+          imageQuality: 80,
+          maxWidth: 1600,
+          maxHeight: 1600,
+        );
 
-        ref.read(postAdWizardProvider.notifier).addImage(file);
+        if (pickedFile != null) {
+          final file = File(pickedFile.path);
+          final length = await file.length();
+          if (length > 1024 * 1024 * 5) {
+            _showErrorSnackBar('حجم الصورة كبير جداً، يرجى اختيار صورة أخرى.');
+            return;
+          }
+          ref.read(postAdWizardProvider.notifier).addImage(file);
+        }
       }
     } catch (e) {
-      _showErrorSnackBar('حدث خطأ أثناء اختيار الصورة.');
+      _showErrorSnackBar('حدث خطأ أثناء اختيار الصور.');
     }
   }
 

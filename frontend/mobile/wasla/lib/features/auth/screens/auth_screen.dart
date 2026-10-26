@@ -32,7 +32,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   String _formatPhone(String raw) {
     String digits = raw.replaceAll(RegExp(r'\D'), '');
-    if (digits.startsWith('0')) digits = digits.substring(1);
+    if (digits.startsWith('20') && digits.length >= 12) {
+      digits = digits.substring(2);
+    }
+    if (digits.startsWith('0')) {
+      digits = digits.substring(1);
+    }
     return '+20$digits';
   }
 

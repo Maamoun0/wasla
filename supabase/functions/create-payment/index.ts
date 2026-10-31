@@ -25,6 +25,11 @@ serve(async (req) => {
         const { data, error } = await supabase.auth.getUser(token);
         return error || !data.user ? null : data.user.id;
       },
+      async setting(key, fallback) {
+        const { data, error } = await supabase.rpc("app_setting_bool", { p_key: key, p_default: fallback });
+        if (error) throw error;
+        return data === true;
+      },
       async getActivePackage(id) {
         const { data, error } = await supabase
           .from("payment_packages")

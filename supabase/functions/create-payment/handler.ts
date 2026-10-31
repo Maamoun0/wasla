@@ -43,6 +43,8 @@ export interface NewTransaction {
 
 export interface CreatePaymentDeps {
   authenticate(token: string): Promise<string | null>;
+  /** An admin switch from app_configs (maintenance_mode, enable_boost_feature). */
+  setting(key: string, fallback: boolean): Promise<boolean>;
   getActivePackage(id: string): Promise<PaymentPackage | null>;
   getAd(id: string): Promise<{ user_id: string; status: string } | null>;
   hasActiveBoost(adId: string, boostType: string): Promise<boolean>;
@@ -72,6 +74,9 @@ export async function handleCreatePayment(req: Request, deps: CreatePaymentDeps)
   if (!authHeader.startsWith("Bearer ")) return json({ error: "غير مصرح بالدخول (توكن مفقود)" }, 401);
   const userId = await deps.authenticate(authHeader.substring(7));
   if (!userId) return json({ error: "جلسة العمل منتهية أو غير صالحة" }, 401);
+  if (await deps.setting("maintenance_mode", false)) {
+    return json({ error: "الدفع متوقف مؤقتاً للصيانة. حاول بعد شوية.", code: "maintenance" }, 503);
+  }
 
   let body: { package_id?: unknown; ad_id?: unknown; payment_method?: unknown };
   try {
@@ -91,6 +96,9 @@ export async function handleCreatePayment(req: Request, deps: CreatePaymentDeps)
 
   let referenceId: string | null = null;
   if (pkg.kind === "ad_boost") {
+    if (!(await deps.setting("enable_boost_feature", true))) {
+      return json({ error: "ترويج الإعلانات متوقف حالياً.", code: "boost_disabled" }, 403);
+    }
     const adId = typeof body.ad_id === "string" ? body.ad_id : "";
     if (!UUID_RE.test(adId)) return json({ error: "رقم تعريف الإعلان مطلوب للترقية" }, 400);
 

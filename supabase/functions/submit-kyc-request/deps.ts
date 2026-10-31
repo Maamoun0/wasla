@@ -11,6 +11,11 @@ export function supabaseDeps(supabase: SupabaseClient, hmacSecret: string): Subm
       const { data, error } = await supabase.auth.getUser(token);
       return error || !data.user ? null : data.user.id;
     },
+      async setting(key, fallback) {
+        const { data, error } = await supabase.rpc("app_setting_bool", { p_key: key, p_default: fallback });
+        if (error) throw error;
+        return data === true;
+      },
     async hasPendingRequest(userId) {
       const { data, error } = await supabase.from("user_verifications").select("id")
         .eq("user_id", userId).eq("status", "pending").eq("type", "national_id");

@@ -10,6 +10,7 @@ import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
 import '../providers/my_ads_provider.dart';
+import '../../../shared/providers/app_settings_provider.dart';
 
 class MyAdsScreen extends ConsumerStatefulWidget {
   const MyAdsScreen({super.key});
@@ -222,8 +223,10 @@ class _MyAdCard extends ConsumerWidget {
                 const Spacer(),
                 // Actions
                 if (status == 'active') ...[
-                  _ActionIcon(icon: Icons.flash_on_rounded, color: AppColors.accent500,
-                    onTap: () => context.push('/profile/boost/${ad['id']}')),
+                  // Hidden while the admin has boosting switched off (create-payment refuses it too).
+                  if (ref.watch(appSettingsProvider).valueOrNull?.boostEnabled ?? true)
+                    _ActionIcon(icon: Icons.flash_on_rounded, color: AppColors.accent500,
+                      onTap: () => context.push('/profile/boost/${ad['id']}')),
                   _ActionIcon(icon: Icons.bar_chart_rounded, color: AppColors.primary600,
                     onTap: () => context.push('/profile/performance/${ad['id']}')),
                 ],

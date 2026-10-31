@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/widgets/trust_badge.dart';
+import '../../../shared/providers/app_settings_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -184,7 +185,9 @@ class _LoggedInView extends ConsumerWidget {
                 const SizedBox(height: 12),
                 _MenuSection(title: 'account'.tr(), items: [
                   _MenuItem(icon: Icons.workspace_premium_outlined, label: 'mySubscription'.tr(), route: AppRoutes.subscription),
-                  _MenuItem(icon: Icons.verified_outlined,          label: 'identityVerification'.tr(), route: AppRoutes.verification),
+                  // Hidden while the admin has KYC requests switched off (the server refuses them too).
+                  if (ref.watch(appSettingsProvider).valueOrNull?.kycEnabled ?? true)
+                    _MenuItem(icon: Icons.verified_outlined,          label: 'identityVerification'.tr(), route: AppRoutes.verification),
                   _MenuItem(icon: Icons.star_outline_rounded,       label: 'myReviews'.tr(), route: AppRoutes.myReviews),
                 ]),
                 const SizedBox(height: 12),

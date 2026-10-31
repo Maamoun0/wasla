@@ -30,22 +30,26 @@ export interface NewAd {
   fields: unknown[];
 }
 
-/** A subscription-plan limit (FR-5.3), from plan_violation / create_ad_transaction. */
-export type PlanLimit = "ad_limit_reached" | "image_limit_exceeded";
+/** Why posting is refused (posting_block / create_ad_transaction). */
+export type PostingBlock = "maintenance" | "trust_score_too_low" | "ad_limit_reached" | "image_limit_exceeded";
+export const POSTING_BLOCKS: readonly PostingBlock[] = ["maintenance", "trust_score_too_low", "ad_limit_reached", "image_limit_exceeded"];
 
-export class PlanLimitError extends Error {
-  constructor(readonly limit: PlanLimit) {
-    super(limit);
+export class PostingBlockedError extends Error {
+  constructor(readonly block: PostingBlock) {
+    super(block);
   }
 }
 
-const PLAN_LIMIT_MESSAGES: Record<PlanLimit, string> = {
-  ad_limit_reached: "وصلت للحد الأقصى لعدد الإعلانات في باقتك. احذف إعلاناً أو رقِّ باقتك للنشر.",
-  image_limit_exceeded: "عدد الصور أكبر من المسموح في باقتك.",
+const POSTING_BLOCK_RESPONSES: Record<PostingBlock, [number, string]> = {
+  maintenance: [503, "النشر متوقف مؤقتاً للصيانة. حاول بعد شوية."],
+  trust_score_too_low: [403, "مؤشر الثقة في حسابك أقل من المطلوب للنشر. وثّق هويتك عشان ترفعه."],
+  ad_limit_reached: [403, "وصلت للحد الأقصى لعدد الإعلانات في باقتك. احذف إعلاناً أو رقِّ باقتك للنشر."],
+  image_limit_exceeded: [400, "عدد الصور أكبر من المسموح في باقتك."],
 };
 
-function planLimitResponse(limit: PlanLimit): Response {
-  return json({ error: PLAN_LIMIT_MESSAGES[limit], code: limit }, limit === "ad_limit_reached" ? 403 : 400);
+function postingBlockedResponse(block: PostingBlock): Response {
+  const [status, message] = POSTING_BLOCK_RESPONSES[block];
+  return json({ error: message, code: block }, status);
 }
 
 export interface CreateAdDeps {
@@ -55,8 +59,10 @@ export interface CreateAdDeps {
   getCategoryName(categoryId: number): Promise<string>;
   getCategoryFields(categoryId: number): Promise<FieldDefinition[]>;
   moderationAllowed(userId: string): Promise<boolean>;
-  /** The plan limit this ad would break, if any (checked before the AI review). */
-  planViolation(userId: string, imageCount: number): Promise<PlanLimit | null>;
+  /** The admin switch ai_moderation_enabled (off: every ad goes straight to human review). */
+  aiModerationEnabled(): Promise<boolean>;
+  /** Why this ad may not be posted, if anything (checked before the AI review). */
+  postingBlock(userId: string, imageCount: number): Promise<PostingBlock | null>;
   moderate(ad: AdText): Promise<ModerationResult>;
   createAd(ad: NewAd): Promise<string>;
   logModeration(userId: string, tempDraftId: string, result: ModerationResult, adId: string | null): Promise<void>;
@@ -120,12 +126,14 @@ export async function handleCreateAd(req: Request, deps: CreateAdDeps): Promise<
   }
 
   const imageCount = Array.isArray(body.images) ? body.images.length : 0;
-  const violation = await deps.planViolation(userId, imageCount);
-  if (violation) return planLimitResponse(violation);
+  const blocked = await deps.postingBlock(userId, imageCount);
+  if (blocked) return postingBlockedResponse(blocked);
 
   const price = body.price === null || body.price === undefined ? null : Number(body.price);
   let moderation: ModerationResult;
-  if (!(await deps.moderationAllowed(userId))) {
+  if (!(await deps.aiModerationEnabled())) {
+    moderation = MANUAL_REVIEW("ai_disabled");
+  } else if (!(await deps.moderationAllowed(userId))) {
     moderation = MANUAL_REVIEW("daily_ai_limit");
   } else {
     try {
@@ -157,8 +165,8 @@ export async function handleCreateAd(req: Request, deps: CreateAdDeps): Promise<
     fields,
   });
   } catch (err) {
-    // The database re-checks the limits atomically (two requests at once).
-    if (err instanceof PlanLimitError) return planLimitResponse(err.limit);
+    // The database re-checks atomically (two requests at once, or a switch flipped meanwhile).
+    if (err instanceof PostingBlockedError) return postingBlockedResponse(err.block);
     throw err;
   }
 

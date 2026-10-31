@@ -8,12 +8,13 @@ const IMAGE = btoa("not-really-a-jpeg");
 
 type Row = Parameters<SubmitKycDeps["createVerification"]>[0];
 
-function fakeDeps(opts: { inUse?: boolean; insertError?: Error } = {}) {
+function fakeDeps(opts: { inUse?: boolean; insertError?: Error; settings?: Record<string, boolean> } = {}) {
   const rows: Row[] = [];
   const uploaded: string[] = [];
   const removed: string[] = [];
   const deps: SubmitKycDeps = {
     authenticate: (token) => Promise.resolve(token === "user-token" ? "user-1" : null),
+    setting: (key, fallback) => Promise.resolve(opts.settings?.[key] ?? fallback),
     hasPendingRequest: () => Promise.resolve(false),
     nationalIdHmac: (id) => nationalIdHmac(id, SECRET),
     nationalIdInUse: () => Promise.resolve(opts.inUse ?? false),
@@ -95,4 +96,17 @@ Deno.test("an invalid ID is rejected after normalization", async () => {
   const res = await handleSubmitKyc(submit("٢٩٠٠١٠١١٢٣٤٥"), deps);
   assertEquals(res.status, 400);
   assertEquals(rows.length, 0);
+});
+
+Deno.test("KYC requests stop when the switch is off or during maintenance, before any upload", async () => {
+  for (const [settings, status, code] of [
+    [{ enable_kyc_verification: false }, 403, "kyc_disabled"],
+    [{ maintenance_mode: true }, 503, "maintenance"],
+  ] as const) {
+    const { deps, uploaded, rows } = fakeDeps({ settings });
+    const res = await handleSubmitKyc(submit(ID), deps);
+    assertEquals(res.status, status);
+    assertEquals((await res.json()).code, code);
+    assertEquals([uploaded.length, rows.length], [0, 0]);
+  }
 });

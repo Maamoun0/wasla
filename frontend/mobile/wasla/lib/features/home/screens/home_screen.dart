@@ -8,6 +8,7 @@ import '../../../shared/providers/ads_provider.dart';
 import '../../notifications/providers/notifications_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart';
 import '../../../core/location/location_service.dart';
+import '../../../shared/providers/app_settings_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -151,6 +152,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               error: (_, __) => const SizedBox(),
             ),
           ),
+
+          if (ref.watch(appSettingsProvider).valueOrNull?.maintenance ?? false)
+            const SliverToBoxAdapter(child: MaintenanceBanner()),
 
           // ── Recent / Near-me Ads Header ──────────────────────
           SliverToBoxAdapter(
@@ -323,6 +327,32 @@ class _FeaturedSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
       ],
+    );
+  }
+}
+
+/// Shown while the admin has maintenance mode on.
+class MaintenanceBanner extends StatelessWidget {
+  const MaintenanceBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: AppColors.warning.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
+      child: const Row(
+        children: [
+          Icon(Icons.construction_rounded, color: AppColors.warning),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'التطبيق في وضع الصيانة: نشر الإعلانات والدفع والتوثيق متوقفين مؤقتاً. التصفح شغال عادي.',
+              style: TextStyle(fontFamily: 'Cairo', fontSize: 13),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

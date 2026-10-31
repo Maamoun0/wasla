@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
-import { CreateAdDeps, handleCreateAd, NewAd, PlanLimitError } from "./handler.ts";
+import { CreateAdDeps, handleCreateAd, NewAd, PostingBlockedError } from "./handler.ts";
 import type { ModerationResult } from "./moderation.ts";
 
 const USER = "11111111-1111-1111-1111-111111111111";
@@ -22,7 +22,8 @@ function fakeDeps(over: Partial<CreateAdDeps> = {}) {
       { id: 1, field_name: "service_location", label_ar: "مكان", field_type: "select", is_required: true, options: ["في منزل العميل"] },
     ]),
     moderationAllowed: () => Promise.resolve(true),
-    planViolation: () => Promise.resolve(null),
+    aiModerationEnabled: () => Promise.resolve(true),
+    postingBlock: () => Promise.resolve(null),
     moderate: () => {
       moderated++;
       return Promise.resolve(LOW);
@@ -93,7 +94,7 @@ Deno.test("missing required dynamic field: 400 before any AI call", async () => 
 });
 
 Deno.test("over the plan's ad limit: refused before the AI review, with a clear code", async () => {
-  const { deps, created, moderatedCount } = fakeDeps({ planViolation: () => Promise.resolve("ad_limit_reached") });
+  const { deps, created, moderatedCount } = fakeDeps({ postingBlock: () => Promise.resolve("ad_limit_reached") });
   const res = await handleCreateAd(post(BODY), deps);
   assertEquals(res.status, 403);
   assertEquals((await res.json()).code, "ad_limit_reached");
@@ -101,8 +102,27 @@ Deno.test("over the plan's ad limit: refused before the AI review, with a clear 
 });
 
 Deno.test("the database's own limit check (concurrent posts) gets the same answer", async () => {
-  const { deps } = fakeDeps({ createAd: () => Promise.reject(new PlanLimitError("image_limit_exceeded")) });
+  const { deps } = fakeDeps({ createAd: () => Promise.reject(new PostingBlockedError("image_limit_exceeded")) });
   const res = await handleCreateAd(post(BODY), deps);
   assertEquals(res.status, 400);
   assertEquals((await res.json()).code, "image_limit_exceeded");
+});
+
+Deno.test("maintenance and a low trust score are refused before the AI review", async () => {
+  for (const [block, status] of [["maintenance", 503], ["trust_score_too_low", 403]] as const) {
+    const { deps, created, moderatedCount } = fakeDeps({ postingBlock: () => Promise.resolve(block) });
+    const res = await handleCreateAd(post(BODY), deps);
+    assertEquals(res.status, status);
+    assertEquals((await res.json()).code, block);
+    assertEquals([moderatedCount(), created.length], [0, 0]);
+  }
+});
+
+Deno.test("with AI moderation switched off the ad goes to human review without calling the model", async () => {
+  const { deps, created, logs, moderatedCount } = fakeDeps({ aiModerationEnabled: () => Promise.resolve(false) });
+  const res = await handleCreateAd(post(BODY), deps);
+  assertEquals(res.status, 200);
+  assertEquals(moderatedCount(), 0);
+  assertEquals(created[0].aiRiskLevel, "unreviewed");
+  assertEquals(logs[0].moderation.error, "ai_disabled");
 });

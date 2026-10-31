@@ -15,6 +15,7 @@ function fakeDeps(overrides: Partial<CreatePaymentDeps> = {}) {
   const attached: [string, string][] = [];
   const deps: CreatePaymentDeps = {
     authenticate: (t) => Promise.resolve(t === "good" ? "user-1" : null),
+    setting: (_key, fallback) => Promise.resolve(fallback),
     getActivePackage: (id) => Promise.resolve(PACKAGES[id] ?? null),
     getAd: (id) => Promise.resolve(id === AD_ID ? { user_id: "user-1", status: "active" } : null),
     hasActiveBoost: () => Promise.resolve(false),
@@ -137,4 +138,20 @@ Deno.test("credit purchases are disabled until prices are set: 400 and nothing i
   assertEquals(res.status, 400);
   assertEquals(inserted.length, 0);
   assertEquals(paymobCalls.length, 0);
+});
+
+Deno.test("maintenance stops new payments before anything is created", async () => {
+  const { deps, inserted, paymobCalls } = fakeDeps({ setting: (key, fallback) => Promise.resolve(key === "maintenance_mode" ? true : fallback) });
+  const res = await handleCreatePayment(post({ package_id: "boost_featured_7d", ad_id: AD_ID }), deps);
+  assertEquals(res.status, 503);
+  assertEquals((await res.json()).code, "maintenance");
+  assertEquals([inserted.length, paymobCalls.length], [0, 0]);
+});
+
+Deno.test("with boosting switched off, boost packages cannot be bought", async () => {
+  const { deps, inserted } = fakeDeps({ setting: (key, fallback) => Promise.resolve(key === "enable_boost_feature" ? false : fallback) });
+  const res = await handleCreatePayment(post({ package_id: "boost_featured_7d", ad_id: AD_ID }), deps);
+  assertEquals(res.status, 403);
+  assertEquals((await res.json()).code, "boost_disabled");
+  assertEquals(inserted.length, 0);
 });

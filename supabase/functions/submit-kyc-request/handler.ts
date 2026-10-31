@@ -19,6 +19,8 @@ export const NATIONAL_ID_REJECTED = "تعذّر قبول طلب التحقق ب�
 
 export interface SubmitKycDeps {
   authenticate(token: string): Promise<string | null>;
+  /** An admin switch from app_configs (maintenance_mode, enable_kyc_verification). */
+  setting(key: string, fallback: boolean): Promise<boolean>;
   hasPendingRequest(userId: string): Promise<boolean>;
   /** HMAC-SHA256 of the normalized ID with the server-side secret. */
   nationalIdHmac(normalizedId: string): Promise<string>;
@@ -113,6 +115,12 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   if (!authHeader.startsWith("Bearer ")) return json({ error: "غير مصرح بالدخول (توكن مفقود)" }, 401);
   const userId = await deps.authenticate(authHeader.substring(7));
   if (!userId) return json({ error: "جلسة العمل منتهية أو غير صالحة" }, 401);
+  if (await deps.setting("maintenance_mode", false)) {
+    return json({ error: "التوثيق متوقف مؤقتاً للصيانة. حاول بعد شوية.", code: "maintenance" }, 503);
+  }
+  if (!(await deps.setting("enable_kyc_verification", true))) {
+    return json({ error: "استقبال طلبات توثيق الهوية متوقف حالياً.", code: "kyc_disabled" }, 403);
+  }
 
   let body: { full_name?: unknown; national_id?: unknown; front_image?: unknown; back_image?: unknown };
   try {

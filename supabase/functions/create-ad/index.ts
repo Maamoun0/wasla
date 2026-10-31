@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { corsHeaders, handleCreateAd, PlanLimit, PlanLimitError } from "./handler.ts";
+import { corsHeaders, handleCreateAd, POSTING_BLOCKS, PostingBlock, PostingBlockedError } from "./handler.ts";
 import type { FieldDefinition } from "./fields.ts";
 import { anthropicClassifier, configFromEnv, moderateAd } from "./moderation.ts";
 
@@ -52,10 +52,15 @@ serve(async (req) => {
         return data === true;
       },
       moderate: (ad) => moderateAd(ad, classifier, moderationConfig),
-      async planViolation(userId, imageCount) {
-        const { data, error } = await supabase.rpc("plan_violation", { p_user_id: userId, p_image_count: imageCount });
+      async aiModerationEnabled() {
+        const { data, error } = await supabase.rpc("app_setting_bool", { p_key: "ai_moderation_enabled", p_default: true });
         if (error) throw error;
-        return (data as PlanLimit | null) ?? null;
+        return data !== false;
+      },
+      async postingBlock(userId, imageCount) {
+        const { data, error } = await supabase.rpc("posting_block", { p_user_id: userId, p_image_count: imageCount });
+        if (error) throw error;
+        return (data as PostingBlock | null) ?? null;
       },
       async createAd(ad) {
         const { data, error } = await supabase.rpc("create_ad_transaction", {
@@ -77,8 +82,8 @@ serve(async (req) => {
           p_images: ad.images,
           p_fields: ad.fields,
         });
-        if (error?.message === "ad_limit_reached" || error?.message === "image_limit_exceeded") {
-          throw new PlanLimitError(error.message);
+        if (error && (POSTING_BLOCKS as readonly string[]).includes(error.message)) {
+          throw new PostingBlockedError(error.message as PostingBlock);
         }
         if (error) throw error;
         return data as string;

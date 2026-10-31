@@ -73,7 +73,7 @@ export default async function SettingsPage() {
           <ConfigForm 
             configKey="min_trust_score_to_post" 
             label="الحد الأدنى لمؤشر الثقة للنشر" 
-            initialValue={getConfig('min_trust_score_to_post') || 20} 
+            initialValue={getConfig('min_trust_score_to_post') ?? 0} 
             type="number"
           />
         </div>

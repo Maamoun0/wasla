@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../core/constants/app_colors.dart';
@@ -37,13 +36,17 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
     final uid = ref.read(currentUserIdProvider);
     if (uid == null) return;
     final client = ref.read(supabaseClientProvider);
-    final res = await client
-        .from('favorites')
-        .select('id')
-        .eq('user_id', uid)
-        .eq('ad_id', widget.adId)
-        .maybeSingle();
-    if (mounted) setState(() => _isFavorited = res != null);
+    try {
+      final res = await client
+          .from('favorites')
+          .select('id')
+          .eq('user_id', uid)
+          .eq('ad_id', widget.adId)
+          .maybeSingle();
+      if (mounted) setState(() => _isFavorited = res != null);
+    } catch (_) {
+      // Offline or a server error: the heart just stays empty; the page still works.
+    }
   }
 
   Future<void> _toggleFavorite() async {
@@ -62,7 +65,6 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
   Future<void> _contact(Map<String, dynamic> ad, String type) async {
     final uid = ref.read(currentUserIdProvider);
     if (uid == null) { context.push(AppRoutes.auth); return; }
-    final client = ref.read(supabaseClientProvider);
 
     void notify(String msg) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -70,7 +72,8 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
 
     final SellerPhoneResult result;
     try {
-      result = await revealSellerPhone(client: client, adId: widget.adId, contactType: type);
+      // Also logs the contact (contact_logs), which review eligibility relies on.
+      result = await ref.read(sellerPhoneRevealerProvider)(widget.adId, type);
     } catch (_) {
       notify('تعذّر الوصول لبيانات التواصل. حاول مرة أخرى.');
       return;
@@ -88,16 +91,12 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
         return;
     }
 
-    Uri uri;
-    switch (type) {
-      case 'whatsapp':
-        uri = Uri.parse('https://wa.me/${phone.replaceAll('+', '')}');
-      case 'phone':
-        uri = Uri.parse('tel:$phone');
-      default:
-        return;
+    final uri = sellerContactUri(type, phone, ad['title'] as String? ?? '');
+    if (uri == null) {
+      notify('رقم البائع غير صالح.');
+      return;
     }
-    if (await canLaunchUrl(uri)) launchUrl(uri);
+    await ref.read(externalLinkLauncherProvider)(uri);
   }
 
   void _report(BuildContext ctx) {

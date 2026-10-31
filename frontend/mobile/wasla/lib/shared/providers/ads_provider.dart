@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ── Ad Detail Provider ────────────────────────────────────────────
 final adDetailProvider =
@@ -419,3 +420,31 @@ Future<SellerPhoneResult> revealSellerPhone({
 }
 
 // Notifications providers live in features/notifications/providers.
+
+/// Where a contact button leads once the seller's number is revealed:
+/// `tel:` for a call, wa.me with a ready message naming the ad for WhatsApp.
+Uri? sellerContactUri(String type, String phone, String adTitle) {
+  final digits = phone.replaceAll(RegExp(r'[^0-9]'), '');
+  if (digits.isEmpty) return null;
+  switch (type) {
+    case 'phone':
+      return Uri(scheme: 'tel', path: '+$digits');
+    case 'whatsapp':
+      return Uri.https('wa.me', '/$digits', {'text': 'مرحباً، بخصوص إعلانك "$adTitle" على وصلة'});
+    default:
+      return null;
+  }
+}
+
+/// Reveals the seller's number through reveal_seller_phone, which also logs
+/// the contact in contact_logs (review eligibility). Overridable in tests.
+final sellerPhoneRevealerProvider = Provider<Future<SellerPhoneResult> Function(String adId, String contactType)>(
+  (ref) => (adId, contactType) =>
+      revealSellerPhone(client: ref.read(supabaseClientProvider), adId: adId, contactType: contactType),
+);
+
+/// Opens a tel: / https: link. Overridable in tests.
+final externalLinkLauncherProvider = Provider<Future<void> Function(Uri uri)>((ref) => (uri) async {
+      if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+    });
+

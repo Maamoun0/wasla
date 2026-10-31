@@ -26,6 +26,7 @@ vi.mock('@/lib/auth', () => ({
 
 import { updateConfigAction } from '@/app/dashboard/settings/actions';
 import { updateUserStatusAction } from '@/app/dashboard/users/actions';
+import { updatePackageAction } from '@/app/dashboard/packages/actions';
 
 const opts = { auth: { persistSession: false, autoRefreshToken: false } };
 const password = 'Test-password-123!';
@@ -56,6 +57,7 @@ describe.skipIf(!env.enabled)('admin actions against local Supabase', () => {
   });
 
   afterAll(async () => {
+    await admin.from('payment_packages').update({ price_egp: 60, is_active: true }).eq('id', 'boost_featured_7d');
     await admin.from('app_configs').update({ value: false }).eq('key', 'maintenance_mode');
     if (target) await admin.auth.admin.deleteUser(target.id);
     if (staffId) await admin.auth.admin.deleteUser(staffId);
@@ -87,5 +89,25 @@ describe.skipIf(!env.enabled)('admin actions against local Supabase', () => {
     expect(await updateUserStatusAction(target.id, 'suspended')).toEqual({ success: true });
     expect(await canSignIn(target.email)).toMatch(/banned/i);
     await updateUserStatusAction(target.id, 'active');
+  });
+
+  it('a package price saved in the panel is the price create-payment charges; bad values are refused', async () => {
+    expect(await updatePackageAction('boost_featured_7d', { price_egp: 75.5, is_active: false })).toEqual({ success: true });
+    // Same query create-payment uses (getActivePackage): inactive packages cannot be bought.
+    const active = await admin.from('payment_packages').select('price_egp')
+      .eq('id', 'boost_featured_7d').eq('is_active', true).maybeSingle();
+    expect(active.data).toBeNull();
+
+    expect(await updatePackageAction('boost_featured_7d', { is_active: true })).toEqual({ success: true });
+    const { data } = await admin.from('payment_packages').select('price_egp, is_active, duration_days')
+      .eq('id', 'boost_featured_7d').eq('is_active', true).single();
+    expect(data).toEqual({ price_egp: 75.5, is_active: true, duration_days: 7 });
+
+    expect((await updatePackageAction('boost_featured_7d', { price_egp: -1 })).success).toBe(false);
+    expect((await updatePackageAction('boost_featured_7d', { duration_days: 365 })).success).toBe(false);
+
+    const { data: audit } = await admin.from('audit_logs').select('changes')
+      .eq('actor_id', staffId).eq('action', 'update_payment_package').order('created_at', { ascending: true });
+    expect(audit?.[0]?.changes).toMatchObject({ id: 'boost_featured_7d', before: { price_egp: 60 }, after: { price_egp: 75.5 } });
   });
 });

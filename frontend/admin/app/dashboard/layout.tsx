@@ -7,6 +7,7 @@ import {
   AlertCircle, 
   Users, 
   Settings, 
+  Tag,
   LogOut 
 } from 'lucide-react';
 import { requireStaff } from '@/lib/auth';
@@ -15,7 +16,7 @@ import { requireStaff } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  await requireStaff();
+  const staff = await requireStaff();
 
   const menuItems = [
     { name: 'الرئيسية', icon: LayoutDashboard, href: '/dashboard' },
@@ -23,6 +24,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     { name: 'توثيق الهوية', icon: UserCheck, href: '/dashboard/kyc' },
     { name: 'البلاغات', icon: AlertCircle, href: '/dashboard/reports' },
     { name: 'المستخدمين', icon: Users, href: '/dashboard/users' },
+    // Prices are admin-only (the page and its action check this too).
+    ...(staff.role === 'admin' ? [{ name: 'الباقات والأسعار', icon: Tag, href: '/dashboard/packages' }] : []),
     { name: 'الإعدادات', icon: Settings, href: '/dashboard/settings' },
   ];
 

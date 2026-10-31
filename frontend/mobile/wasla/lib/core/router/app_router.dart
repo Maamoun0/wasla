@@ -138,7 +138,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.saved,
-            builder: (ctx, state) => const SavedScreen(),
+            builder: (ctx, state) => SavedScreen(
+              initialTab: state.uri.queryParameters['tab'] == 'alerts' ? 1 : 0,
+            ),
           ),
           GoRoute(
             path: AppRoutes.profile,
@@ -235,15 +237,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.paymentWebView,
-        builder: (ctx, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          return PaymentWebViewScreen(
-            paymentUrl: extra['paymentUrl'] as String,
-            transactionId: extra['transactionId'] as String,
-            paymentType: extra['paymentType'] as String,
-            referenceId: extra['referenceId'] as String?,
-          );
-        },
+        builder: (ctx, state) => paymentScreenFor(state.extra),
       ),
     ],
     errorBuilder: (ctx, state) => Scaffold(
@@ -275,24 +269,72 @@ class _AuthStateListenable extends ChangeNotifier {
 }
 
 // ── Auth Guard ───────────────────────────────────────────────────
+/// The payment page for the data the paying screen passed in `extra`, or a
+/// "start again" page when there is none (restored app, typed URL).
+Widget paymentScreenFor(Object? extra) {
+  if (extra is! Map<String, dynamic> ||
+      extra['paymentUrl'] is! String ||
+      extra['transactionId'] is! String ||
+      extra['paymentType'] is! String) {
+    return const _MissingPaymentScreen();
+  }
+  return PaymentWebViewScreen(
+    paymentUrl: extra['paymentUrl'] as String,
+    transactionId: extra['transactionId'] as String,
+    paymentType: extra['paymentType'] as String,
+    referenceId: extra['referenceId'] as String?,
+  );
+}
+
+/// Pages a guest may open. Browsing (ads, sellers, photos, search) is public;
+/// Saved, Profile and Notifications show their own sign-in prompt. Everything
+/// else (posting, payments, my ads, settings…) needs a session.
+bool isPublicLocation(String location) {
+  const exact = {
+    AppRoutes.splash, AppRoutes.onboarding, AppRoutes.auth, AppRoutes.otp,
+    AppRoutes.home, AppRoutes.explore, AppRoutes.saved, AppRoutes.profile, AppRoutes.notifications,
+  };
+  final path = Uri.parse(location).path;
+  if (exact.contains(path)) return true;
+  // /ad/:id, /seller/:id, /photos/:adId (one segment after the prefix).
+  return RegExp(r'^/(ad|seller|photos)/[^/]+$').hasMatch(path);
+}
+
 String? _authGuard(BuildContext context, GoRouterState state, Ref ref) {
   final session = Supabase.instance.client.auth.currentSession;
   final isLoggedIn = session != null;
 
-  final publicRoutes = [
-    AppRoutes.splash,
-    AppRoutes.onboarding,
-    AppRoutes.auth,
-    AppRoutes.otp,
-    AppRoutes.home,
-    AppRoutes.explore,
-  ];
-
-  final isPublicRoute = publicRoutes.contains(state.matchedLocation);
-
-  if (!isLoggedIn && !isPublicRoute) {
+  if (!isLoggedIn && !isPublicLocation(state.matchedLocation)) {
     return AppRoutes.auth;
   }
 
   return null;
+}
+
+/// Shown when the payment page is opened without a payment (e.g. app restore).
+class _MissingPaymentScreen extends StatelessWidget {
+  const _MissingPaymentScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('الدفع')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('انتهت جلسة الدفع. ابدأ عملية الدفع من جديد.', textAlign: TextAlign.center),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => context.go(AppRoutes.myAds),
+                child: const Text('العودة لإعلاناتي'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

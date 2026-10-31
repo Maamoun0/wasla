@@ -159,10 +159,13 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
                               controller: _pageController,
                               itemCount: media.length,
                               onPageChanged: (i) => setState(() => _currentPhoto = i),
-                              itemBuilder: (_, i) => CachedNetworkImage(
-                                imageUrl: media[i]['url'] as String,
-                                fit: BoxFit.cover,
-                                placeholder: (_, __) => Container(color: AppColors.neutral200),
+                              itemBuilder: (_, i) => GestureDetector(
+                                onTap: () => context.push('/photos/${widget.adId}?index=$i'),
+                                child: CachedNetworkImage(
+                                  imageUrl: media[i]['url'] as String,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Container(color: AppColors.neutral200),
+                                ),
                               ),
                             ),
                       if (media.length > 1)

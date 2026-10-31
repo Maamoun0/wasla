@@ -179,7 +179,7 @@ class _LoggedInView extends ConsumerWidget {
                 _MenuSection(title: 'myAds'.tr(), items: [
                   _MenuItem(icon: Icons.campaign_outlined,    label: 'myAds'.tr(),           route: AppRoutes.myAds),
                   _MenuItem(icon: Icons.favorite_outline,     label: 'favorites'.tr(),             route: AppRoutes.saved),
-                  _MenuItem(icon: Icons.notifications_none,   label: 'savedAlerts'.tr(),  route: AppRoutes.saved),
+                  _MenuItem(icon: Icons.notifications_none,   label: 'savedAlerts'.tr(),  route: '${AppRoutes.saved}?tab=alerts'),
                 ]),
                 const SizedBox(height: 12),
                 _MenuSection(title: 'account'.tr(), items: [

@@ -159,6 +159,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
       - run: flutter pub get
+      # No iOS build runs here, so at least catch a malformed Info.plist or manifest.
+      - name: Platform config files are well-formed
+        run: |
+          python3 -c "import plistlib; plistlib.load(open('ios/Runner/Info.plist', 'rb'))"
+          python3 -c "import xml.dom.minidom as m; m.parse('android/app/src/main/AndroidManifest.xml')"
       - name: Analyze (fails on any info or warning)
         run: flutter analyze --fatal-infos --fatal-warnings
       - name: Tests

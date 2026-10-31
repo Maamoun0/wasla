@@ -76,7 +76,7 @@ class AdSuccessScreen extends ConsumerWidget {
 
                 // Success Subtitle
                 const Text(
-                  'إعلانك الآن قيد المراجعة التلقائية بواسطة الذكاء الاصطناعي لتأمين المحتوى وسيكون نشطاً على المنصة قريباً.',
+                  'إعلانك وصل لفريق المراجعة. هيظهر للناس أول ما يتوافق عليه، وهيوصلك إشعار بالنتيجة.',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 14,

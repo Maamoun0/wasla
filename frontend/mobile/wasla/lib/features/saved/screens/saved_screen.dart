@@ -13,7 +13,10 @@ import '../../../features/auth/providers/auth_provider.dart';
 import '../providers/saved_searches_provider.dart';
 
 class SavedScreen extends ConsumerStatefulWidget {
-  const SavedScreen({super.key});
+  const SavedScreen({super.key, this.initialTab = 0});
+
+  /// 0: favorites, 1: saved-search alerts (/saved?tab=alerts).
+  final int initialTab;
 
   @override
   ConsumerState<SavedScreen> createState() => _SavedScreenState();
@@ -26,7 +29,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTab.clamp(0, 1));
   }
 
   @override

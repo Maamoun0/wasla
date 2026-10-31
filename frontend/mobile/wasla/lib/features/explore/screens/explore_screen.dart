@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/providers/ads_provider.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../saved/providers/saved_searches_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show AdCard, AdCardShimmer, EmptyState;
 
 class ExploreScreen extends ConsumerStatefulWidget {
@@ -22,6 +24,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   void initState() {
     super.initState();
     _scrollCtrl.addListener(_onScroll);
+    // Explore can be opened with a search already applied (a saved search).
+    _searchCtrl.text = ref.read(adsNotifierProvider).filter.query ?? '';
   }
 
   void _onScroll() {
@@ -30,10 +34,36 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     }
   }
 
+  // Keeps the other filters: a new query only replaces the text.
   void _search(String q) {
-    ref.read(adsNotifierProvider.notifier).applyFilter(
-      AdsFilter(query: q.isNotEmpty ? q : null),
+    final current = ref.read(adsNotifierProvider).filter;
+    ref.read(adsNotifierProvider.notifier).applyFilter(current.withQuery(q.isNotEmpty ? q : null));
+  }
+
+  Future<void> _saveSearch() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) {
+      messenger.showSnackBar(const SnackBar(content: Text('سجّل الدخول عشان تحفظ البحث وتوصلك التنبيهات')));
+      return;
+    }
+    final filter = ref.read(adsNotifierProvider).filter;
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => _SaveSearchDialog(initialName: defaultSavedSearchName(filter)),
     );
+    if (name == null || !mounted) return;
+    final row = savedSearchRow(filter, userId: userId, name: name);
+    if (row == null) return;
+    try {
+      await saveSearch(ref.read(supabaseClientProvider), row);
+      ref.invalidate(savedSearchesProvider);
+      messenger.showSnackBar(const SnackBar(content: Text('تم حفظ البحث. هنبعتلك تنبيه أول ما ينزل إعلان مطابق.')));
+    } on SavedSearchLimitReached catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(content: Text('تعذّر حفظ البحث. حاول مرة أخرى.')));
+    }
   }
 
   void _showFilters() {
@@ -55,6 +85,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     final adsState = ref.watch(adsNotifierProvider);
+    // Keep the search box in step when the query changes elsewhere (saved search, clear).
+    ref.listen(adsNotifierProvider.select((s) => s.filter.query), (_, q) {
+      if ((q ?? '') != _searchCtrl.text) _searchCtrl.text = q ?? '';
+    });
 
     return Scaffold(
       backgroundColor: AppColors.neutral50,
@@ -123,6 +157,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const Spacer(),
+                  if (adsState.filter.hasCriteria)
+                    TextButton.icon(
+                      onPressed: _saveSearch,
+                      icon: const Icon(Icons.bookmark_add_outlined, size: 18),
+                      label: const Text('احفظ البحث'),
+                    ),
                   _ViewToggle(
                     isGrid: _isGridView,
                     onToggle: (v) => setState(() => _isGridView = v),
@@ -263,6 +303,16 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
   double _maxPrice = 50000;
 
   @override
+  void initState() {
+    super.initState();
+    // Open on the filters already applied.
+    final f = ref.read(adsNotifierProvider).filter;
+    _adType = f.adType;
+    _minPrice = (f.minPrice ?? 0).clamp(0, 50000).toDouble();
+    _maxPrice = (f.maxPrice ?? 50000).clamp(0, 50000).toDouble();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -342,8 +392,10 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
+                    // Keeps the text query; only the refinements change.
+                    final current = ref.read(adsNotifierProvider).filter;
                     ref.read(adsNotifierProvider.notifier).applyFilter(
-                      AdsFilter(
+                      current.withRefinements(
                         adType: _adType,
                         minPrice: _minPrice > 0 ? _minPrice : null,
                         maxPrice: _maxPrice < 50000 ? _maxPrice : null,
@@ -390,6 +442,49 @@ class _FilterChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SaveSearchDialog extends StatefulWidget {
+  const _SaveSearchDialog({required this.initialName});
+  final String initialName;
+
+  @override
+  State<_SaveSearchDialog> createState() => _SaveSearchDialogState();
+}
+
+class _SaveSearchDialogState extends State<_SaveSearchDialog> {
+  late final _ctrl = TextEditingController(text: widget.initialName);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('احفظ البحث'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('هنبعتلك إشعار لما ينزل إعلان جديد يطابق البحث ده.'),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _ctrl,
+            maxLength: 100,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'اسم البحث'),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+        ElevatedButton(onPressed: () => Navigator.pop(context, _ctrl.text), child: const Text('حفظ')),
+      ],
     );
   }
 }

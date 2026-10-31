@@ -69,6 +69,39 @@ class AdsFilter {
       limit:        limit        ?? this.limit,
     );
   }
+
+  /// Same filters with another text query (null clears it). copyWith cannot clear.
+  AdsFilter withQuery(String? newQuery) => AdsFilter(
+        categoryId: categoryId,
+        cityId: cityId,
+        adType: adType,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        featuredOnly: featuredOnly,
+        query: newQuery,
+        limit: limit,
+      );
+
+  /// Same query and place with new type/price filters (null clears each).
+  AdsFilter withRefinements({String? adType, double? minPrice, double? maxPrice}) => AdsFilter(
+        categoryId: categoryId,
+        cityId: cityId,
+        adType: adType,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        featuredOnly: featuredOnly,
+        query: query,
+        limit: limit,
+      );
+
+  /// True when the search narrows anything (worth saving as an alert).
+  bool get hasCriteria =>
+      (query?.trim().isNotEmpty ?? false) ||
+      categoryId != null ||
+      cityId != null ||
+      adType != null ||
+      minPrice != null ||
+      maxPrice != null;
 }
 
 class AdsState {

@@ -17,7 +17,7 @@ INSERT INTO public.ads (id, user_id, category_id, title, description, city_id, s
   ('aaaaaaaa-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222',
    (SELECT id FROM public.categories WHERE slug = 'plumbing'), 'إعلان ب', 'desc', (SELECT min(id) FROM public.cities), 'active');
 INSERT INTO public.push_tokens (user_id, token, platform) VALUES ('11111111-1111-1111-1111-111111111111', 'tok-a', 'android');
-INSERT INTO public.saved_searches (user_id, name) VALUES ('11111111-1111-1111-1111-111111111111', 'بحث');
+INSERT INTO public.saved_searches (user_id, name, keywords) VALUES ('11111111-1111-1111-1111-111111111111', 'بحث', 'سيارة');
 -- A has also acted as staff: audit and moderation history reference A.
 INSERT INTO public.audit_logs (actor_id, action, target_type) VALUES ('11111111-1111-1111-1111-111111111111', 'test_deletion_marker', 'ad');
 INSERT INTO public.ad_moderation_log (ad_id, moderator_id, action, previous_status, new_status)

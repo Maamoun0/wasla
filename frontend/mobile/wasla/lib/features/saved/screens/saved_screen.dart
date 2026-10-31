@@ -10,6 +10,7 @@ import '../../../core/supabase/push_notification_service.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
+import '../providers/saved_searches_provider.dart';
 
 class SavedScreen extends ConsumerStatefulWidget {
   const SavedScreen({super.key});
@@ -49,7 +50,10 @@ class _SavedScreenState extends ConsumerState<SavedScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: favs.maybeWhen(data: (d) => '${'favorites'.tr()} (${d.length})', orElse: () => 'favorites'.tr())),
+            Tab(
+                text: favs.maybeWhen(
+                    data: (d) => '${'favorites'.tr()} (${d.length})',
+                    orElse: () => 'favorites'.tr())),
             Tab(text: 'myAlerts'.tr()),
           ],
         ),
@@ -75,13 +79,17 @@ class _FavoritesTab extends ConsumerWidget {
     final client = ref.watch(supabaseClientProvider);
 
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: client.from('favorites').select('''
+      future: client
+          .from('favorites')
+          .select('''
         id, notes, created_at,
         ads(id, title, price, price_type, status, city_id,
           ad_media(url, is_primary),
           cities(name_ar))
-      ''').eq('user_id', userId).order('created_at', ascending: false).then(
-        (r) => (r as List).cast<Map<String, dynamic>>()),
+      ''')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .then((r) => (r as List).cast<Map<String, dynamic>>()),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -121,9 +129,10 @@ class _FavoriteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ad    = (fav['ads'] as Map?) ?? {};
+    final ad = (fav['ads'] as Map?) ?? {};
     final media = (ad['ad_media'] as List?)?.cast<Map<String, dynamic>>() ?? [];
-    final img   = media.firstWhere((m) => m['is_primary'] == true, orElse: () => media.isNotEmpty ? media[0] : {});
+    final img = media.firstWhere((m) => m['is_primary'] == true,
+        orElse: () => media.isNotEmpty ? media[0] : {});
     final notes = fav['notes'] as String?;
 
     return GestureDetector(
@@ -138,16 +147,21 @@ class _FavoriteCard extends StatelessWidget {
           children: [
             // Image
             ClipRRect(
-              borderRadius: const BorderRadius.horizontal(right: Radius.circular(14)),
+              borderRadius:
+                  const BorderRadius.horizontal(right: Radius.circular(14)),
               child: img['url'] != null
                   ? CachedNetworkImage(
                       imageUrl: img['url'] as String,
-                      width: 100, height: 100, fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
                     )
                   : Container(
-                      width: 100, height: 100,
+                      width: 100,
+                      height: 100,
                       color: AppColors.neutral100,
-                      child: const Icon(Icons.image_outlined, color: AppColors.neutral300, size: 36),
+                      child: const Icon(Icons.image_outlined,
+                          color: AppColors.neutral300, size: 36),
                     ),
             ),
             // Info
@@ -158,23 +172,32 @@ class _FavoriteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(ad['title'] as String? ?? '',
-                      style: Theme.of(context).textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        style: Theme.of(context).textTheme.titleSmall,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 4),
                     if (notes != null && notes.isNotEmpty)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(
                           color: AppColors.primary50,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text(notes, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.primary600),
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                        child: Text(notes,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(color: AppColors.primary600),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
                       ),
                     Row(children: [
-                      const Icon(Icons.location_on_rounded, size: 12, color: AppColors.neutral400),
+                      const Icon(Icons.location_on_rounded,
+                          size: 12, color: AppColors.neutral400),
                       Text((ad['cities'] as Map?)?['name_ar'] as String? ?? '',
-                        style: Theme.of(context).textTheme.labelSmall),
+                          style: Theme.of(context).textTheme.labelSmall),
                     ]),
                   ],
                 ),
@@ -182,7 +205,8 @@ class _FavoriteCard extends StatelessWidget {
             ),
             // Remove
             IconButton(
-              icon: const Icon(Icons.close_rounded, color: AppColors.neutral400, size: 20),
+              icon: const Icon(Icons.close_rounded,
+                  color: AppColors.neutral400, size: 20),
               onPressed: onRemove,
             ),
           ],
@@ -200,16 +224,18 @@ class _WatchlistTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final client = ref.watch(supabaseClientProvider);
+    final searches = ref.watch(savedSearchesProvider);
 
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: client.from('saved_searches').select().eq('user_id', userId)
-          .order('created_at', ascending: false)
-          .then((r) => (r as List).cast<Map<String, dynamic>>()),
-      builder: (ctx, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final list = snapshot.data ?? [];
+    return searches.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => EmptyState(
+        title: 'تعذّر تحميل عمليات البحث المحفوظة',
+        subtitle: 'تحقق من اتصالك وحاول مرة أخرى.',
+        action: TextButton(
+            onPressed: () => ref.invalidate(savedSearchesProvider),
+            child: const Text('إعادة المحاولة')),
+      ),
+      data: (list) {
         if (list.isEmpty) {
           return EmptyState(
             title: 'noAlerts'.tr(),
@@ -225,14 +251,41 @@ class _WatchlistTab extends ConsumerWidget {
           itemCount: list.length,
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (_, i) => _WatchlistCard(
+            key: ValueKey(list[i]['id']),
             item: list[i],
-            onToggle: () async {
-              await client.from('saved_searches').update({
-                'is_active': !(list[i]['is_active'] as bool? ?? true),
-              }).eq('id', list[i]['id']);
+            onOpen: () {
+              ref
+                  .read(adsNotifierProvider.notifier)
+                  .applyFilter(adsFilterFromSavedSearch(list[i]));
+              context.go(AppRoutes.explore);
+            },
+            onToggle: (active) async {
+              await client
+                  .from('saved_searches')
+                  .update({'is_active': active}).eq('id', list[i]['id']);
             },
             onDelete: () async {
-              await client.from('saved_searches').delete().eq('id', list[i]['id']);
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (dialogContext) => AlertDialog(
+                  title: const Text('حذف البحث المحفوظ؟'),
+                  content: const Text('مش هتوصلك تنبيهات عن البحث ده تاني.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        child: const Text('إلغاء')),
+                    TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, true),
+                        child: const Text('حذف')),
+                  ],
+                ),
+              );
+              if (confirmed != true) return;
+              await client
+                  .from('saved_searches')
+                  .delete()
+                  .eq('id', list[i]['id']);
+              ref.invalidate(savedSearchesProvider);
             },
           ),
         );
@@ -242,9 +295,15 @@ class _WatchlistTab extends ConsumerWidget {
 }
 
 class _WatchlistCard extends StatefulWidget {
-  const _WatchlistCard({required this.item, required this.onToggle, required this.onDelete});
+  const _WatchlistCard(
+      {super.key,
+      required this.item,
+      required this.onOpen,
+      required this.onToggle,
+      required this.onDelete});
   final Map<String, dynamic> item;
-  final VoidCallback onToggle, onDelete;
+  final VoidCallback onOpen, onDelete;
+  final Future<void> Function(bool active) onToggle;
 
   @override
   State<_WatchlistCard> createState() => _WatchlistCardState();
@@ -262,55 +321,66 @@ class _WatchlistCardState extends State<_WatchlistCard> {
   @override
   Widget build(BuildContext context) {
     final name = widget.item['name'] as String? ?? 'savedSearch'.tr();
-    final kw   = widget.item['keywords'] as String?;
+    final kw = widget.item['keywords'] as String?;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _active ? AppColors.primary200 : AppColors.neutral200),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44, height: 44,
-            decoration: BoxDecoration(
-              color: _active ? AppColors.primary50 : AppColors.neutral100,
-              borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: widget.onOpen,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+              color: _active ? AppColors.primary200 : AppColors.neutral200),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: _active ? AppColors.primary50 : AppColors.neutral100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.notifications_active_outlined,
+                  color: _active ? AppColors.primary600 : AppColors.neutral400),
             ),
-            child: Icon(Icons.notifications_active_outlined,
-              color: _active ? AppColors.primary600 : AppColors.neutral400),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: Theme.of(context).textTheme.titleSmall),
-                if (kw != null && kw.isNotEmpty)
-                  Text(kw, style: Theme.of(context).textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: Theme.of(context).textTheme.titleSmall),
+                  if (kw != null && kw.isNotEmpty)
+                    Text(kw,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                ],
+              ),
             ),
-          ),
-          Switch(
-            value: _active,
-            activeThumbColor: AppColors.primary600,
-            onChanged: (v) async {
-              if (v) {
-                // Request permission when enabling notifications (Piece 1.2)
-                final granted = await PushNotificationService.requestPermission();
-                if (!granted) return;
-              }
-              setState(() => _active = v);
-              widget.onToggle();
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
-            onPressed: widget.onDelete,
-          ),
-        ],
+            Switch(
+              value: _active,
+              activeThumbColor: AppColors.primary600,
+              onChanged: (v) async {
+                if (v) {
+                  // Request permission when enabling notifications (Piece 1.2)
+                  final granted =
+                      await PushNotificationService.requestPermission();
+                  if (!granted) return;
+                }
+                setState(() => _active = v);
+                await widget.onToggle(v);
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded,
+                  color: AppColors.error, size: 20),
+              onPressed: widget.onDelete,
+            ),
+          ],
+        ),
       ),
     );
   }

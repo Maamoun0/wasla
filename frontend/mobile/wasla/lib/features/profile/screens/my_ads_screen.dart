@@ -9,6 +9,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
+import '../providers/my_ads_provider.dart';
 
 class MyAdsScreen extends ConsumerStatefulWidget {
   const MyAdsScreen({super.key});
@@ -76,36 +77,29 @@ class _AdsByStatus extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uid    = ref.watch(currentUserIdProvider);
-    final client = ref.watch(supabaseClientProvider);
     if (uid == null) return const SizedBox();
-
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: client.from('ads').select('''
-        id, title, price, price_type, views_count, contacts_count, favorites_count,
-        created_at, expires_at, rejection_reason, is_featured,
-        ad_media(url, is_primary),
-        cities(name_ar)
-      ''').eq('user_id', uid).eq('status', status)
-          .order('created_at', ascending: false)
-          .then((r) => (r as List).cast<Map<String, dynamic>>()),
-      builder: (ctx, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final ads = snap.data ?? [];
-        if (ads.isEmpty) {
+    final ads = ref.watch(myAdsProvider(status));
+    return ads.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => EmptyState(
+        title: 'تعذّر تحميل إعلاناتك',
+        subtitle: 'تحقق من اتصالك وحاول مرة أخرى.',
+        action: TextButton(onPressed: () => ref.invalidate(myAdsProvider(status)), child: const Text('إعادة المحاولة')),
+      ),
+      data: (list) {
+        if (list.isEmpty) {
           return EmptyState(
             title: 'noAdsFound'.tr(),
             subtitle: status == 'active' ? 'postFirstAd'.tr() : 'noAdsStatus'.tr(),
           );
         }
         return RefreshIndicator(
-          onRefresh: () async => (ctx as Element).markNeedsBuild(),
+          onRefresh: () async => ref.invalidate(myAdsProvider(status)),
           child: ListView.separated(
             padding: const EdgeInsets.all(16),
-            itemCount: ads.length,
+            itemCount: list.length,
             separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (_, i) => _MyAdCard(ad: ads[i], status: status, statusColor: statusColor),
+            itemBuilder: (_, i) => _MyAdCard(ad: list[i], status: status, statusColor: statusColor),
           ),
         );
       },
@@ -129,6 +123,9 @@ class _MyAdCard extends ConsumerWidget {
     final favs   = ad['favorites_count'] as int? ?? 0;
     final isFeat = ad['is_featured'] == true;
     final reason = ad['rejection_reason'] as String?;
+    final expiresAt = DateTime.tryParse(ad['expires_at'] as String? ?? '');
+    final expiry = expiryLabel(status, expiresAt);
+    final renewable = canRenewAd(status, expiresAt);
 
     return Container(
       decoration: BoxDecoration(
@@ -181,6 +178,11 @@ class _MyAdCard extends ConsumerWidget {
                         child: Text(_statusLabel(status),
                           style: TextStyle(fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w700, color: statusColor)),
                       ),
+                      if (expiry != null) ...[
+                        const SizedBox(height: 4),
+                        Text(expiry, style: TextStyle(fontFamily: 'Cairo', fontSize: 11,
+                          color: renewable ? AppColors.warning : AppColors.neutral500)),
+                      ],
                     ],
                   ),
                 ),
@@ -225,6 +227,16 @@ class _MyAdCard extends ConsumerWidget {
                   _ActionIcon(icon: Icons.bar_chart_rounded, color: AppColors.primary600,
                     onTap: () => context.push('/profile/performance/${ad['id']}')),
                 ],
+                if (renewable)
+                  TextButton.icon(
+                    onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final error = await ref.read(renewAdProvider)(ad['id'] as String);
+                      messenger.showSnackBar(SnackBar(content: Text(error ?? 'تم تجديد الإعلان لمدة 30 يوم.')));
+                    },
+                    icon: const Icon(Icons.autorenew_rounded, size: 18),
+                    label: const Text('تجديد'),
+                  ),
                 _ActionIcon(icon: Icons.open_in_new_rounded, color: AppColors.neutral500,
                   onTap: () => context.push('/ad/${ad['id']}')),
               ],

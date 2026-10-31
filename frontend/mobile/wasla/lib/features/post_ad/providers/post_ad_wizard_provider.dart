@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/draft_ad.dart';
+import '../../../core/supabase/function_errors.dart';
 
 class PostAdWizardState extends Equatable {
   final DraftAd draft;
@@ -410,19 +411,11 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
         'dynamic_fields': draft.dynamicFieldValues,
       };
 
+      // Non-2xx answers throw FunctionException (handled below).
       final response = await client.functions.invoke(
         'create-ad',
         body: body,
       );
-
-      if (response.status != 200) {
-        final data = response.data;
-        String errMsg = 'فشل نشر الإعلان';
-        if (data is Map) {
-          errMsg = data['error'] ?? data['message'] ?? errMsg;
-        }
-        throw Exception(errMsg);
-      }
 
       final resData = response.data;
       String? adId;
@@ -435,7 +428,7 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
     } catch (e) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: () => e.toString().replaceAll('Exception: ', ''),
+        errorMessage: () => functionErrorMessage(e, fallback: 'فشل نشر الإعلان. تحقق من اتصالك وحاول مرة أخرى.'),
       );
       rethrow;
     }

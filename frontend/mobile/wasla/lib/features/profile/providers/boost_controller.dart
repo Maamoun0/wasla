@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../core/supabase/function_errors.dart';
 
 enum BoostScreenStatus { idle, loading, success, error }
 
@@ -215,20 +216,13 @@ class BoostController extends StateNotifier<BoostState> {
 
       state = state.copyWith(isVerifying: false);
 
-      if (functionResponse.status != 200) {
-        final errorMsg = functionResponse.data is Map
-            ? (functionResponse.data['error'] ?? 'فشل تهيئة بوابة الدفع')
-            : 'فشل تهيئة بوابة الدفع';
-        state = state.copyWith(errorMessage: () => errorMsg);
-        return null;
-      }
-
       return functionResponse.data as Map<String, dynamic>;
 
     } catch (e) {
+      // A refusal from create-payment (FunctionException) carries its own message.
       state = state.copyWith(
         isVerifying: false,
-        errorMessage: () => 'حدث خطأ في الاتصال بالخادم، يرجى المحاولة لاحقاً',
+        errorMessage: () => functionErrorMessage(e, fallback: 'حدث خطأ في الاتصال بالخادم، يرجى المحاولة لاحقاً'),
       );
       return null;
     }

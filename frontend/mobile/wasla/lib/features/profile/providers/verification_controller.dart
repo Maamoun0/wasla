@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/national_id_validator.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../core/supabase/function_errors.dart';
 
 enum VerificationStatus { idle, loading, success, error }
 
@@ -188,7 +189,7 @@ class VerificationController extends StateNotifier<VerificationState> {
       final base64Back = base64Encode(backBytes);
 
       // Invoke submit-kyc-request
-      final response = await _client.functions.invoke(
+      await _client.functions.invoke(
         'submit-kyc-request',
         body: {
           'full_name': state.fullName.trim(),
@@ -199,11 +200,6 @@ class VerificationController extends StateNotifier<VerificationState> {
         },
       );
 
-      if (response.status != 200) {
-        final errorMsg = response.data is Map ? (response.data['error'] ?? 'حدث خطأ ما') : 'فشل إرسال طلب التحقق';
-        throw Exception(errorMsg);
-      }
-
       state = state.copyWith(
         status: VerificationStatus.success,
         errorMessage: () => null,
@@ -212,7 +208,7 @@ class VerificationController extends StateNotifier<VerificationState> {
     } catch (e) {
       state = state.copyWith(
         status: VerificationStatus.error,
-        errorMessage: () => 'فشل إرسال طلب التحقق: ${e.toString().replaceAll('Exception: ', '')}',
+        errorMessage: () => functionErrorMessage(e, fallback: 'فشل إرسال طلب التحقق. تحقق من اتصالك وحاول مرة أخرى.'),
       );
     }
   }

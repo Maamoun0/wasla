@@ -326,24 +326,4 @@ Future<SellerPhoneResult> revealSellerPhone({
   return parseSellerPhoneResponse(res);
 }
 
-// ── Notifications Provider ─────────────────────────────────────────
-final notificationsProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
-  final client = ref.watch(supabaseClientProvider);
-  final userId = client.auth.currentUser?.id;
-  if (userId == null) return Stream.value([]);
-
-  return client
-      .from('notifications')
-      .stream(primaryKey: ['id'])
-      .eq('user_id', userId)
-      .order('created_at', ascending: false)
-      .map((data) => data.cast<Map<String, dynamic>>());
-});
-
-final unreadCountProvider = Provider<int>((ref) {
-  final notifs = ref.watch(notificationsProvider);
-  return notifs.maybeWhen(
-    data: (list) => list.where((n) => n['is_read'] == false).length,
-    orElse: () => 0,
-  );
-});
+// Notifications providers live in features/notifications/providers.

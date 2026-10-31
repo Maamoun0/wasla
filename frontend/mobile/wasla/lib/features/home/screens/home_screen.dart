@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
+import '../../notifications/providers/notifications_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -42,7 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final adsState   = ref.watch(adsNotifierProvider);
     final featured   = ref.watch(featuredAdsProvider);
     final categories = ref.watch(categoriesProvider);
-    final unread     = ref.watch(unreadCountProvider);
+    final unread     = ref.watch(unreadCountProvider).valueOrNull ?? 0;
 
     return Scaffold(
       backgroundColor: AppColors.neutral50,

@@ -12,6 +12,7 @@ import 'core/constants/app_constants.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/supabase/push_notification_service.dart';
+import 'features/notifications/providers/notifications_provider.dart';
 
 void main() async {
   try {
@@ -131,14 +132,8 @@ class _WaslaAppState extends ConsumerState<WaslaApp> {
   }
 
   void _handleNotificationRouting(Map<String, dynamic> data) {
-    final type = data['type'];
-    final id = data['ad_id'];
-
-    if (type == 'watchlist_match' && id != null) {
-      ref.read(routerProvider).push('/ad/$id');
-    } else if (type == 'ad_status_change') {
-      ref.read(routerProvider).push(AppRoutes.myAds);
-    }
+    final route = notificationRoute(data);
+    if (route != null) ref.read(routerProvider).push(route);
   }
 
   @override

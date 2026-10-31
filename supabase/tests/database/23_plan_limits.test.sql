@@ -3,7 +3,7 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
 SET LOCAL search_path = public, extensions;
-SELECT plan(15);
+SELECT plan(16);
 
 INSERT INTO auth.users (id, email, phone, raw_user_meta_data, aud, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'free@test.local', '+201000000001', '{}', 'authenticated', 'authenticated'),
@@ -20,7 +20,7 @@ CREATE FUNCTION pg_temp.new_ad(p_user uuid, p_draft text, n integer) RETURNS uui
     '[]'::jsonb);
 $$;
 
--- Free plan: 5 live ads, 4 photos (current plan rows).
+-- Free plan: 5 live ads, 8 photos (FR-3.1).
 SELECT is((public.user_plan('11111111-1111-1111-1111-111111111111')).name::text, 'free', 'no subscription means the free plan');
 
 INSERT INTO public.ads (user_id, category_id, title, description, price, city_id, status)
@@ -30,9 +30,9 @@ FROM unnest(ARRAY['active', 'active', 'pending', 'expired', 'expired', 'rejected
 SELECT is(public.live_ad_count('11111111-1111-1111-1111-111111111111'), 3, 'only pending and active ads count');
 
 SET LOCAL ROLE service_role;
-SELECT lives_ok($$ SELECT pg_temp.new_ad('11111111-1111-1111-1111-111111111111', 'd1', 4) $$, '4th live ad with 4 photos is accepted');
-SELECT throws_ok($$ SELECT pg_temp.new_ad('11111111-1111-1111-1111-111111111111', 'd2', 5) $$,
-  'P0001', 'image_limit_exceeded', '5 photos are over the free plan''s 4');
+SELECT lives_ok($$ SELECT pg_temp.new_ad('11111111-1111-1111-1111-111111111111', 'd1', 8) $$, '4th live ad with 8 photos is accepted (FR-3.1)');
+SELECT throws_ok($$ SELECT pg_temp.new_ad('11111111-1111-1111-1111-111111111111', 'd2', 9) $$,
+  'P0001', 'image_limit_exceeded', '9 photos are over the free plan''s 8');
 SELECT lives_ok($$ SELECT pg_temp.new_ad('11111111-1111-1111-1111-111111111111', 'd3', 1) $$, '5th live ad is accepted');
 SELECT throws_ok($$ SELECT pg_temp.new_ad('11111111-1111-1111-1111-111111111111', 'd4', 1) $$,
   'P0001', 'ad_limit_reached', 'a 6th live ad is refused on the free plan');
@@ -47,7 +47,7 @@ SELECT set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111
 SET LOCAL ROLE authenticated;
 SELECT is(public.renew_ad((SELECT id FROM public.ads WHERE user_id = auth.uid() AND status = 'expired' LIMIT 1)) ->> 'error',
   'ad_limit_reached', 'an expired ad cannot be brought back over the limit');
-SELECT is(public.my_plan_usage(), '{"plan": "free", "plan_name_ar": "مجاني", "max_ads": 5, "max_images_per_ad": 4, "live_ads": 5}'::jsonb,
+SELECT is(public.my_plan_usage(), '{"plan": "free", "plan_name_ar": "مجاني", "max_ads": 5, "max_images_per_ad": 8, "live_ads": 5}'::jsonb,
   'the app reads its limits and usage');
 
 -- N23: no direct photo writes.
@@ -63,6 +63,8 @@ INSERT INTO public.user_subscriptions (user_id, plan_id, status, expires_at)
 VALUES ('22222222-2222-2222-2222-222222222222', (SELECT id FROM public.subscription_plans WHERE name = 'basic'), 'active', now() + interval '20 days');
 SET LOCAL ROLE service_role;
 SELECT lives_ok($$ SELECT pg_temp.new_ad('22222222-2222-2222-2222-222222222222', 'b1', 8) $$, 'a basic subscriber posts 8 photos');
+SELECT results_eq($$ SELECT name::text, max_images_per_ad::int FROM public.subscription_plans ORDER BY sort_order $$,
+  $$ VALUES ('free', 8), ('basic', 8), ('premium', 12), ('business', 20) $$, 'photo limits per plan (decision 2026-11-01)');
 RESET ROLE;
 UPDATE public.user_subscriptions SET expires_at = now() - interval '1 day' WHERE user_id = '22222222-2222-2222-2222-222222222222';
 SELECT is((public.user_plan('22222222-2222-2222-2222-222222222222')).name::text, 'free', 'an expired subscription falls back to free');

@@ -15,6 +15,6 @@ void main() {
   });
 
   test('the fallback photo limit is the smallest plan\'s', () {
-    expect(fallbackMaxImages, 4);
+    expect(fallbackMaxImages, 8);
   });
 }

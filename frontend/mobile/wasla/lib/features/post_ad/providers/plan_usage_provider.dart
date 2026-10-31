@@ -36,7 +36,7 @@ class PlanUsage {
 
 /// Photo limit used while the plan is loading or unavailable: the smallest
 /// plan's, so the app never promises more than the server accepts.
-const fallbackMaxImages = 4;
+const fallbackMaxImages = 8;
 
 final planUsageProvider = FutureProvider.autoDispose<PlanUsage?>((ref) async {
   if (ref.watch(currentUserIdProvider) == null) return null;

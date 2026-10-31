@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../providers/post_ad_wizard_provider.dart';
+import '../../../shared/providers/locations_provider.dart';
 import '../models/draft_ad.dart';
 
 class LocationPriceScreen extends ConsumerStatefulWidget {

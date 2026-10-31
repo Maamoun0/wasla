@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
+import '../../../shared/providers/locations_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart';
 import '../providers/auth_provider.dart';
 
@@ -21,6 +22,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _nameCtrl = TextEditingController();
   final _formKey  = GlobalKey<FormState>();
   String? _avatarUrl;
+  int? _governorateId;
+  int? _cityId;
   bool _isLoading = false;
 
   @override
@@ -66,6 +69,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       await ref.read(authNotifierProvider.notifier).updateProfile(
         fullName: _nameCtrl.text.trim(),
         avatarUrl: _avatarUrl,
+        cityId: _cityId,
       );
       if (mounted) context.go(AppRoutes.home);
     } catch (_) {
@@ -148,6 +152,18 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   ),
                   validator: (v) => (v == null || v.trim().isEmpty) ? AppStrings.errorRequired : null,
                 ),
+                const SizedBox(height: 16),
+
+                // ── City (FR-1.3) ──────────────────────────────
+                _CityPicker(
+                  governorateId: _governorateId,
+                  cityId: _cityId,
+                  onGovernorate: (id) => setState(() {
+                    _governorateId = id;
+                    _cityId = null;
+                  }),
+                  onCity: (id) => setState(() => _cityId = id),
+                ),
                 const SizedBox(height: 32),
 
                 // ── Save Button ────────────────────────────────
@@ -165,6 +181,67 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Governorate, then a city in it. Both required when saving the profile.
+class _CityPicker extends ConsumerWidget {
+  const _CityPicker({
+    required this.governorateId,
+    required this.cityId,
+    required this.onGovernorate,
+    required this.onCity,
+  });
+
+  final int? governorateId;
+  final int? cityId;
+  final ValueChanged<int?> onGovernorate;
+  final ValueChanged<int?> onCity;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final governorates = ref.watch(governoratesProvider);
+    final cities = governorateId == null ? null : ref.watch(citiesProvider(governorateId!));
+
+    List<DropdownMenuItem<int>> items(List<Map<String, dynamic>> rows) => [
+          for (final r in rows) DropdownMenuItem(value: r['id'] as int, child: Text(r['name_ar'] as String? ?? '')),
+        ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DropdownButtonFormField<int>(
+          key: ValueKey('gov:$governorateId'),
+          initialValue: governorateId,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'المحافظة',
+            prefixIcon: Icon(Icons.map_outlined),
+          ),
+          items: items(governorates.valueOrNull ?? const []),
+          onChanged: governorates.hasValue ? onGovernorate : null,
+          validator: (v) => v == null ? AppStrings.errorRequired : null,
+        ),
+        if (governorates.hasError)
+          const Padding(
+            padding: EdgeInsets.only(top: 6),
+            child: Text('تعذّر تحميل المحافظات', style: TextStyle(color: AppColors.error, fontFamily: 'Cairo')),
+          ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<int>(
+          key: ValueKey('city:$governorateId:$cityId'),
+          initialValue: cityId,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'المدينة / الحي',
+            prefixIcon: Icon(Icons.location_city_outlined),
+          ),
+          items: items(cities?.valueOrNull ?? const []),
+          onChanged: (cities?.hasValue ?? false) ? onCity : null,
+          validator: (v) => v == null ? AppStrings.errorRequired : null,
+        ),
+      ],
     );
   }
 }

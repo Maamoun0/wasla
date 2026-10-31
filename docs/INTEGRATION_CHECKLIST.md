@@ -34,28 +34,41 @@ npx -y deno@2.1.4 test --config supabase/functions/deno.json --no-lock --allow-e
 
 **النجاح:** إعلان عادي يتصنّف `low` من النموذج السريع (layer 2). وإعلان نصب واضح يعدّي فلتر الكلمات، يتصنّف `medium` أو `high`، ويوصل للنموذج العميق (layer 3). ومن غير أي `error` (اسم نموذج غلط، أو مفتاح، أو parsing). التكلفة: أقل من سنت.
 
-## 2. مزوّد SMS (رموز OTP)
+## 2. رسائل SMS عن طريق Send SMS Hook
+
+Auth مش مربوط بأي مزوّد مدمج. Auth بيبعت كل OTP لـ Edge Function اسمها `send-sms-hook`، والطلب متوقّع بـ Standard Webhooks. الدالة بتختار المزوّد من `SMS_PROVIDER`. أول تنفيذ هو Twilio، وده للتجربة بس. أي مزوّد محلي بعد كده = ملف جديد في `send-sms-hook/providers/` وسطر واحد في `registry.ts`.
 
 | | |
 |---|---|
-| المطلوب | **قرار منك:** أنهي مزوّد. Supabase Auth بيدعم Twilio وTwilio Verify وMessageBird وVonage وTextlocal. محتاج مزوّد بيوصل لأرقام مصر بسعر معقول |
-| فين | لوحة Supabase ← Authentication ← Sign In / Providers ← Phone (مش Edge Function secret) |
-| مع ده | حدود الـ OTP في Authentication ← Rate Limits، بنفس قيم `supabase/config.toml` (production plan §4) |
-| للاختبار | في `supabase/functions/.env` أو في ملف تاني: `WASLA_DEV_SUPABASE_URL`، و`WASLA_DEV_SUPABASE_ANON_KEY` (مفتاح anon لمشروع dev)، و`WASLA_TEST_PHONE` (رقمك بصيغة `+2010…`) |
+| المطلوب (Twilio) | `TWILIO_ACCOUNT_SID`، و`TWILIO_AUTH_TOKEN`، و`TWILIO_FROM` (رقم Twilio) أو `TWILIO_MESSAGING_SERVICE_SID` |
+| الدالة | `SMS_PROVIDER=twilio`، و`SMS_CHANNEL=sms` (الافتراضي، و`whatsapp` محجوز لسه ومش متنفّذ)، و`SMS_TIMEOUT_MS` (الافتراضي 4000، لأن Auth بيدّي الـ hook كله 5 ثواني) |
+| فين | `supabase/functions/.env`، وبعدها `secrets set` |
+| تفعيل الـ hook | لوحة Supabase ← Authentication ← Hooks ← Send SMS ← HTTPS ← `https://<DEV_REF>.supabase.co/functions/v1/send-sms-hook`، وبعدين **Generate secret**. القيمة اللي بتطلع (`v1,whsec_…`) حطها في `SEND_SMS_HOOK_SECRETS` في `supabase/functions/.env`، وارفعها بـ `secrets set` |
+| Phone provider | Authentication ← Sign In / Providers ← Phone: لازم يكون **مفعّل**. مع تفعيل الـ hook، Auth مش بيستخدم المزوّد المدمج |
+| النشر | `npx -y supabase@2.120.0 functions deploy send-sms-hook --project-ref <DEV_REF> --no-verify-jwt` (Auth بيندهها قبل ما يكون فيه JWT. التوقيع هو اللي بيحميها) |
+| مع ده | حدود الـ OTP في Authentication ← Rate Limits، بنفس قيم `supabase/config.toml` (production plan §4). Auth بيطبّقها قبل ما يندَه الـ hook |
+| للاختبار | `WASLA_TEST_PHONE` (رقمك بصيغة `+2010…`)، و`WASLA_DEV_SUPABASE_URL`، و`WASLA_DEV_SUPABASE_ANON_KEY` |
 
-على مرحلتين، عشان الرمز بيوصل على موبايل حقيقي:
-
-```bash
-npx -y deno@2.1.4 test --no-lock --allow-env --allow-net --env-file=supabase/functions/.env supabase/tests/live/sms_otp.live.ts
-```
-
-بعدها، والرمز اللي وصلك اسمه `<CODE>`:
+**أولاً المزوّد لوحده** (قبل النشر). بيبعت رسالة اختبار واحدة:
 
 ```bash
-WASLA_TEST_OTP=<CODE> npx -y deno@2.1.4 test --no-lock --allow-env --allow-net --env-file=supabase/functions/.env supabase/tests/live/sms_otp.live.ts
+npx -y deno@2.1.4 test --config supabase/functions/deno.json --no-lock --allow-env --allow-net --env-file=supabase/functions/.env supabase/tests/live/sms_otp.live.ts
 ```
 
-**النجاح:** الرسالة توصل، والرمز يدخّلك ويرجع session. لو طلبت مرتين في أقل من 60 ثانية، الطلب التاني هيترفض، وده المطلوب.
+لو `WASLA_DEV_*` موجودين والـ hook متنشر، نفس الأمر كمان بيطلب OTP حقيقي من Auth. وبعدها، والرمز اللي وصلك اسمه `<CODE>`:
+
+```bash
+WASLA_TEST_OTP=<CODE> npx -y deno@2.1.4 test --config supabase/functions/deno.json --no-lock --allow-env --allow-net --env-file=supabase/functions/.env supabase/tests/live/sms_otp.live.ts
+```
+
+**النجاح:**
+- رسالة الاختبار توصل.
+- رسالة الـ OTP توصل بالعربي ("رمز التحقق في وصلة: …").
+- الرمز يدخّلك ويرجع session.
+- طلب تاني في أقل من 60 ثانية يترفض.
+- في Edge Function logs: سطر `sent via twilio (sms) to ***XYZ`، ومن غير الرمز.
+
+**محلياً:** الـ hook بيتنده على Twilio وهمي، والسلسلة كلها متغطّية في `supabase/tests/auth/send_sms_hook.local.ts`. الإعداد في `supabase/.env` (انسخه من `supabase/.env.example`).
 
 ## 3. Firebase (الإشعارات)
 
@@ -121,7 +134,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<DEV_REF>.supabase.co/
 | الخدمة | السر | الاختبار الحي | النتيجة |
 |---|---|---|---|
 | Anthropic | ⬜ | `anthropic_moderation.live.ts` | لم يُشغَّل |
-| SMS | ⬜ (والمزوّد لم يُختر) | `sms_otp.live.ts` | لم يُشغَّل |
+| SMS (hook + Twilio) | ⬜ | `sms_otp.live.ts` | لم يُشغَّل |
 | Firebase | ⬜ | `fcm.live.ts` | لم يُشغَّل |
 | Paymob Sandbox | ⬜ | `paymob_sandbox.live.ts` + الدورة اليدوية | لم يُشغَّل |
 | KYC HMAC | ⬜ | `curl` أعلاه | لم يُشغَّل |

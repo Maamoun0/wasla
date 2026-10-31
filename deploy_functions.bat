@@ -28,6 +28,9 @@ call npx supabase functions deploy purge-kyc-documents --project-ref %PROJECT_RE
 echo Deploying payment-webhook...
 call npx supabase functions deploy payment-webhook --project-ref %PROJECT_REF%
 
+echo Deploying send-sms-hook...
+call npx supabase functions deploy send-sms-hook --no-verify-jwt --project-ref %PROJECT_REF%
+
 echo Deploying submit-kyc-request...
 call npx supabase functions deploy submit-kyc-request --project-ref %PROJECT_REF%
 

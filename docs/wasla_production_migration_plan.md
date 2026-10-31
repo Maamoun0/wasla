@@ -34,6 +34,7 @@ Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
 - `dispatch-notifications`
 - `purge-deleted-accounts`
 - `purge-kyc-documents`
+- `send-sms-hook` (with `--no-verify-jwt`; see §4)
 
 ## 3. Secrets
 
@@ -66,6 +67,13 @@ Until both secrets exist, the `dispatch-notifications`, `purge-deleted-accounts`
   - token verifications per 5 minutes per IP: 30.
 
   Enabling CAPTCHA protection (hCaptcha or Turnstile) for phone sign-in is recommended before launch.
+- **SMS delivery goes through the Send SMS Hook**, not a built-in provider:
+  - Deploy `send-sms-hook` with `--no-verify-jwt`.
+  - In Authentication → Hooks → Send SMS, choose HTTPS with `https://<PROD_REF>.supabase.co/functions/v1/send-sms-hook`, generate the secret, and set it as the `SEND_SMS_HOOK_SECRETS` function secret.
+  - Set `SMS_PROVIDER` and that provider's credentials. Twilio is only the test provider; the production provider is a new file in `send-sms-hook/providers/`.
+  - The Phone provider must stay enabled (Authentication → Providers → Phone). With the hook on, Auth does not use the built-in provider.
+  - The limits above still apply: Auth checks them before calling the hook.
+  - If the hook or the provider fails, Auth returns an error and no code is stored or logged.
 - Never configure `test_otp` numbers or placeholder SMS credentials on a hosted project; those in `config.toml` are for local development only.
 - Create the first admin with email and password, then set `public.users.user_type = 'admin'` with the service role. That user enrolls TOTP on first login.
 

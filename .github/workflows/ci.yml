@@ -55,8 +55,17 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/admin/package-lock.json
 
+      # Local-only values for the Send SMS Hook: a fresh signing secret per run
+      # and a fake Twilio that the hook test starts on the runner.
+      - name: Local env for the Send SMS Hook
+        run: |
+          grep -v '^#' supabase/.env.example | grep . > supabase/.env
+          secret="v1,whsec_$(openssl rand -base64 32)"
+          echo "::add-mask::$secret"
+          sed -i "s|^SEND_SMS_HOOK_SECRETS=.*|SEND_SMS_HOOK_SECRETS=$secret|" supabase/.env
+
       - name: Start local Supabase (migrations applied from scratch)
-        run: supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
+        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,supavisor,realtime,postgres-meta
 
       - name: pgTAP
         run: supabase test db
@@ -75,8 +84,9 @@ jobs:
 
       - name: Integration tests (Auth, Storage, KYC)
         run: >-
-          deno test --config supabase/functions/deno.json --no-lock --no-check --allow-env --allow-net
+          deno test --config supabase/functions/deno.json --no-lock --no-check --allow-env --allow-net --allow-run=docker
           supabase/tests/auth/otp_rate_limit.local.ts
+          supabase/tests/auth/send_sms_hook.local.ts
           supabase/tests/storage/buckets.local.ts
           supabase/tests/kyc/kyc_flow.local.ts
 
@@ -106,7 +116,7 @@ jobs:
       - name: Lint
         run: deno lint
       - name: Unit tests
-        run: deno test --no-lock
+        run: deno test --no-lock --allow-net=127.0.0.1
 
   admin:
     name: Admin panel (typecheck, lint, build, test)

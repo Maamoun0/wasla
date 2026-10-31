@@ -50,9 +50,18 @@ max_frequency = "60s"
 otp_length = 6
 otp_expiry = 300
 
-# Local development only. Auth needs a provider configured, but the test
-# number below never reaches it; these placeholders are not credentials.
-# Production SMS provider settings live in the hosted project's dashboard.
+# SMS goes through our own Edge Function (send-sms-hook), not a built-in
+# provider: Auth signs each request (Standard Webhooks) and the function picks
+# the provider from SMS_PROVIDER. Auth still applies every limit below before
+# calling the hook. Values come from supabase/.env (see supabase/.env.example).
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/send-sms-hook"
+secrets = "env(SEND_SMS_HOOK_SECRETS)"
+
+# Local only: the CLI turns phone login on only when a built-in provider is
+# configured. With the hook enabled Auth never calls it (the hook test proves
+# this: these placeholders could not send anything). Not credentials.
 [auth.sms.twilio]
 enabled = true
 account_sid = "local-dev-placeholder"
@@ -86,10 +95,24 @@ enroll_enabled = true
 verify_enabled = true
 
 [edge_runtime]
-enabled = false
+enabled = true
+policy = "per_worker"
+
+# Local only. Hosted projects use `supabase secrets set`.
+[edge_runtime.secrets]
+SEND_SMS_HOOK_SECRETS = "env(SEND_SMS_HOOK_SECRETS)"
+SMS_PROVIDER = "env(SMS_PROVIDER)"
+TWILIO_ACCOUNT_SID = "env(TWILIO_ACCOUNT_SID)"
+TWILIO_AUTH_TOKEN = "env(TWILIO_AUTH_TOKEN)"
+TWILIO_FROM = "env(TWILIO_FROM)"
+TWILIO_API_BASE = "env(TWILIO_API_BASE)"
 
 [analytics]
 enabled = false
+
+# Called by Auth before any user JWT exists; the webhook signature protects it.
+[functions.send-sms-hook]
+verify_jwt = false
 
 [functions.create-payment]
 verify_jwt = false

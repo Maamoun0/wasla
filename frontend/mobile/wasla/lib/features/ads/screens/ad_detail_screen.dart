@@ -51,7 +51,7 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
 
   Future<void> _toggleFavorite() async {
     final uid = ref.read(currentUserIdProvider);
-    if (uid == null) { context.push(AppRoutes.auth); return; }
+    if (uid == null) { context.push(authLocation(from: '/ad/${widget.adId}')); return; }
     final client = ref.read(supabaseClientProvider);
     await toggleFavorite(
       client: client,
@@ -64,7 +64,7 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
 
   Future<void> _contact(Map<String, dynamic> ad, String type) async {
     final uid = ref.read(currentUserIdProvider);
-    if (uid == null) { context.push(AppRoutes.auth); return; }
+    if (uid == null) { context.push(authLocation(from: '/ad/${widget.adId}')); return; }
 
     void notify(String msg) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));

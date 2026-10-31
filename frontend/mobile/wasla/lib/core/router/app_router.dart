@@ -107,18 +107,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.auth,
-        builder: (ctx, state) => const AuthScreen(),
+        builder: (ctx, state) => AuthScreen(returnTo: safeReturnPath(state.uri.queryParameters['from'])),
       ),
       GoRoute(
         path: AppRoutes.otp,
         builder: (ctx, state) => OtpScreen(
+          returnTo: safeReturnPath(state.uri.queryParameters['from']),
           phone: state.uri.queryParameters['phone'] ?? '',
           initialWaitSeconds: int.tryParse(state.uri.queryParameters['wait'] ?? ''),
         ),
       ),
       GoRoute(
         path: AppRoutes.profileSetup,
-        builder: (ctx, state) => const ProfileSetupScreen(),
+        builder: (ctx, state) => ProfileSetupScreen(returnTo: safeReturnPath(state.uri.queryParameters['from'])),
       ),
 
       // ── Shell (Bottom Nav) ───────────────────────────────────
@@ -296,6 +297,22 @@ Widget paymentScreenFor(Object? extra) {
   );
 }
 
+/// Where to go back to after signing in: only a path inside the app (never
+/// another host or scheme, never the sign-in pages themselves).
+String? safeReturnPath(String? from) {
+  if (from == null || !from.startsWith('/') || from.startsWith('//')) return null;
+  final uri = Uri.tryParse(from);
+  if (uri == null || uri.hasScheme || uri.hasAuthority) return null;
+  if (uri.path == AppRoutes.auth || uri.path.startsWith('${AppRoutes.auth}/')) return null;
+  return uri.toString();
+}
+
+/// The sign-in page, remembering where to return.
+String authLocation({String? from}) {
+  final back = safeReturnPath(from);
+  return Uri(path: AppRoutes.auth, queryParameters: back == null ? null : {'from': back}).toString();
+}
+
 /// Pages a guest may open. Browsing (ads, sellers, photos, search) is public;
 /// Saved, Profile and Notifications show their own sign-in prompt. Everything
 /// else (posting, payments, my ads, settings…) needs a session.
@@ -314,8 +331,17 @@ String? _authGuard(BuildContext context, GoRouterState state, Ref ref) {
   final session = Supabase.instance.client.auth.currentSession;
   final isLoggedIn = session != null;
 
-  if (!isLoggedIn && !isPublicLocation(state.matchedLocation)) {
-    return AppRoutes.auth;
+  return authRedirect(isLoggedIn: isLoggedIn, matchedLocation: state.matchedLocation, uri: state.uri);
+}
+
+/// The guard's decision (null = stay).
+String? authRedirect({required bool isLoggedIn, required String matchedLocation, required Uri uri}) {
+  if (!isLoggedIn && !isPublicLocation(matchedLocation)) {
+    return authLocation(from: uri.toString());
+  }
+  // Signed in while on the sign-in page (Google returns here): go back.
+  if (isLoggedIn && matchedLocation == AppRoutes.auth) {
+    return safeReturnPath(uri.queryParameters['from']) ?? AppRoutes.home;
   }
 
   return null;

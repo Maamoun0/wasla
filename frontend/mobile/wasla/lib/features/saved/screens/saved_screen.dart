@@ -400,7 +400,7 @@ class _LoginPrompt extends StatelessWidget {
         title: 'loginFirst'.tr(),
         subtitle: 'loginFirstDesc'.tr(),
         action: ElevatedButton(
-          onPressed: () => context.push(AppRoutes.auth),
+          onPressed: () => context.push(authLocation(from: AppRoutes.saved)),
           child: Text('login'.tr()),
         ),
       ),

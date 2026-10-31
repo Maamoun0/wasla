@@ -49,7 +49,7 @@ class _GuestView extends StatelessWidget {
               SizedBox(
                 width: 220,
                 child: ElevatedButton(
-                  onPressed: () => context.push(AppRoutes.auth),
+                  onPressed: () => context.push(authLocation(from: AppRoutes.profile)),
                   child: Text('login'.tr()),
                 ),
               ),

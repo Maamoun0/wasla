@@ -37,7 +37,7 @@ class NotificationsScreen extends ConsumerWidget {
           ? EmptyState(
               title: 'سجّل الدخول لعرض إشعاراتك',
               subtitle: 'هنا هتلاقي قبول إعلاناتك وتنبيهات البحث المحفوظ.',
-              action: TextButton(onPressed: () => context.go(AppRoutes.auth), child: const Text('تسجيل الدخول')),
+              action: TextButton(onPressed: () => context.push(authLocation(from: AppRoutes.notifications)), child: const Text('تسجيل الدخول')),
             )
           : notifications.when(
               loading: () => const Center(child: CircularProgressIndicator()),

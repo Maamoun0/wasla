@@ -11,7 +11,10 @@ import '../../../shared/widgets/wasla_logo.dart';
 import '../providers/auth_provider.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
-  const AuthScreen({super.key});
+  const AuthScreen({super.key, this.returnTo});
+
+  /// The page to return to after signing in (from /auth?from=…).
+  final String? returnTo;
 
   @override
   ConsumerState<AuthScreen> createState() => _AuthScreenState();
@@ -41,6 +44,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return '+20$digits';
   }
 
+  String _otpLocation(String phone, {int? wait}) => Uri(path: AppRoutes.otp, queryParameters: {
+        'phone': phone,
+        if (wait != null) 'wait': '$wait',
+        if (widget.returnTo != null) 'from': widget.returnTo!,
+      }).toString();
+
   Future<void> _sendOtp() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -56,7 +65,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       await ref.read(authNotifierProvider.notifier).sendOtp(phone);
 
       if (mounted) {
-        context.push('${AppRoutes.otp}?phone=${Uri.encodeComponent(phone)}');
+        context.push(_otpLocation(phone));
       }
     } on OtpRateLimitedException catch (e) {
       // A code was sent to this number moments ago: continue to the code entry
@@ -64,7 +73,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       final wait = e.retryAfter;
       if (mounted && wait != null) {
         final phone = _formatPhone(_phoneController.text.trim());
-        context.push('${AppRoutes.otp}?phone=${Uri.encodeComponent(phone)}&wait=${wait.inSeconds}');
+        context.push(_otpLocation(phone, wait: wait.inSeconds));
       } else if (mounted) {
         _showError(e.message);
       }

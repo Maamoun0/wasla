@@ -12,7 +12,10 @@ import '../providers/auth_provider.dart';
 import '../../legal/legal_provider.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
-  const OtpScreen({super.key, required this.phone, this.initialWaitSeconds});
+  const OtpScreen({super.key, required this.phone, this.initialWaitSeconds, this.returnTo});
+
+  /// The page to return to after signing in.
+  final String? returnTo;
   final String phone;
 
   /// Seconds before a new code may be requested (from the server's limit).
@@ -81,9 +84,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       if (!mounted) return;
 
       if (profile?['full_name'] == null || (profile!['full_name'] as String).isEmpty) {
-        context.go(AppRoutes.profileSetup);
+        context.go(Uri(path: AppRoutes.profileSetup,
+            queryParameters: widget.returnTo == null ? null : {'from': widget.returnTo!}).toString());
       } else {
-        context.go(AppRoutes.home);
+        context.go(widget.returnTo ?? AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {

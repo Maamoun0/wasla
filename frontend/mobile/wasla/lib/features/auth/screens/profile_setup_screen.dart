@@ -12,7 +12,10 @@ import '../../../shared/widgets/wasla_logo.dart';
 import '../providers/auth_provider.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
-  const ProfileSetupScreen({super.key});
+  const ProfileSetupScreen({super.key, this.returnTo});
+
+  /// The page the user was on before signing in.
+  final String? returnTo;
 
   @override
   ConsumerState<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -71,7 +74,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         avatarUrl: _avatarUrl,
         cityId: _cityId,
       );
-      if (mounted) context.go(AppRoutes.home);
+      if (mounted) context.go(widget.returnTo ?? AppRoutes.home);
     } catch (_) {
       _showError(AppStrings.errorGeneral);
     } finally {
@@ -172,7 +175,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
                 // Skip
                 TextButton(
-                  onPressed: () => context.go(AppRoutes.home),
+                  onPressed: () => context.go(widget.returnTo ?? AppRoutes.home),
                   child: const Text('تخطي الآن', style: TextStyle(color: AppColors.neutral400, fontFamily: 'Cairo')),
                 ),
                 const SizedBox(height: 24),

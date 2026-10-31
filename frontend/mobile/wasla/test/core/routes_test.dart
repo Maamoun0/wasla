@@ -13,7 +13,7 @@ import 'package:wasla/shared/providers/ads_provider.dart';
 void main() {
   group('isPublicLocation (auth guard)', () {
     test('guests can browse ads, sellers, photos and search', () {
-      for (final l in ['/home', '/explore', '/ad/abc', '/seller/u1', '/photos/abc', '/saved', '/profile', '/notifications', '/auth/otp']) {
+      for (final l in ['/home', '/explore', '/ad/abc', '/seller/u1', '/photos/abc', '/saved', '/profile', '/notifications', '/auth/otp', '/legal/terms', '/legal/privacy']) {
         expect(isPublicLocation(l), isTrue, reason: l);
       }
     });

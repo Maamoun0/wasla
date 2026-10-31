@@ -34,6 +34,8 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/profile/screens/notification_settings_screen.dart';
 import '../../shared/widgets/bottom_nav_shell.dart';
 import '../../shared/providers/ads_provider.dart';
+import '../../features/legal/legal_provider.dart';
+import '../../features/legal/legal_screen.dart';
 
 // ── Route Names ──────────────────────────────────────────────────
 class AppRoutes {
@@ -76,6 +78,7 @@ class AppRoutes {
 
   // Admin
   static const String admin         = '/admin';
+  static const String legal         = '/legal/:kind';
 }
 
 /// Location of Explore showing [filter] (empty filter: plain /explore).
@@ -170,6 +173,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             state.uri.queryParameters['index'] ?? '0',
           ) ?? 0,
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.legal,
+        builder: (ctx, state) {
+          final kind = LegalKind.fromId(state.pathParameters['kind']);
+          return kind == null ? const _MissingLegalScreen() : LegalScreen(kind: kind);
+        },
       ),
       GoRoute(
         path: AppRoutes.notifications,
@@ -297,7 +307,7 @@ bool isPublicLocation(String location) {
   final path = Uri.parse(location).path;
   if (exact.contains(path)) return true;
   // /ad/:id, /seller/:id, /photos/:adId (one segment after the prefix).
-  return RegExp(r'^/(ad|seller|photos)/[^/]+$').hasMatch(path);
+  return RegExp(r'^/(ad|seller|photos|legal)/[^/]+$').hasMatch(path);
 }
 
 String? _authGuard(BuildContext context, GoRouterState state, Ref ref) {
@@ -337,4 +347,11 @@ class _MissingPaymentScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MissingLegalScreen extends StatelessWidget {
+  const _MissingLegalScreen();
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('الصفحة غير موجودة')));
 }

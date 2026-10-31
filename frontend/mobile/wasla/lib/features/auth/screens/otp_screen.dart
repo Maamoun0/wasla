@@ -9,6 +9,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../providers/auth_provider.dart';
+import '../../legal/legal_provider.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
   const OtpScreen({super.key, required this.phone, this.initialWaitSeconds});
@@ -66,18 +67,13 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       if (!mounted) return;
 
       // Record Legal Acceptance (Piece 2.2)
+      // The user ticked the consent box on the versions shown before sign-in:
+      // record exactly those (accept_legal_documents). If a newer version
+      // appeared meanwhile, the consent dialog in the app asks again.
       try {
-        final client = ref.read(supabaseClientProvider);
-        final userId = ref.read(currentUserIdProvider);
-        if (userId != null) {
-          await client.from('legal_acceptances').upsert({
-            'user_id': userId,
-            'policy_version': 'v1.0',
-            'accepted_at': DateTime.now().toIso8601String(),
-          }, onConflict: 'user_id, policy_version');
-        }
+        await ref.read(acceptCurrentLegalProvider)();
       } catch (e) {
-        debugPrint('Non-critical: Failed to record legal acceptance: $e');
+        debugPrint('Legal acceptance not recorded yet (the app will ask): $e');
       }
 
       // Check if new user (needs profile setup)

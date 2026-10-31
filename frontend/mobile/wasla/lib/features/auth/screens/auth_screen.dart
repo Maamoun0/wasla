@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
@@ -22,7 +21,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  bool _agreedToTerms = true; // مُفعَّل افتراضياً لتسهيل الاختبار
+  // Consent must be given actively: never pre-ticked.
+  bool _agreedToTerms = false;
 
   @override
   void dispose() {
@@ -188,7 +188,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.neutral700),
                           ),
                           GestureDetector(
-                            onTap: () => launchUrl(Uri.parse('https://wasla.app/terms')),
+                            onTap: () => context.push('/legal/terms'),
                             child: const Text(
                               'شروط الاستخدام',
                               style: TextStyle(
@@ -205,7 +205,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.neutral700),
                           ),
                           GestureDetector(
-                            onTap: () => launchUrl(Uri.parse('https://wasla.app/privacy')),
+                            onTap: () => context.push('/legal/privacy'),
                             child: const Text(
                               'سياسة الخصوصية',
                               style: TextStyle(

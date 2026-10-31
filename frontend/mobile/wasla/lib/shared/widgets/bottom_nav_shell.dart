@@ -4,10 +4,36 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/router/app_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../features/legal/legal_provider.dart';
+import '../../features/legal/legal_screen.dart';
 
-class BottomNavShell extends StatelessWidget {
+class BottomNavShell extends ConsumerStatefulWidget {
   const BottomNavShell({super.key, required this.child});
   final Widget child;
+
+  @override
+  ConsumerState<BottomNavShell> createState() => _BottomNavShellState();
+}
+
+class _BottomNavShellState extends ConsumerState<BottomNavShell> {
+  bool _consentShown = false;
+
+  /// Signed-in users who have not accepted the current terms/privacy
+  /// versions (Google sign-in, or a newly published version) are asked once.
+  void _askForConsentIfNeeded(bool? accepted) {
+    if (accepted != false || _consentShown) return;
+    _consentShown = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final docs = await ref.read(legalDocumentsProvider.future);
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => LegalConsentDialog(terms: docs[LegalKind.terms]!, privacy: docs[LegalKind.privacy]!),
+      );
+    });
+  }
 
   static final _tabs = [
     _NavTab(icon: Icons.home_rounded,       label: AppStrings.home,    route: AppRoutes.home),
@@ -28,9 +54,10 @@ class BottomNavShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = _currentIndex(context);
+    _askForConsentIfNeeded(ref.watch(legalStatusProvider).valueOrNull);
 
     return Scaffold(
-      body: child,
+      body: widget.child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.white,

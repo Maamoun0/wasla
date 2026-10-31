@@ -128,6 +128,53 @@ class AdsFilter {
       maxPrice != null;
 }
 
+/// Explore's filter as URL query parameters, so links, deep links and back
+/// navigation carry the search. Only set values are written.
+Map<String, String> adsFilterToQuery(AdsFilter f) {
+  String num(double v) => v == v.roundToDouble() ? v.toInt().toString() : v.toString();
+  final q = f.query?.trim();
+  return {
+    if (q != null && q.isNotEmpty) 'q': q,
+    if (f.categoryId != null) 'category': f.categoryId!,
+    if (f.cityId != null) 'city': '${f.cityId}',
+    if (f.districtId != null) 'district': '${f.districtId}',
+    if (f.adType != null) 'type': f.adType!,
+    if (f.minPrice != null) 'min': num(f.minPrice!),
+    if (f.maxPrice != null) 'max': num(f.maxPrice!),
+    if (f.postedWithinDays != null) 'days': '${f.postedWithinDays}',
+    if (f.featuredOnly) 'featured': 'true',
+  };
+}
+
+/// The filter a URL asks for, or null when it names none (plain /explore:
+/// keep whatever search is open). Invalid values are ignored.
+AdsFilter? adsFilterFromQuery(Map<String, String> params) {
+  const keys = {'q', 'category', 'city', 'district', 'type', 'min', 'max', 'days', 'featured'};
+  if (!params.keys.any(keys.contains)) return null;
+  int? integer(String key) => int.tryParse(params[key] ?? '');
+  double? decimal(String key) => double.tryParse(params[key] ?? '');
+  final type = params['type'];
+  final q = params['q']?.trim();
+  final city = integer('city');
+  return AdsFilter(
+    query: (q == null || q.isEmpty) ? null : q,
+    categoryId: integer('category')?.toString(),
+    cityId: city,
+    districtId: city == null ? null : integer('district'),
+    adType: (type == 'offering' || type == 'seeking') ? type : null,
+    minPrice: decimal('min'),
+    maxPrice: decimal('max'),
+    postedWithinDays: integer('days'),
+    featuredOnly: params['featured'] == 'true',
+  );
+}
+
+/// Same search (ignores paging).
+bool sameSearch(AdsFilter a, AdsFilter b) {
+  final x = adsFilterToQuery(a), y = adsFilterToQuery(b);
+  return x.length == y.length && x.entries.every((e) => y[e.key] == e.value);
+}
+
 class AdsState {
   final List<Map<String, dynamic>> ads;
   final bool isLoading;
@@ -230,7 +277,13 @@ class AdsNotifier extends StateNotifier<AdsState> {
   void clearFilters() => load(filter: const AdsFilter(), refresh: true);
 }
 
+/// Explore's search (driven by the /explore URL).
 final adsNotifierProvider = StateNotifierProvider<AdsNotifier, AdsState>((ref) {
+  return AdsNotifier(ref.watch(supabaseClientProvider));
+});
+
+/// Home's "latest ads" feed, separate so a search never changes it.
+final homeAdsNotifierProvider = StateNotifierProvider<AdsNotifier, AdsState>((ref) {
   return AdsNotifier(ref.watch(supabaseClientProvider));
 });
 

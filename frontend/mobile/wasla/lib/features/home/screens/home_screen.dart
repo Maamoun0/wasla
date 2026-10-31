@@ -21,14 +21,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(adsNotifierProvider.notifier).load());
+    Future.microtask(() => ref.read(homeAdsNotifierProvider.notifier).load());
     _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      ref.read(adsNotifierProvider.notifier).load();
+      ref.read(homeAdsNotifierProvider.notifier).load();
     }
   }
 
@@ -40,7 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final adsState   = ref.watch(adsNotifierProvider);
+    final adsState   = ref.watch(homeAdsNotifierProvider);
     final featured   = ref.watch(featuredAdsProvider);
     final categories = ref.watch(categoriesProvider);
     final unread     = ref.watch(unreadCountProvider).valueOrNull ?? 0;
@@ -222,7 +222,7 @@ class _CategoriesSection extends StatelessWidget {
               final icon = _catIcons[slug] ?? cat['icon'] ?? '📦';
 
               return GestureDetector(
-                onTap: () => ctx.go('${AppRoutes.explore}?category=${cat['id']}'),
+                onTap: () => ctx.push(exploreLocation(AdsFilter(categoryId: '${cat['id']}'))),
                 child: Column(
                   children: [
                     Container(
@@ -270,7 +270,7 @@ class _FeaturedSection extends StatelessWidget {
       children: [
         SectionHeader(
           title: '⭐ إعلانات مميزة',
-          action: () => context.go('${AppRoutes.explore}?featured=true'),
+          action: () => context.push(exploreLocation(const AdsFilter(featuredOnly: true))),
         ),
         SizedBox(
           height: 220,

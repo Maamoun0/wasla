@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/providers/locations_provider.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -10,7 +12,10 @@ import '../../saved/providers/saved_searches_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show AdCard, AdCardShimmer, EmptyState;
 
 class ExploreScreen extends ConsumerStatefulWidget {
-  const ExploreScreen({super.key});
+  const ExploreScreen({super.key, this.initialFilter});
+
+  /// The search the URL asks for (/explore?category=…); null keeps the open one.
+  final AdsFilter? initialFilter;
 
   @override
   ConsumerState<ExploreScreen> createState() => _ExploreScreenState();
@@ -27,6 +32,43 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     _scrollCtrl.addListener(_onScroll);
     // Explore can be opened with a search already applied (a saved search).
     _searchCtrl.text = ref.read(adsNotifierProvider).filter.query ?? '';
+    Future.microtask(() => _applyUrlFilter(firstOpen: true));
+  }
+
+  @override
+  void didUpdateWidget(covariant ExploreScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Same page, new URL (deep link, back to an earlier search).
+    if (widget.initialFilter != null) Future.microtask(_applyUrlFilter);
+  }
+
+  void _applyUrlFilter({bool firstOpen = false}) {
+    if (!mounted) return;
+    final notifier = ref.read(adsNotifierProvider.notifier);
+    final current = ref.read(adsNotifierProvider);
+    final wanted = widget.initialFilter;
+    if (wanted != null && !sameSearch(wanted, current.filter)) {
+      notifier.applyFilter(wanted);
+    } else if (firstOpen && current.ads.isEmpty && !current.isLoading) {
+      notifier.refresh();
+    } else if (firstOpen) {
+      _syncUrl(current.filter);
+    }
+  }
+
+  static bool _sameQuery(Uri a, Uri b) {
+    final x = a.queryParameters, y = b.queryParameters;
+    return a.path == b.path && x.length == y.length && x.entries.every((e) => y[e.key] == e.value);
+  }
+
+  /// Keeps the address in step with the search without growing the history.
+  void _syncUrl(AdsFilter filter) {
+    if (!mounted) return;
+    final target = exploreLocation(filter);
+    if (GoRouter.maybeOf(context) == null) return;
+    // This page's own address (also right when Explore was pushed on top of Home).
+    final here = GoRouterState.of(context).uri;
+    if (!_sameQuery(here, Uri.parse(target))) context.replace(target);
   }
 
   void _onScroll() {
@@ -89,6 +131,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     // Keep the search box in step when the query changes elsewhere (saved search, clear).
     ref.listen(adsNotifierProvider.select((s) => s.filter.query), (_, q) {
       if ((q ?? '') != _searchCtrl.text) _searchCtrl.text = q ?? '';
+    });
+    ref.listen(adsNotifierProvider.select((s) => s.filter), (prev, next) {
+      if (prev == null || !sameSearch(prev, next)) _syncUrl(next);
     });
 
     return Scaffold(

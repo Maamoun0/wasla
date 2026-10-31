@@ -33,6 +33,7 @@ import '../../features/profile/screens/payment_webview_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/profile/screens/notification_settings_screen.dart';
 import '../../shared/widgets/bottom_nav_shell.dart';
+import '../../shared/providers/ads_provider.dart';
 
 // ── Route Names ──────────────────────────────────────────────────
 class AppRoutes {
@@ -75,6 +76,12 @@ class AppRoutes {
 
   // Admin
   static const String admin         = '/admin';
+}
+
+/// Location of Explore showing [filter] (empty filter: plain /explore).
+String exploreLocation(AdsFilter filter) {
+  final query = adsFilterToQuery(filter);
+  return Uri(path: AppRoutes.explore, queryParameters: query.isEmpty ? null : query).toString();
 }
 
 // ── Router Provider ─────────────────────────────────────────────
@@ -121,7 +128,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.explore,
-            builder: (ctx, state) => const ExploreScreen(),
+            builder: (ctx, state) => ExploreScreen(
+              initialFilter: adsFilterFromQuery(state.uri.queryParameters),
+            ),
           ),
           GoRoute(
             path: AppRoutes.postCategory,

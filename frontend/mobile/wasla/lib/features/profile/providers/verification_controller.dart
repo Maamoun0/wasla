@@ -74,7 +74,7 @@ class VerificationController extends StateNotifier<VerificationState> {
       final response = await _client
           .from('user_verifications')
           // Explicit columns: the HMAC and code hash are not readable by clients.
-          .select('id, status, created_at, decided_at, national_id_last4')
+          .select('id, status, created_at, decided_at, national_id_last4, rejection_reason')
           .eq('user_id', _userId)
           .eq('type', 'national_id')
           .order('created_at', ascending: false)

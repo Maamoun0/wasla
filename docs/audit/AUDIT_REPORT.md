@@ -587,7 +587,7 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 ### نتيجة جديدة
 | # | النتيجة | الحالة |
 |---|---|---|
-| N17 | سبب رفض الـ KYC بيتسجّل في `audit_logs` بس. `user_verifications` مافيهوش عمود `rejection_reason`، فالتطبيق دايماً بيعرض رسالة الرفض الافتراضية (`verification_screen.dart:64`) | مفتوح، 🟡 S |
+| N17 | سبب رفض الـ KYC بيتسجّل في `audit_logs` بس. `user_verifications` مافيهوش عمود `rejection_reason`، فالتطبيق دايماً بيعرض رسالة الرفض الافتراضية (`verification_screen.dart:64`) | مُصلح (§18) |
 
 ---
 

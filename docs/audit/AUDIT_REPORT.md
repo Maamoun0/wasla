@@ -588,3 +588,18 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 | # | النتيجة | الحالة |
 |---|---|---|
 | N17 | سبب رفض الـ KYC بيتسجّل في `audit_logs` بس. `user_verifications` مافيهوش عمود `rejection_reason`، فالتطبيق دايماً بيعرض رسالة الرفض الافتراضية (`verification_screen.dart:64`) | مفتوح، 🟡 S |
+
+---
+
+## 16. الـ push، الـ CI على GitHub، وقائمة الربط
+
+- **الـ push:** الفرع `fix/audit` اترفع على `origin`، ومفيش merge على `main`. الـ workflow كان بيشتغل بس على push لـ `main`/`develop`، فوسّعت الـ trigger لكل الفروع.
+- **gitleaks قبل الـ push** (v8.21.2 على كل التاريخ): لقى 10 نتائج، وفحصتها كلها، ومفيش ولا واحدة سر حقيقي:
+  - 6 منها JWT، فكّيتها وكلها `role: anon` لمشروعي الـ dev (مفاتيح عامة بطبيعتها، ومطابقة لفحص §3.5).
+  - مفتاح RSA بيتولّد وقت تشغيل الاختبار، وده بس الـ header بتاعه.
+  - قيمتين وهميتين في اختبارات.
+  - placeholder مقطوع في الـ README.
+  - اتسجلت في `.gitleaksignore` بالـ fingerprint، كل واحدة مع سببها، وبعدها الفحص بقى "no leaks found". أي نتيجة جديدة لسه هتفشّل الـ CI.
+- **نتيجة الـ CI على GitHub:** [run 40383329027](https://github.com/Maamoun0/wasla/actions/runs/40383329027). الخمس jobs ماشتغلوش أصلاً: "The job was not started because your account is locked due to a billing issue". **محتاج تصلّح الـ billing في حساب GitHub.** مفيش فرق بين المحلي وGitHub أقدر أشوفه قبل كده.
+- GitHub نبّه إن `ubuntu-latest` بيتنقل لـ Ubuntu 26. ثبّتّ `ubuntu-24.04` عشان النتيجة تبقى قابلة للتكرار.
+- **قائمة الربط:** `docs/INTEGRATION_CHECKLIST.md` فيها كل سر، وفين يتحط، والأمر اللي بيثبت إنه شغال. وفيه 4 اختبارات حية جديدة في `supabase/tests/live/` (Anthropic وFCM وPaymob sandbox وSMS)، بتتخطى نفسها من غير الأسرار، واتأكدت إنها بتعمل type-check. **ولا واحد فيهم اشتغل على خدمة حقيقية لحد دلوقتي.**

@@ -27,7 +27,7 @@ env:
 jobs:
   secret-scan:
     name: Secret scanning (gitleaks)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,7 +40,7 @@ jobs:
   # Auth OTP limits, Storage policies, the KYC flow and the admin actions.
   database:
     name: Database (pgTAP) and integration tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
@@ -92,7 +92,7 @@ jobs:
 
   functions:
     name: Edge Functions (deno check, lint, test)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: supabase/functions
@@ -110,7 +110,7 @@ jobs:
 
   admin:
     name: Admin panel (typecheck, lint, build, test)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend/admin
@@ -137,7 +137,7 @@ jobs:
 
   flutter:
     name: Flutter (analyze, test)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend/mobile/wasla

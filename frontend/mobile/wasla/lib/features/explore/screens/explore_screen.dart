@@ -10,6 +10,7 @@ import '../../../shared/providers/locations_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../saved/providers/saved_searches_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show AdCard, AdCardShimmer, EmptyState;
+import '../map/ads_map.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key, this.initialFilter});
@@ -24,7 +25,7 @@ class ExploreScreen extends ConsumerStatefulWidget {
 class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   final _searchCtrl   = TextEditingController();
   final _scrollCtrl   = ScrollController();
-  bool _isGridView    = true;
+  _ResultsView _view  = _ResultsView.grid;
 
   @override
   void initState() {
@@ -210,8 +211,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       label: const Text('احفظ البحث'),
                     ),
                   _ViewToggle(
-                    isGrid: _isGridView,
-                    onToggle: (v) => setState(() => _isGridView = v),
+                    view: _view,
+                    onToggle: (v) => setState(() => _view = v),
                   ),
                 ],
               ),
@@ -219,7 +220,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
             // ── Results ──────────────────────────────────────
             Expanded(
-              child: adsState.isLoading && adsState.ads.isEmpty
+              // The map (FR-2.4) shows every matching ad in view, not just the loaded page.
+              child: _view == _ResultsView.map
+                  ? const AdsMapView()
+                  : adsState.isLoading && adsState.ads.isEmpty
                   ? _buildShimmer()
                   : adsState.ads.isEmpty
                       ? EmptyState(
@@ -230,7 +234,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             child: const Text('مسح الفلاتر'),
                           ),
                         )
-                      : _isGridView
+                      : _view == _ResultsView.grid
                           ? _buildGrid(adsState)
                           : _buildList(adsState),
             ),
@@ -291,10 +295,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 }
 
 // ── View Toggle ───────────────────────────────────────────────────
+enum _ResultsView { grid, list, map }
+
 class _ViewToggle extends StatelessWidget {
-  const _ViewToggle({required this.isGrid, required this.onToggle});
-  final bool isGrid;
-  final ValueChanged<bool> onToggle;
+  const _ViewToggle({required this.view, required this.onToggle});
+  final _ResultsView view;
+  final ValueChanged<_ResultsView> onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -305,8 +311,9 @@ class _ViewToggle extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _ToggleBtn(icon: Icons.grid_view_rounded,    isActive: isGrid,  onTap: () => onToggle(true)),
-          _ToggleBtn(icon: Icons.view_list_rounded,    isActive: !isGrid, onTap: () => onToggle(false)),
+          _ToggleBtn(icon: Icons.grid_view_rounded, isActive: view == _ResultsView.grid, onTap: () => onToggle(_ResultsView.grid)),
+          _ToggleBtn(icon: Icons.view_list_rounded, isActive: view == _ResultsView.list, onTap: () => onToggle(_ResultsView.list)),
+          _ToggleBtn(icon: Icons.map_outlined,      isActive: view == _ResultsView.map,  onTap: () => onToggle(_ResultsView.map)),
         ],
       ),
     );

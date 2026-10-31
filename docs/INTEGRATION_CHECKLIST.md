@@ -127,6 +127,21 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<DEV_REF>.supabase.co/
 
 **النجاح:** `401`، يعني السر موجود والدالة وصلت لمرحلة التحقق من المستخدم. `500` يعني السر ناقص أو أقصر من 32 حرف. والمنطق نفسه (التطبيع، والتكرار، وعدم تخزين الرقم) متغطي في pgTAP 16، وفي `submit-kyc-request/handler_test.ts`، وفي `supabase/tests/kyc/kyc_flow.local.ts`.
 
+## 6. Google Maps (الخريطة وتحديد مكان الإعلان)
+
+| | |
+|---|---|
+| المطلوب | API key من Google Cloud، مفعّل عليه **Maps SDK for Android** و**Maps SDK for iOS**، ومقصور على package `com.ahmedmaamoun.wasla` وعلى bundle id بتاع iOS |
+| Android | متغير البيئة `MAPS_API_KEY` وقت البناء، أو سطر `MAPS_API_KEY=…` في `frontend/mobile/wasla/android/local.properties` (مش في git) |
+| iOS | ملف `frontend/mobile/wasla/ios/Flutter/Maps.xcconfig` (مش في git) فيه `MAPS_API_KEY = …` |
+| بيستخدمه | شاشة تحديد المكان في نشر الإعلان، وعرض الخريطة في البحث (🟡13). الاتنين ماكانوش هيشتغلوا قبل كده، لأن المفتاح كان placeholder مكتوب في الكود |
+
+```bash
+MAPS_API_KEY=<KEY> flutter build apk --debug
+```
+
+**النجاح:** على جهاز، افتح البحث ← زرار الخريطة. الإعلانات تظهر مجمّعة، والضغط على مجموعة بيقرّب، والضغط على إعلان لوحده بيفتح صفحته. وشاشة تحديد المكان في نشر الإعلان بتعرض الخريطة.
+
 ---
 
 ## الحالة
@@ -138,3 +153,4 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<DEV_REF>.supabase.co/
 | Firebase | ⬜ | `fcm.live.ts` | لم يُشغَّل |
 | Paymob Sandbox | ⬜ | `paymob_sandbox.live.ts` + الدورة اليدوية | لم يُشغَّل |
 | KYC HMAC | ⬜ | `curl` أعلاه | لم يُشغَّل |
+| Google Maps | ⬜ | تجربة على جهاز | لم يُشغَّل |

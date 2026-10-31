@@ -74,6 +74,8 @@
 	</array>
 	<!-- Google sign-in returns to the app through wasla://login-callback
 	     (auth_provider.dart; Android declares the same scheme). -->
+	<key>GMSApiKey</key>
+	<string>$(MAPS_API_KEY)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

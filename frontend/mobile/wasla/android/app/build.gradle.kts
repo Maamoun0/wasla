@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -30,6 +32,14 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Google Maps key from the MAPS_API_KEY environment variable or
+        // android/local.properties (not in git). Empty: the map shows an
+        // error tile instead of crashing.
+        val localProps = Properties()
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) localPropsFile.inputStream().use { localProps.load(it) }
+        manifestPlaceholders["mapsApiKey"] =
+            System.getenv("MAPS_API_KEY") ?: localProps.getProperty("MAPS_API_KEY", "")
     }
 
     buildTypes {

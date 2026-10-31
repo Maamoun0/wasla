@@ -19,6 +19,8 @@ export const NATIONAL_ID_REJECTED = "تعذّر قبول طلب التحقق ب�
 
 export interface SubmitKycDeps {
   authenticate(token: string): Promise<string | null>;
+  /** Suspended/banned accounts keep a valid access token for up to an hour. */
+  accountBlocked(userId: string): Promise<boolean>;
   /** An admin switch from app_configs (maintenance_mode, enable_kyc_verification). */
   setting(key: string, fallback: boolean): Promise<boolean>;
   hasPendingRequest(userId: string): Promise<boolean>;
@@ -117,6 +119,9 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   if (!userId) return json({ error: "جلسة العمل منتهية أو غير صالحة" }, 401);
   if (await deps.setting("maintenance_mode", false)) {
     return json({ error: "التوثيق متوقف مؤقتاً للصيانة. حاول بعد شوية.", code: "maintenance" }, 503);
+  }
+  if (await deps.accountBlocked(userId)) {
+    return json({ error: "حسابك موقوف. تواصل مع الدعم.", code: "account_blocked" }, 403);
   }
   if (!(await deps.setting("enable_kyc_verification", true))) {
     return json({ error: "استقبال طلبات توثيق الهوية متوقف حالياً.", code: "kyc_disabled" }, 403);

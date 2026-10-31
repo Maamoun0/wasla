@@ -11,6 +11,11 @@ export function supabaseDeps(supabase: SupabaseClient, hmacSecret: string): Subm
       const { data, error } = await supabase.auth.getUser(token);
       return error || !data.user ? null : data.user.id;
     },
+      async accountBlocked(userId) {
+        const { data, error } = await supabase.rpc("account_blocked", { p_user_id: userId });
+        if (error) throw error;
+        return data === true;
+      },
       async setting(key, fallback) {
         const { data, error } = await supabase.rpc("app_setting_bool", { p_key: key, p_default: fallback });
         if (error) throw error;

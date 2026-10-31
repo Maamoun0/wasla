@@ -31,8 +31,8 @@ export interface NewAd {
 }
 
 /** Why posting is refused (posting_block / create_ad_transaction). */
-export type PostingBlock = "maintenance" | "trust_score_too_low" | "ad_limit_reached" | "image_limit_exceeded";
-export const POSTING_BLOCKS: readonly PostingBlock[] = ["maintenance", "trust_score_too_low", "ad_limit_reached", "image_limit_exceeded"];
+export type PostingBlock = "maintenance" | "account_blocked" | "trust_score_too_low" | "ad_limit_reached" | "image_limit_exceeded";
+export const POSTING_BLOCKS: readonly PostingBlock[] = ["maintenance", "account_blocked", "trust_score_too_low", "ad_limit_reached", "image_limit_exceeded"];
 
 export class PostingBlockedError extends Error {
   constructor(readonly block: PostingBlock) {
@@ -42,6 +42,7 @@ export class PostingBlockedError extends Error {
 
 const POSTING_BLOCK_RESPONSES: Record<PostingBlock, [number, string]> = {
   maintenance: [503, "النشر متوقف مؤقتاً للصيانة. حاول بعد شوية."],
+  account_blocked: [403, "حسابك موقوف. تواصل مع الدعم."],
   trust_score_too_low: [403, "مؤشر الثقة في حسابك أقل من المطلوب للنشر. وثّق هويتك عشان ترفعه."],
   ad_limit_reached: [403, "وصلت للحد الأقصى لعدد الإعلانات في باقتك. احذف إعلاناً أو رقِّ باقتك للنشر."],
   image_limit_exceeded: [400, "عدد الصور أكبر من المسموح في باقتك."],

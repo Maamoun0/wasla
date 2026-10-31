@@ -15,6 +15,7 @@ function fakeDeps(overrides: Partial<CreatePaymentDeps> = {}) {
   const attached: [string, string][] = [];
   const deps: CreatePaymentDeps = {
     authenticate: (t) => Promise.resolve(t === "good" ? "user-1" : null),
+    accountBlocked: () => Promise.resolve(false),
     setting: (_key, fallback) => Promise.resolve(fallback),
     getActivePackage: (id) => Promise.resolve(PACKAGES[id] ?? null),
     getAd: (id) => Promise.resolve(id === AD_ID ? { user_id: "user-1", status: "active" } : null),
@@ -153,5 +154,13 @@ Deno.test("with boosting switched off, boost packages cannot be bought", async (
   const res = await handleCreatePayment(post({ package_id: "boost_featured_7d", ad_id: AD_ID }), deps);
   assertEquals(res.status, 403);
   assertEquals((await res.json()).code, "boost_disabled");
+  assertEquals(inserted.length, 0);
+});
+
+Deno.test("a suspended or banned account cannot start a payment with its remaining token", async () => {
+  const { deps, inserted } = fakeDeps({ accountBlocked: () => Promise.resolve(true) });
+  const res = await handleCreatePayment(post({ package_id: "boost_featured_7d", ad_id: AD_ID }), deps);
+  assertEquals(res.status, 403);
+  assertEquals((await res.json()).code, "account_blocked");
   assertEquals(inserted.length, 0);
 });

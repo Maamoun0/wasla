@@ -8,12 +8,13 @@ const IMAGE = btoa("not-really-a-jpeg");
 
 type Row = Parameters<SubmitKycDeps["createVerification"]>[0];
 
-function fakeDeps(opts: { inUse?: boolean; insertError?: Error; settings?: Record<string, boolean> } = {}) {
+function fakeDeps(opts: { inUse?: boolean; insertError?: Error; settings?: Record<string, boolean>; blocked?: boolean } = {}) {
   const rows: Row[] = [];
   const uploaded: string[] = [];
   const removed: string[] = [];
   const deps: SubmitKycDeps = {
     authenticate: (token) => Promise.resolve(token === "user-token" ? "user-1" : null),
+    accountBlocked: () => Promise.resolve(opts.blocked ?? false),
     setting: (key, fallback) => Promise.resolve(opts.settings?.[key] ?? fallback),
     hasPendingRequest: () => Promise.resolve(false),
     nationalIdHmac: (id) => nationalIdHmac(id, SECRET),
@@ -109,4 +110,12 @@ Deno.test("KYC requests stop when the switch is off or during maintenance, befor
     assertEquals((await res.json()).code, code);
     assertEquals([uploaded.length, rows.length], [0, 0]);
   }
+});
+
+Deno.test("a suspended or banned account cannot submit KYC with its remaining token", async () => {
+  const { deps, uploaded } = fakeDeps({ blocked: true });
+  const res = await handleSubmitKyc(submit(ID), deps);
+  assertEquals(res.status, 403);
+  assertEquals((await res.json()).code, "account_blocked");
+  assertEquals(uploaded.length, 0);
 });

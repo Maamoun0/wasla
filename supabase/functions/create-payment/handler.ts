@@ -43,6 +43,8 @@ export interface NewTransaction {
 
 export interface CreatePaymentDeps {
   authenticate(token: string): Promise<string | null>;
+  /** Suspended/banned accounts keep a valid access token for up to an hour. */
+  accountBlocked(userId: string): Promise<boolean>;
   /** An admin switch from app_configs (maintenance_mode, enable_boost_feature). */
   setting(key: string, fallback: boolean): Promise<boolean>;
   getActivePackage(id: string): Promise<PaymentPackage | null>;
@@ -76,6 +78,9 @@ export async function handleCreatePayment(req: Request, deps: CreatePaymentDeps)
   if (!userId) return json({ error: "جلسة العمل منتهية أو غير صالحة" }, 401);
   if (await deps.setting("maintenance_mode", false)) {
     return json({ error: "الدفع متوقف مؤقتاً للصيانة. حاول بعد شوية.", code: "maintenance" }, 503);
+  }
+  if (await deps.accountBlocked(userId)) {
+    return json({ error: "حسابك موقوف. تواصل مع الدعم.", code: "account_blocked" }, 403);
   }
 
   let body: { package_id?: unknown; ad_id?: unknown; payment_method?: unknown };

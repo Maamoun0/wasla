@@ -11,6 +11,7 @@ import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../shared/widgets/trust_badge.dart';
 import '../../../features/auth/providers/auth_provider.dart';
+import '../../profile/providers/ad_performance_provider.dart';
 
 class AdDetailScreen extends ConsumerStatefulWidget {
   const AdDetailScreen({super.key, required this.adId});
@@ -30,6 +31,8 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
   void initState() {
     super.initState();
     _checkFavorited();
+    // Counted by record_ad_view (not the owner's views; once a day per viewer).
+    Future.microtask(() => ref.read(adViewRecorderProvider)(widget.adId));
   }
 
   Future<void> _checkFavorited() async {

@@ -123,7 +123,7 @@
 | FR-1.4 | KYC: وجه/ظهر + سيلفي + مطابقة + شارة | `user_verifications` (+`decided_at`, `documents_deleted_at`) | `submit-kyc-request`, `purge-kyc-documents`, `moderate_kyc` | `verification_screen.dart` | `kyc/` | pgTAP 18 + تكامل KYC محلي | ⚠️ | مُصلح (§14): الاعتماد يضبط شارة ✓ الظاهرة للكل، والمستندات تُحذف بعد 7 أيام من الاعتماد و30 يوماً من الرفض. الرقم القومي مايتخزنش: آخر 4 أرقام + HMAC، ونفس الرقم مايتقبلش على حسابين (N14). متبقٍ: السيلفي (🟡 #20)، ولا مطابقة آلية حسب قرارك |
 | FR-2.1 | Feed حسب موقع GPS | `location_point` (elite_v3) | — | — | — | ❌ | ❌ | لا استخدام لـ `geolocator` في `lib/` |
 | FR-2.2 | بحث نصي عربي بالمرادفات والأخطاء | `normalize_arabic`, `search_ads()`, فهرس trigram | — | `ads_provider.dart` | — | pgTAP 17 + Flutter | ⚠️ | مُصلح (§11): توحيد الحروف، بحث بالبادئة، وتسامح مع الأخطاء الإملائية. متبقٍ: المرادفات غير منفّذة |
-| FR-2.3 | فلاتر: قسم، سعر، مدينة، حي، نوع، تاريخ | `search_ads(p_district_id, p_posted_within_days)` | — | `explore_screen.dart` (شيت الفلاتر) | — | pgTAP 21 + widget 2 + Flutter | ⚠️ | §18: الحي والتاريخ والمدينة في الشيت، والفلاتر مابقتش تمسح البحث. متبقٍ: **فلتر القسم مش بيوصل للبحث** (N19) |
+| FR-2.3 | فلاتر: قسم، سعر، مدينة، حي، نوع، تاريخ | `search_ads(p_district_id, p_posted_within_days)` | — | `explore_screen.dart` (شيت الفلاتر) | — | pgTAP 21 + widget 2 + Flutter | ⚠️ | §18: الحي والتاريخ والمدينة في الشيت، والفلاتر مابقتش تمسح البحث. §19: فلتر القسم بيوصل من الرئيسية والـ URL (N19). متبقٍ: التجربة على جهاز |
 | FR-2.4 | عرض خريطة مع Clusters | — | — | — | — | ❌ | ❌ | `GoogleMap` يُستخدم فقط لاختيار الموقع (`location_price_screen.dart:504`)؛ مفتاح Maps placeholder في `AndroidManifest.xml`/`AppDelegate.swift` (تعديل غير مُرسَل) |
 | FR-3.1 | معالج 5 خطوات، حتى 8 صور | `ad_media` | `create-ad` | `post_ad/` (6 شاشات) | — | `post_ad_wizard_test.dart` | ⚠️ | حد 8 صور في العميل فقط (`add_photos_screen.dart:24`)؛ لا تحقق في الخادم؛ لا integration test |
 | FR-3.2 | حقول ديناميكية حسب القسم | `category_fields`, `get_category_fields()` | `create-ad` (يتحقق من الإلزامي والقيم) | `category_fields_provider.dart` | — | pgTAP 14 + Deno 5 | ⚠️ | مُصلح (§10): كل الأقسام الفرعية لها حقول. متبقٍ: تجربة المعالج على جهاز فعلي |
@@ -662,7 +662,7 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 ### نتائج جديدة
 | # | النتيجة | الحالة |
 |---|---|---|
-| N19 | الضغط على قسم في الرئيسية بيروح لـ `/explore?category=ID`، بس مسار Explore بيتجاهل `category`، فـ**فلتر القسم مابيتطبّقش في أي مكان في التطبيق**، مع إن `search_ads` بيدعمه (القسم الرئيسي بيشمل الفرعي) | مفتوح، S. محتاج ترتيبك |
+| N19 | الضغط على قسم في الرئيسية بيروح لـ `/explore?category=ID`، بس مسار Explore بيتجاهل `category`، فـ**فلتر القسم مابيتطبّقش في أي مكان في التطبيق**، مع إن `search_ads` بيدعمه (القسم الرئيسي بيشمل الفرعي) | **🟠**، مُصلح (§19، `e6c6f17`) |
 
 ### نتائج كل الحزم بعد §18
 | الحزمة | النتيجة |
@@ -675,3 +675,74 @@ FR-1.2 (Facebook)، FR-1.3 (اختيار المدينة)، FR-1.4 (سيلفي + 
 | CI على GitHub | **لسه مقفول بسبب الـ billing** (آخر run: `ef6e397`، ولا job بدأ) |
 
 **وقفت بعد أول 5 بنود زي ما طلبت.** البند التالي في §13 هو رقم 5 (انتهاء الإعلان من تاريخ الاعتماد).
+
+---
+
+## 19. N19 (اترفع لـ 🟠) ومراجعة المسارات في التطبيق كله
+
+### N19: فلتر القسم (`e6c6f17`)
+- **المشكلة:** الرئيسية بتفتح `/explore?category=ID`، والمسار بيتجاهل الـ query، فالقسم مابيتطبّقش في أي مكان. ونفس الكلام في `?featured=true`.
+- **الإصلاح:**
+  - `/explore` بيقرأ `q`، و`category`، و`city`، و`district`، و`type`، و`min`، و`max`، و`days`، و`featured` عند الفتح، ولما الـ URL يتغير.
+  - `/explore` من غير parameters بيسيب البحث المفتوح زي ما هو.
+  - أي تغيير في الفلتر بيعمل `replace` للـ URL، فالتاريخ مابيكبرش.
+  - الرئيسية بتعمل `push`، فزرار الرجوع بيرجع للرئيسية.
+- **مشكلة اكتشفتها وأنا بصلّح:** الرئيسية والبحث كانوا بيشتركوا في نفس الـ provider، فالقسم اللي بتختاره في البحث كان بيغيّر قائمة الرئيسية. الرئيسية بقى ليها `homeAdsNotifierProvider` لوحدها.
+- **الاختبارات (widget):**
+  - الضغط على "مركبات" في الرئيسية بيفتح البحث، و`p_category_id = 1` بيوصل لـ `search_ads`، وبيظهر القسم وأقسامه الفرعية بس.
+  - الرجوع بيرجع للرئيسية.
+  - deep link فيه `category` و`q` بيفتح البحث ده، والتعديل بيحدّث الـ URL.
+  - أما إن القسم الرئيسي بيشمل الفرعي على السيرفر، فده متغطي في pgTAP 11.
+
+### جدول المسارات
+كل `go`/`push`/`replace`، وكل توجيه إشعار، وكل deep link. "بتتقري؟" معناها: الشاشة اللي بتستقبل بتقرأ الـ parameter فعلاً.
+
+| المصدر | الوجهة | الـ parameters | بتتقري؟ | الحالة |
+|---|---|---|---|---|
+| `home_screen.dart:225` (قسم) | `/explore` | `?category=` | ✅ بعد الإصلاح | ✔ N19 |
+| `home_screen.dart:273` (المميز) | `/explore` | `?featured=true` | ✅ بعد الإصلاح | ✔ N19 |
+| `home_screen.dart:91,141`، `saved_screen.dart:103,244`، bottom nav | `/explore` | — | — | ✅ |
+| `saved_screen.dart:260` (بحث محفوظ) | `/explore` | الفلتر في الـ provider ثم `go` | ✅ (الـ URL بيتزامن) | ✅ |
+| `home_screen.dart:63` | `/notifications` | — | — | ✅ |
+| `AdCard` (`wasla_logo.dart:154`)، `saved_screen.dart:139`، `my_ads_screen.dart:229`، `seller_profile_screen.dart:264`، `ad_success_screen.dart:95` | `/ad/:id` | path `id` | ✅ | ✅. كان **محجوب على الزوار** بالـ guard، واتصلّح |
+| `ad_detail_screen.dart:263` | `/seller/:id` | path `id` | ✅ | ✅. كان محجوب على الزوار، واتصلّح |
+| صور الإعلان (`ad_detail_screen.dart`) | `/photos/:adId` | path + `?index=` | ✅ | **المسار كان موجود ومحدش بيفتحه**. اتربط |
+| `ad_detail_screen.dart:51,64`، `profile_screen.dart:51`، `saved_screen.dart:400` | `/auth` | — | — | ✅. بس بعد الدخول المستخدم بيروح للرئيسية مش للصفحة اللي كان فيها (N22) |
+| `auth_screen.dart:59,67` | `/auth/otp` | `?phone=&wait=` | ✅ (`app_router`) | ✅ |
+| `otp_screen.dart:88,90`، `splash_screen.dart`، `onboarding_screen.dart` | `/auth/setup`، `/home`، `/onboarding`، `/auth` | — | — | ✅ |
+| `select_category_screen.dart:97` ← `ad_form:304` ← `add_photos:255` ← `location_price:440` | `/post/form` ← `/post/photos` ← `/post/location` ← `/post/preview` | الحالة في `postAdWizardProvider` | ✅ | ✅ |
+| `ad_preview_screen.dart:36` | `/post/success` | `?id=` | ✅ (`GoRouterState` في `ad_success_screen.dart:16`) | ✅. الرسالة كانت بتقول إن الـ AI هيفعّل الإعلان، واتصلّحت |
+| `my_ads_screen.dart:224` | `/profile/boost/:id` | path `id` | ✅ | ✅ |
+| `my_ads_screen.dart:226` | `/profile/performance/:id` | path `id` | ✅ | ✅ (الشاشة نفسها فاضية، وده 🟡 #12) |
+| `boost_ad_screen.dart:347`، `subscription_screen.dart:401` | `/profile/payment` | `extra` (Map) | ✅ | **كانت بتقع لو مفيش `extra`** (cast إجباري)، واتصلّح |
+| `profile_screen.dart` (القائمة) | `/profile/my-ads`، `/saved`، `/profile/subscription`، `/profile/verify`، `/profile/reviews`، `/settings` | — | — | ✅ |
+| `profile_screen.dart` "التنبيهات المحفوظة" | `/saved` | — | ❌ كانت بتفتح المفضلة | اتصلّح: `?tab=alerts` |
+| `settings_screen.dart:233` | `/settings/notifications` | — | — | ✅ |
+| `conversations_screen.dart:61` | `/chat/:id` | path `id` | ❌ **المسار مش موجود** | N20 |
+| (لا شيء) | `ConversationsScreen`، `ChatDetailScreen` | — | — | N20: مش مربوطين بأي مسار |
+| `AppRoutes.admin` (`/admin`) | — | — | — | ثابت ملوش استخدام ولا مسار، مش بيعمل ضرر |
+| Push (`main.dart`) + القائمة داخل التطبيق | `/ad/:id` (`watchlist_match`)، `/profile/my-ads` (`ad_status_change`) | `data.ad_id` | ✅ (`notificationRoute`) | ✅ (§18) |
+| Deep link `wasla://login-callback` (Google) | Supabase / app_links | `code` | Android ✅. **iOS ❌ مفيش URL scheme** | اتصلّح (`CFBundleURLTypes`). ماتجرّبش على جهاز |
+
+### أزرار فاضية
+| المكان | المشكلة | الحالة |
+|---|---|---|
+| `settings_screen.dart:279` سياسة الخصوصية | `onTap: () {}` | N21 |
+| `settings_screen.dart:286` شروط الاستخدام | `onTap: () {}` | N21 |
+
+مفيش أي TODO، أو "قريباً"، أو `UnimplementedError` في `lib/`.
+
+### الإصلاحات الصغيرة (`0539415`)، كل واحد بـ widget/unit test في `test/core/routes_test.dart`
+1. **الـ guard:** `isPublicLocation` بيسمح بتصفح الإعلانات والبائعين والصور. والمحفوظ والملف الشخصي والإشعارات بيعرضوا رسالة الدخول بتاعتهم. الباقي محتاج جلسة.
+2. **عارض الصور:** اتربط.
+3. **التنبيهات المحفوظة:** بتفتح تبويبها.
+4. **صفحة الدفع:** من غير بيانات بتعرض "ابدأ من جديد" بدل ما تقع.
+5. **`Info.plist`:** كان **XML غير صالح** (`< RowanUIInterfaceOrientationLandscapeRight` من commit `333e1e7`، قبل التدقيق)، وده بيكسر أي build لـ iOS. وكمان ماكانش فيه URL scheme. اتصلّح الاتنين، والـ CI بقى بيتأكد إن `Info.plist` و`AndroidManifest.xml` سليمين. الفحص بيفشل على الملف القديم، اتأكدت من ده.
+6. **رسالة نجاح النشر:** اتصلّحت.
+
+### بنود جديدة كبيرة
+| # | البند | الحالة |
+|---|---|---|
+| N20 | الشات: جداول `conversations`/`messages` وشاشتين وprovider موجودين، بس مفيش مسار ولا زرار يوصّل ليهم. والشات مش من متطلبات الـ SRS الـ 28، والـ RLS بتاعه ماتراجعش | **محتاج قرارك:** نكمّله (مسارات + زرار "راسل البائع" + مراجعة RLS + اختبارات، حجمه M–L) ولا نشيله |
+| N21 | سياسة الخصوصية وشروط الاستخدام: الزرارين فاضيين، ومفيش نص قانوني في الريبو. المتاجر بتطلب رابط سياسة خصوصية | **محتاج النص منك** (أو رابط). مش هكتب نص قانوني |
+| N22 | الدخول من صفحة محمية بيرجّع المستخدم للرئيسية مش للصفحة اللي كان فيها | 🟡 S |

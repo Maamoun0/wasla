@@ -26,9 +26,12 @@ final adDetailProvider =
 class AdsFilter {
   final String? categoryId;
   final int? cityId;
+  final int? districtId;
   final String? adType;
   final double? minPrice;
   final double? maxPrice;
+  /// Only ads published in the last N days.
+  final int? postedWithinDays;
   final bool featuredOnly;
   final String? query;
   final int page;
@@ -37,9 +40,11 @@ class AdsFilter {
   const AdsFilter({
     this.categoryId,
     this.cityId,
+    this.districtId,
     this.adType,
     this.minPrice,
     this.maxPrice,
+    this.postedWithinDays,
     this.featuredOnly = false,
     this.query,
     this.page = 1,
@@ -49,9 +54,11 @@ class AdsFilter {
   AdsFilter copyWith({
     String? categoryId,
     int? cityId,
+    int? districtId,
     String? adType,
     double? minPrice,
     double? maxPrice,
+    int? postedWithinDays,
     bool? featuredOnly,
     String? query,
     int? page,
@@ -60,9 +67,11 @@ class AdsFilter {
     return AdsFilter(
       categoryId:   categoryId   ?? this.categoryId,
       cityId:       cityId       ?? this.cityId,
+      districtId:   districtId   ?? this.districtId,
       adType:       adType       ?? this.adType,
       minPrice:     minPrice     ?? this.minPrice,
       maxPrice:     maxPrice     ?? this.maxPrice,
+      postedWithinDays: postedWithinDays ?? this.postedWithinDays,
       featuredOnly: featuredOnly ?? this.featuredOnly,
       query:        query        ?? this.query,
       page:         page         ?? this.page,
@@ -74,31 +83,46 @@ class AdsFilter {
   AdsFilter withQuery(String? newQuery) => AdsFilter(
         categoryId: categoryId,
         cityId: cityId,
+        districtId: districtId,
         adType: adType,
         minPrice: minPrice,
         maxPrice: maxPrice,
+        postedWithinDays: postedWithinDays,
         featuredOnly: featuredOnly,
         query: newQuery,
         limit: limit,
       );
 
-  /// Same query and place with new type/price filters (null clears each).
-  AdsFilter withRefinements({String? adType, double? minPrice, double? maxPrice}) => AdsFilter(
+  /// Same query and category with the filter sheet's values (null clears each).
+  AdsFilter withRefinements({
+    int? cityId,
+    int? districtId,
+    String? adType,
+    double? minPrice,
+    double? maxPrice,
+    int? postedWithinDays,
+  }) =>
+      AdsFilter(
         categoryId: categoryId,
         cityId: cityId,
+        // A district only makes sense inside the chosen city.
+        districtId: cityId == null ? null : districtId,
         adType: adType,
         minPrice: minPrice,
         maxPrice: maxPrice,
+        postedWithinDays: postedWithinDays,
         featuredOnly: featuredOnly,
         query: query,
         limit: limit,
       );
 
-  /// True when the search narrows anything (worth saving as an alert).
+  /// True when the search narrows what alerts can match (worth saving).
+  /// The date window does not count: alerts are about new ads anyway.
   bool get hasCriteria =>
       (query?.trim().isNotEmpty ?? false) ||
       categoryId != null ||
       cityId != null ||
+      districtId != null ||
       adType != null ||
       minPrice != null ||
       maxPrice != null;
@@ -146,6 +170,8 @@ Map<String, dynamic> searchAdsParams(AdsFilter f, {required int offset}) {
     if (f.adType != null) 'p_ad_type': f.adType,
     if (f.minPrice != null) 'p_min_price': f.minPrice,
     if (f.maxPrice != null) 'p_max_price': f.maxPrice,
+    if (f.districtId != null) 'p_district_id': f.districtId,
+    if (f.postedWithinDays != null) 'p_posted_within_days': f.postedWithinDays,
     'p_featured_only': f.featuredOnly,
     'p_limit': f.limit,
     'p_offset': offset,

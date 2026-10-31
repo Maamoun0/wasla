@@ -18,6 +18,7 @@ Map<String, dynamic>? savedSearchRow(AdsFilter f,
     if (f.minPrice != null) 'min_price': f.minPrice,
     if (f.maxPrice != null) 'max_price': f.maxPrice,
     if (f.adType != null) 'ad_type': f.adType,
+    if (f.districtId != null) 'district_id': f.districtId,
   };
   final cleanName = name?.trim();
   return {
@@ -46,6 +47,7 @@ AdsFilter adsFilterFromSavedSearch(Map<String, dynamic> row) {
     query: row['keywords'] as String?,
     categoryId: row['category_id']?.toString(),
     cityId: row['city_id'] as int?,
+    districtId: (filters['district_id'] as num?)?.toInt(),
     adType: filters['ad_type'] as String?,
     minPrice: number(filters['min_price']),
     maxPrice: number(filters['max_price']),

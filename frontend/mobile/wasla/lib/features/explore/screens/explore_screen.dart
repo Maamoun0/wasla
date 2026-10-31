@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/providers/ads_provider.dart';
+import '../../../shared/providers/locations_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../saved/providers/saved_searches_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show AdCard, AdCardShimmer, EmptyState;
@@ -298,117 +299,226 @@ class _FilterSheet extends ConsumerStatefulWidget {
 }
 
 class _FilterSheetState extends ConsumerState<_FilterSheet> {
+  static const _maxPriceRange = 50000.0;
+  // Posting-date choices, in days (null: any time).
+  static const _dateOptions = <(String, int?)>[
+    ('أي وقت', null),
+    ('آخر 24 ساعة', 1),
+    ('آخر أسبوع', 7),
+    ('آخر شهر', 30),
+  ];
+
+  int? _governorateId;
+  int? _cityId;
+  int? _districtId;
+  int? _postedWithinDays;
   String? _adType;
   double _minPrice = 0;
-  double _maxPrice = 50000;
+  double _maxPrice = _maxPriceRange;
 
   @override
   void initState() {
     super.initState();
     // Open on the filters already applied.
     final f = ref.read(adsNotifierProvider).filter;
+    _cityId = f.cityId;
+    _districtId = f.districtId;
+    _postedWithinDays = f.postedWithinDays;
     _adType = f.adType;
-    _minPrice = (f.minPrice ?? 0).clamp(0, 50000).toDouble();
-    _maxPrice = (f.maxPrice ?? 50000).clamp(0, 50000).toDouble();
+    _minPrice = (f.minPrice ?? 0).clamp(0, _maxPriceRange).toDouble();
+    _maxPrice = (f.maxPrice ?? _maxPriceRange).clamp(0, _maxPriceRange).toDouble();
+    if (_cityId != null) {
+      // The governorate of an already chosen city, so its dropdown shows it.
+      ref.read(cityByIdProvider(_cityId!).future).then((city) {
+        if (mounted && city != null) setState(() => _governorateId = city['governorate_id'] as int?);
+      });
+    }
+  }
+
+  List<DropdownMenuItem<int?>> _items(List<Map<String, dynamic>> rows, String anyLabel) => [
+        DropdownMenuItem<int?>(value: null, child: Text(anyLabel)),
+        for (final r in rows) DropdownMenuItem<int?>(value: r['id'] as int, child: Text(r['name_ar'] as String? ?? '')),
+      ];
+
+  Widget _dropdown({
+    required String label,
+    required int? value,
+    required List<DropdownMenuItem<int?>> items,
+    required ValueChanged<int?>? onChanged,
+  }) {
+    // Keep the value only when the list contains it (lists load asynchronously).
+    final present = items.any((i) => i.value == value);
+    return DropdownButtonFormField<int?>(
+      key: ValueKey('$label:${present ? value : null}:${items.length}'),
+      initialValue: present ? value : null,
+      isExpanded: true,
+      decoration: InputDecoration(labelText: label, isDense: true),
+      items: items,
+      onChanged: onChanged,
+    );
+  }
+
+  void _apply() {
+    final current = ref.read(adsNotifierProvider).filter;
+    // Keeps the text query and category; everything in the sheet is replaced.
+    ref.read(adsNotifierProvider.notifier).applyFilter(
+          current.withRefinements(
+            cityId: _cityId,
+            districtId: _districtId,
+            adType: _adType,
+            minPrice: _minPrice > 0 ? _minPrice : null,
+            maxPrice: _maxPrice < _maxPriceRange ? _maxPrice : null,
+            postedWithinDays: _postedWithinDays,
+          ),
+        );
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    const none = <Map<String, dynamic>>[];
+    final governorates = ref.watch(governoratesProvider).valueOrNull ?? none;
+    final cities = _governorateId == null ? none : ref.watch(citiesProvider(_governorateId!)).valueOrNull ?? none;
+    final districts = _cityId == null ? none : ref.watch(districtsProvider(_cityId!)).valueOrNull ?? none;
+
     return Container(
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
       decoration: const BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(24, 0, 24, MediaQuery.of(context).viewInsets.bottom + 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Handle
-          Center(
-            child: Container(
-              width: 40, height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: AppColors.neutral200,
-                borderRadius: BorderRadius.circular(2),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Handle
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.neutral200,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
 
-          Text('الفلاتر', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 20),
+            Text('الفلاتر', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 20),
 
-          // Ad Type
-          Text('نوع الإعلان', style: Theme.of(context).textTheme.titleSmall),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 10,
-            children: [
-              _FilterChip(label: 'الكل',    value: null,        selected: _adType == null,       onTap: () => setState(() => _adType = null)),
-              _FilterChip(label: 'معروض',   value: 'offering',  selected: _adType == 'offering', onTap: () => setState(() => _adType = 'offering')),
-              _FilterChip(label: 'مطلوب',   value: 'seeking',   selected: _adType == 'seeking',  onTap: () => setState(() => _adType = 'seeking')),
-            ],
-          ),
-          const SizedBox(height: 20),
+            // Location: governorate -> city -> district
+            Text('المكان', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 10),
+            _dropdown(
+              label: 'المحافظة',
+              value: _governorateId,
+              items: _items(governorates, 'كل المحافظات'),
+              onChanged: (v) => setState(() {
+                _governorateId = v;
+                _cityId = null;
+                _districtId = null;
+              }),
+            ),
+            const SizedBox(height: 10),
+            _dropdown(
+              label: 'المدينة',
+              value: _cityId,
+              items: _items(cities, 'كل المدن'),
+              onChanged: _governorateId == null
+                  ? null
+                  : (v) => setState(() {
+                        _cityId = v;
+                        _districtId = null;
+                      }),
+            ),
+            const SizedBox(height: 10),
+            _dropdown(
+              label: 'الحي',
+              value: _districtId,
+              items: _items(districts, 'كل الأحياء'),
+              onChanged: _cityId == null ? null : (v) => setState(() => _districtId = v),
+            ),
+            const SizedBox(height: 20),
 
-          // Price Range
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('نطاق السعر', style: Theme.of(context).textTheme.titleSmall),
-              Text(
-                '${_minPrice.toInt()} — ${_maxPrice.toInt()} ج.م',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-          RangeSlider(
-            values: RangeValues(_minPrice, _maxPrice),
-            min: 0, max: 50000,
-            divisions: 100,
-            activeColor: AppColors.primary600,
-            onChanged: (v) => setState(() {
-              _minPrice = v.start;
-              _maxPrice = v.end;
-            }),
-          ),
-          const SizedBox(height: 24),
+            // Posting date
+            Text('تاريخ النشر', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                for (final (label, days) in _dateOptions)
+                  _FilterChip(
+                    label: label,
+                    value: days?.toString(),
+                    selected: _postedWithinDays == days,
+                    onTap: () => setState(() => _postedWithinDays = days),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20),
 
-          // Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    setState(() { _adType = null; _minPrice = 0; _maxPrice = 50000; });
-                    ref.read(adsNotifierProvider.notifier).clearFilters();
-                    Navigator.pop(context);
-                  },
-                  child: const Text('مسح الكل'),
+            // Ad Type
+            Text('نوع الإعلان', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              children: [
+                _FilterChip(label: 'الكل',    value: null,        selected: _adType == null,       onTap: () => setState(() => _adType = null)),
+                _FilterChip(label: 'معروض',   value: 'offering',  selected: _adType == 'offering', onTap: () => setState(() => _adType = 'offering')),
+                _FilterChip(label: 'مطلوب',   value: 'seeking',   selected: _adType == 'seeking',  onTap: () => setState(() => _adType = 'seeking')),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Price Range
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('نطاق السعر', style: Theme.of(context).textTheme.titleSmall),
+                Text(
+                  '${_minPrice.toInt()} — ${_maxPrice.toInt()} ج.م',
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Keeps the text query; only the refinements change.
-                    final current = ref.read(adsNotifierProvider).filter;
-                    ref.read(adsNotifierProvider.notifier).applyFilter(
-                      current.withRefinements(
-                        adType: _adType,
-                        minPrice: _minPrice > 0 ? _minPrice : null,
-                        maxPrice: _maxPrice < 50000 ? _maxPrice : null,
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
-                  child: const Text('تطبيق'),
+              ],
+            ),
+            RangeSlider(
+              values: RangeValues(_minPrice, _maxPrice),
+              min: 0, max: _maxPriceRange,
+              divisions: 100,
+              activeColor: AppColors.primary600,
+              onChanged: (v) => setState(() {
+                _minPrice = v.start;
+                _maxPrice = v.end;
+              }),
+            ),
+            const SizedBox(height: 24),
+
+            // Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      ref.read(adsNotifierProvider.notifier).clearFilters();
+                      Navigator.pop(context);
+                    },
+                    child: const Text('مسح الكل'),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _apply,
+                    child: const Text('تطبيق'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

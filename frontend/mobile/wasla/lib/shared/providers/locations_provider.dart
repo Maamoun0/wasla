@@ -33,3 +33,9 @@ final districtsProvider = FutureProvider.family<List<Map<String, dynamic>>, int>
       .order('name_ar');
   return (response as List).cast<Map<String, dynamic>>();
 });
+
+/// One city with its governorate, to reopen a filter on an already chosen city.
+final cityByIdProvider = FutureProvider.family<Map<String, dynamic>?, int>((ref, cityId) async {
+  final client = ref.watch(supabaseClientProvider);
+  return await client.from('cities').select('id, governorate_id, name_ar').eq('id', cityId).maybeSingle();
+});

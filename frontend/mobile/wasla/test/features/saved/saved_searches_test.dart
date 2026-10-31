@@ -37,12 +37,21 @@ void main() {
   });
 
   test('a saved row reopens the same search', () {
-    const original = AdsFilter(query: 'شقة', categoryId: '5', cityId: 2, adType: 'seeking', minPrice: 1000, maxPrice: 5000);
+    const original = AdsFilter(query: 'شقة', categoryId: '5', cityId: 2, districtId: 40, adType: 'seeking', minPrice: 1000, maxPrice: 5000);
     final row = savedSearchRow(original, userId: 'u1')!;
+    expect(row['filters'], {'min_price': 1000.0, 'max_price': 5000.0, 'ad_type': 'seeking', 'district_id': 40});
     // As returned by PostgREST: ints for whole-number prices.
-    row['filters'] = {'min_price': 1000, 'max_price': 5000, 'ad_type': 'seeking'};
+    row['filters'] = {'min_price': 1000, 'max_price': 5000, 'ad_type': 'seeking', 'district_id': 40};
     final reopened = adsFilterFromSavedSearch(row);
     expect(searchAdsParams(reopened, offset: 0), searchAdsParams(original, offset: 0));
+  });
+
+  test('district and date reach search_ads; the date is not saved in an alert', () {
+    const f = AdsFilter(cityId: 2, districtId: 40, postedWithinDays: 7);
+    final params = searchAdsParams(f, offset: 0);
+    expect([params['p_city_id'], params['p_district_id'], params['p_posted_within_days']], [2, 40, 7]);
+    expect(savedSearchRow(const AdsFilter(postedWithinDays: 7), userId: 'u1'), isNull, reason: 'a date alone is not an alert');
+    expect((savedSearchRow(f, userId: 'u1')!['filters'] as Map).containsKey('posted_within_days'), isFalse);
   });
 
   group('AdsFilter keeps the rest of the search', () {
@@ -53,9 +62,14 @@ void main() {
       expect([g.query, g.categoryId, g.cityId, g.adType, g.minPrice, g.maxPrice], [null, '7', 1, 'offering', 10, 20]);
     });
 
-    test('new refinements keep the query and can clear each refinement', () {
-      final g = f.withRefinements(adType: null, minPrice: 50);
-      expect([g.query, g.categoryId, g.cityId, g.adType, g.minPrice, g.maxPrice], ['لابتوب', '7', 1, null, 50, null]);
+    test('the filter sheet replaces its own values and keeps the query and category', () {
+      final g = f.withRefinements(cityId: 2, districtId: 9, minPrice: 50, postedWithinDays: 7);
+      expect([g.query, g.categoryId, g.cityId, g.districtId, g.adType, g.minPrice, g.maxPrice, g.postedWithinDays],
+          ['لابتوب', '7', 2, 9, null, 50, null, 7]);
+    });
+
+    test('a district without a city is dropped', () {
+      expect(f.withRefinements(districtId: 9).districtId, isNull);
     });
   });
 

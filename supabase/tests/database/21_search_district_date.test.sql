@@ -66,8 +66,8 @@ SELECT is((SELECT data ->> 'ad_id' FROM public.notifications_outbox
            WHERE user_id = '22222222-2222-2222-2222-222222222222' AND data ->> 'type' = 'watchlist_match'),
   'cccccccc-2222-0000-0000-000000000002', 'for the ad in that district');
 SELECT has_function('public', 'search_ads',
-  ARRAY['text', 'integer', 'integer', 'ad_type_enum', 'numeric', 'numeric', 'boolean', 'integer', 'integer', 'integer', 'integer'],
-  'one search_ads with the new parameters (the old overload is gone)');
+  ARRAY['text', 'integer', 'integer', 'ad_type_enum', 'numeric', 'numeric', 'boolean', 'integer', 'integer', 'numeric', 'numeric', 'numeric', 'integer', 'integer'],
+  'one search_ads with the district/date parameters (later also near-me, 🟡7)');
 
 SELECT * FROM finish();
 ROLLBACK;

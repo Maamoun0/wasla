@@ -32,6 +32,11 @@ class AdsFilter {
   final double? maxPrice;
   /// Only ads published in the last N days.
   final int? postedWithinDays;
+  /// "Near me": closest first from this (rounded) point, within [radiusKm].
+  /// Never written to the URL or saved.
+  final double? nearLat;
+  final double? nearLng;
+  final double? radiusKm;
   final bool featuredOnly;
   final String? query;
   final int page;
@@ -45,11 +50,16 @@ class AdsFilter {
     this.minPrice,
     this.maxPrice,
     this.postedWithinDays,
+    this.nearLat,
+    this.nearLng,
+    this.radiusKm,
     this.featuredOnly = false,
     this.query,
     this.page = 1,
     this.limit = 20,
   });
+
+  bool get isNearMe => nearLat != null && nearLng != null;
 
   AdsFilter copyWith({
     String? categoryId,
@@ -219,6 +229,9 @@ Map<String, dynamic> searchAdsParams(AdsFilter f, {required int offset}) {
     if (f.maxPrice != null) 'p_max_price': f.maxPrice,
     if (f.districtId != null) 'p_district_id': f.districtId,
     if (f.postedWithinDays != null) 'p_posted_within_days': f.postedWithinDays,
+    if (f.isNearMe) 'p_near_lat': f.nearLat,
+    if (f.isNearMe) 'p_near_lng': f.nearLng,
+    if (f.isNearMe && f.radiusKm != null) 'p_radius_km': f.radiusKm,
     'p_featured_only': f.featuredOnly,
     'p_limit': f.limit,
     'p_offset': offset,

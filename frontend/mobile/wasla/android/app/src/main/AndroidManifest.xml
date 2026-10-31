@@ -2,6 +2,8 @@
 
     <!-- ── Permissions ──────────────────────────────────────────── -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- "Near me" feed (FR-2.1): approximate location, asked only on tap. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application

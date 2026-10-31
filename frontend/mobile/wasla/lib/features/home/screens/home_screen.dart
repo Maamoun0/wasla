@@ -7,6 +7,7 @@ import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../notifications/providers/notifications_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart';
+import '../../../core/location/location_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +15,9 @@ class HomeScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
+
+/// Radius of the home "near me" feed.
+const nearMeRadiusKm = 50.0;
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _scrollController = ScrollController();
@@ -23,6 +27,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     Future.microtask(() => ref.read(homeAdsNotifierProvider.notifier).load());
     _scrollController.addListener(_onScroll);
+  }
+
+  /// FR-2.1: nearest ads within [nearMeRadiusKm]; asks for location only now.
+  Future<void> _showNearMe() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await ref.read(locationReaderProvider)();
+    final here = result.location;
+    if (here == null) {
+      messenger.showSnackBar(SnackBar(content: Text(result.message ?? '')));
+      return;
+    }
+    ref.read(homeAdsNotifierProvider.notifier).applyFilter(
+          AdsFilter(nearLat: here.lat, nearLng: here.lng, radiusKm: nearMeRadiusKm),
+        );
   }
 
   void _onScroll() {
@@ -134,11 +152,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // ── Recent Ads Header ────────────────────────────────
+          // ── Recent / Near-me Ads Header ──────────────────────
           SliverToBoxAdapter(
             child: SectionHeader(
-              title: 'أحدث الإعلانات',
+              title: adsState.filter.isNearMe ? 'الأقرب ليك' : 'أحدث الإعلانات',
               action: () => context.go(AppRoutes.explore),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('الأحدث'),
+                    selected: !adsState.filter.isNearMe,
+                    onSelected: (_) => ref.read(homeAdsNotifierProvider.notifier).applyFilter(const AdsFilter()),
+                  ),
+                  ChoiceChip(
+                    avatar: const Icon(Icons.near_me_outlined, size: 16),
+                    label: const Text('الأقرب لي'),
+                    selected: adsState.filter.isNearMe,
+                    onSelected: (_) => _showNearMe(),
+                  ),
+                ],
+              ),
             ),
           ),
 

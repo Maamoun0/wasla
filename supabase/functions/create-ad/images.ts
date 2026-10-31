@@ -1,8 +1,10 @@
 // Ad images must be public URLs of objects the caller uploaded to their own
 // folder of the "ads" bucket: {origin}/storage/v1/object/public/ads/{userId}/...
-// (storage policies only allow writes there). At most 8 images (FR-3.1).
+// (storage policies only allow writes there). The per-plan photo limit is
+// enforced in the database (plan_violation); this is only a sanity cap at the
+// largest plan's limit.
 
-export const MAX_AD_IMAGES = 8;
+export const MAX_AD_IMAGES = 20;
 
 export interface AdImageInput {
   url?: unknown;

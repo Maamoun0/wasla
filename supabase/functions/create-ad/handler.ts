@@ -30,6 +30,24 @@ export interface NewAd {
   fields: unknown[];
 }
 
+/** A subscription-plan limit (FR-5.3), from plan_violation / create_ad_transaction. */
+export type PlanLimit = "ad_limit_reached" | "image_limit_exceeded";
+
+export class PlanLimitError extends Error {
+  constructor(readonly limit: PlanLimit) {
+    super(limit);
+  }
+}
+
+const PLAN_LIMIT_MESSAGES: Record<PlanLimit, string> = {
+  ad_limit_reached: "وصلت للحد الأقصى لعدد الإعلانات في باقتك. احذف إعلاناً أو رقِّ باقتك للنشر.",
+  image_limit_exceeded: "عدد الصور أكبر من المسموح في باقتك.",
+};
+
+function planLimitResponse(limit: PlanLimit): Response {
+  return json({ error: PLAN_LIMIT_MESSAGES[limit], code: limit }, limit === "ad_limit_reached" ? 403 : 400);
+}
+
 export interface CreateAdDeps {
   allowedImageOrigins: string[];
   authenticate(token: string): Promise<string | null>;
@@ -37,6 +55,8 @@ export interface CreateAdDeps {
   getCategoryName(categoryId: number): Promise<string>;
   getCategoryFields(categoryId: number): Promise<FieldDefinition[]>;
   moderationAllowed(userId: string): Promise<boolean>;
+  /** The plan limit this ad would break, if any (checked before the AI review). */
+  planViolation(userId: string, imageCount: number): Promise<PlanLimit | null>;
   moderate(ad: AdText): Promise<ModerationResult>;
   createAd(ad: NewAd): Promise<string>;
   logModeration(userId: string, tempDraftId: string, result: ModerationResult, adId: string | null): Promise<void>;
@@ -99,6 +119,10 @@ export async function handleCreateAd(req: Request, deps: CreateAdDeps): Promise<
     }, 400);
   }
 
+  const imageCount = Array.isArray(body.images) ? body.images.length : 0;
+  const violation = await deps.planViolation(userId, imageCount);
+  if (violation) return planLimitResponse(violation);
+
   const price = body.price === null || body.price === undefined ? null : Number(body.price);
   let moderation: ModerationResult;
   if (!(await deps.moderationAllowed(userId))) {
@@ -111,7 +135,9 @@ export async function handleCreateAd(req: Request, deps: CreateAdDeps): Promise<
     }
   }
 
-  const adId = await deps.createAd({
+  let adId: string;
+  try {
+    adId = await deps.createAd({
     userId,
     tempDraftId,
     categoryId,
@@ -130,6 +156,11 @@ export async function handleCreateAd(req: Request, deps: CreateAdDeps): Promise<
     images: Array.isArray(body.images) ? body.images : [],
     fields,
   });
+  } catch (err) {
+    // The database re-checks the limits atomically (two requests at once).
+    if (err instanceof PlanLimitError) return planLimitResponse(err.limit);
+    throw err;
+  }
 
   await deps.logModeration(userId, tempDraftId, moderation, adId);
   return json({ success: true, ad_id: adId, message: "تم إرسال الإعلان للمراجعة." }, 200);

@@ -7,6 +7,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../providers/post_ad_wizard_provider.dart';
+import '../providers/plan_usage_provider.dart';
 
 // ── Select Category Screen ─────────────────────────────────────────
 class SelectCategoryScreen extends ConsumerStatefulWidget {
@@ -88,7 +89,17 @@ class _SelectCategoryScreenState extends ConsumerState<SelectCategoryScreen> {
                         subs: subs,
                         mainCat: _selectedMain!,
                         colors: _catColors,
-                        onSelect: (sub) {
+                        onSelect: (sub) async {
+                          // Tell the user before they fill the whole ad (the server refuses it anyway).
+                          final usage = await ref.read(planUsageProvider.future).catchError((_) => null);
+                          if (!context.mounted) return;
+                          if (usage != null && usage.atAdLimit) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(usage.adLimitMessage),
+                              action: SnackBarAction(label: 'الباقات', onPressed: () => context.push(AppRoutes.subscription)),
+                            ));
+                            return;
+                          }
                           // Update the wizard provider directly
                           ref.read(postAdWizardProvider.notifier).setCategory(
                             sub['id'] as int,

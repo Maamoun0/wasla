@@ -29,6 +29,7 @@ Deno.test("external hosts and other buckets are rejected", () => {
   assertEquals(validateAdImages([{ url: "not a url" }], USER, [ORIGIN]), "رابط صورة غير صالح");
 });
 
-Deno.test("more than 8 images are rejected", () => {
-  assertEquals(validateAdImages(Array.from({ length: 9 }, (_, i) => own(i)), USER, [ORIGIN]), "الحد الأقصى 8 صور للإعلان");
+Deno.test("more images than the largest plan allows are rejected", () => {
+  assertEquals(validateAdImages(Array.from({ length: 21 }, (_, i) => own(i)), USER, [ORIGIN]), "الحد الأقصى 20 صور للإعلان");
+  assertEquals(validateAdImages(Array.from({ length: 12 }, (_, i) => own(i)), USER, [ORIGIN]), null, "plan limits are checked by the database");
 });

@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
-import { CreateAdDeps, handleCreateAd, NewAd } from "./handler.ts";
+import { CreateAdDeps, handleCreateAd, NewAd, PlanLimitError } from "./handler.ts";
 import type { ModerationResult } from "./moderation.ts";
 
 const USER = "11111111-1111-1111-1111-111111111111";
@@ -22,6 +22,7 @@ function fakeDeps(over: Partial<CreateAdDeps> = {}) {
       { id: 1, field_name: "service_location", label_ar: "مكان", field_type: "select", is_required: true, options: ["في منزل العميل"] },
     ]),
     moderationAllowed: () => Promise.resolve(true),
+    planViolation: () => Promise.resolve(null),
     moderate: () => {
       moderated++;
       return Promise.resolve(LOW);
@@ -89,4 +90,19 @@ Deno.test("missing required dynamic field: 400 before any AI call", async () => 
   const res = await handleCreateAd(post({ ...BODY, dynamic_fields: {} }), deps);
   assertEquals(res.status, 400);
   assertEquals(moderatedCount(), 0);
+});
+
+Deno.test("over the plan's ad limit: refused before the AI review, with a clear code", async () => {
+  const { deps, created, moderatedCount } = fakeDeps({ planViolation: () => Promise.resolve("ad_limit_reached") });
+  const res = await handleCreateAd(post(BODY), deps);
+  assertEquals(res.status, 403);
+  assertEquals((await res.json()).code, "ad_limit_reached");
+  assertEquals([moderatedCount(), created.length], [0, 0]);
+});
+
+Deno.test("the database's own limit check (concurrent posts) gets the same answer", async () => {
+  const { deps } = fakeDeps({ createAd: () => Promise.reject(new PlanLimitError("image_limit_exceeded")) });
+  const res = await handleCreateAd(post(BODY), deps);
+  assertEquals(res.status, 400);
+  assertEquals((await res.json()).code, "image_limit_exceeded");
 });

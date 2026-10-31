@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../providers/post_ad_wizard_provider.dart';
 import '../models/draft_ad.dart';
+import '../providers/plan_usage_provider.dart';
 
 class AddPhotosScreen extends ConsumerStatefulWidget {
   const AddPhotosScreen({super.key});
@@ -19,10 +20,14 @@ class AddPhotosScreen extends ConsumerStatefulWidget {
 class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
   final ImagePicker _picker = ImagePicker();
 
+  /// Photos allowed by the user's plan (FR-5.3).
+  int get _maxImages => ref.read(planUsageProvider).valueOrNull?.maxImagesPerAd ?? fallbackMaxImages;
+
   Future<void> _pickImage(ImageSource source) async {
     final state = ref.read(postAdWizardProvider);
-    if (state.draft.images.length >= 8) {
-      _showErrorSnackBar('لا يمكن إضافة أكثر من 8 صور للإعلان.');
+    final maxImages = _maxImages;
+    if (state.draft.images.length >= maxImages) {
+      _showErrorSnackBar('لا يمكن إضافة أكثر من $maxImages صور للإعلان في باقتك.');
       return;
     }
 
@@ -35,7 +40,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
         );
         
         if (pickedFiles.isNotEmpty) {
-          int remainingSlots = 8 - state.draft.images.length;
+          int remainingSlots = maxImages - state.draft.images.length;
           int filesToAdd = pickedFiles.length > remainingSlots ? remainingSlots : pickedFiles.length;
           
           for (int i = 0; i < filesToAdd; i++) {
@@ -47,7 +52,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
           }
           
           if (pickedFiles.length > remainingSlots) {
-            _showErrorSnackBar('تمت إضافة $remainingSlots صور فقط للوصول للحد الأقصى (8 صور).');
+            _showErrorSnackBar('تمت إضافة $remainingSlots صور فقط للوصول للحد الأقصى ($maxImages صور).');
           }
         }
       } else {
@@ -201,14 +206,14 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSizes.md),
                 color: AppColors.primary600.withValues(alpha: 0.05),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.info_outline_rounded, color: AppColors.primary600, size: 20),
-                    SizedBox(width: AppSizes.sm),
+                    const Icon(Icons.info_outline_rounded, color: AppColors.primary600, size: 20),
+                    const SizedBox(width: AppSizes.sm),
                     Expanded(
                       child: Text(
-                        'يمكنك إضافة حتى 8 صور. الصورة الأولى ستكون صورة الغلاف الرئيسية. اسحب لإعادة الترتيب.',
-                        style: TextStyle(
+                        'يمكنك إضافة حتى ${ref.watch(planUsageProvider).valueOrNull?.maxImagesPerAd ?? fallbackMaxImages} صور. الصورة الأولى ستكون صورة الغلاف الرئيسية. اسحب لإعادة الترتيب.',
+                        style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 12,
                           color: AppColors.primary700,
@@ -328,7 +333,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'الصور المضافة (${images.length}/8)',
+                'الصور المضافة (${images.length}/$_maxImages)',
                 style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.bold,
@@ -336,7 +341,7 @@ class _AddPhotosScreenState extends ConsumerState<AddPhotosScreen> {
                   color: AppColors.neutral700,
                 ),
               ),
-              if (images.length < 8)
+              if (images.length < _maxImages)
                 TextButton.icon(
                   onPressed: _showImageSourceBottomSheet,
                   icon: const Icon(Icons.add_photo_alternate_rounded, size: 18),

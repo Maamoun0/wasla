@@ -117,7 +117,9 @@ class _NavItem extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: AppDurations.fast,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        // 6, not 8: with Cairo's line height the label needs 55 of the 54 left
+        // at 8 (one pixel of overflow on a real device).
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

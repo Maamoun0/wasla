@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
 
+import '../../../data/repositories/saved_repository.dart';
 import '../../../shared/providers/ads_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -72,19 +73,12 @@ final savedSearchesProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return const [];
-  final rows = await ref
-      .watch(supabaseClientProvider)
-      .from('saved_searches')
-      .select(
-          'id, name, category_id, city_id, keywords, filters, is_active, created_at')
-      .eq('user_id', userId)
-      .order('created_at', ascending: false);
-  return rows.cast<Map<String, dynamic>>();
+  return ref.watch(savedRepositoryProvider).savedSearches(userId);
 });
 
-Future<void> saveSearch(SupabaseClient client, Map<String, dynamic> row) async {
+Future<void> saveSearch(SavedRepository repository, Map<String, dynamic> row) async {
   try {
-    await client.from('saved_searches').insert(row);
+    await repository.insertSavedSearch(row);
   } on PostgrestException catch (e) {
     throw savedSearchError(e);
   }

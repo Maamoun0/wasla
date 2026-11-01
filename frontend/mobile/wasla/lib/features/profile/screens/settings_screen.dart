@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../../data/repositories/auth_repository.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -114,16 +115,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             final scaffoldMessenger = ScaffoldMessenger.of(ctx);
 
                             try {
-                              final client = ref.read(supabaseClientProvider);
                               final userId = ref.read(currentUserIdProvider);
                               final reason = reasonController.text.trim();
 
                               if (userId != null) {
-                                // Hides the account and its ads now, blocks sign-in,
-                                // and schedules the permanent purge 30 days later.
-                                await client.rpc('request_account_deletion', params: {
-                                  'p_reason': reason.isNotEmpty ? reason : null,
-                                });
+                                await ref
+                                    .read(authRepositoryProvider)
+                                    .requestAccountDeletion(reason.isNotEmpty ? reason : null);
 
                                 if (ctx.mounted) {
                                   navigator.pop();

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../data/repositories/payments_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../core/supabase/function_errors.dart';
 
@@ -62,10 +63,10 @@ class BoostState {
 }
 
 class BoostController extends StateNotifier<BoostState> {
-  final SupabaseClient _client;
+  final PaymentsRepository _repository;
   final String? _userId;
 
-  BoostController(this._client, this._userId) : super(BoostState()) {
+  BoostController(this._repository, this._userId) : super(BoostState()) {
     init();
   }
 
@@ -89,13 +90,7 @@ class BoostController extends StateNotifier<BoostState> {
   Future<void> fetchUserEligibleAds() async {
     if (_userId == null) return;
     try {
-      final response = await _client
-          .from('ads')
-          .select('*, ad_boosts(expires_at, boost_type)')
-          .eq('user_id', _userId)
-          .eq('status', 'active');
-
-      final List<Map<String, dynamic>> ads = List<Map<String, dynamic>>.from(response);
+      final ads = await _repository.activeAdsWithBoosts(_userId);
       
       // Filter ads locally: keep only those whose boosts have expired or have no boost
       final now = DateTime.now();
@@ -123,14 +118,7 @@ class BoostController extends StateNotifier<BoostState> {
   // Boost packages and their prices come from public.payment_packages,
   // the same table create-payment charges from.
   Future<void> fetchPackages() async {
-    final response = await _client
-        .from('payment_packages')
-        .select('id, name_ar, price_egp, boost_type, duration_days')
-        .eq('kind', 'ad_boost')
-        .eq('is_active', true)
-        .order('price_egp', ascending: true);
-
-    final packages = (response as List).map((item) => BoostPackage(
+    final packages = (await _repository.boostPackages()).map((item) => BoostPackage(
           key: item['id'] as String,
           price: (item['price_egp'] as num).toDouble(),
           nameAr: item['name_ar'] as String,
@@ -162,11 +150,7 @@ class BoostController extends StateNotifier<BoostState> {
 
     try {
       // 1. Fresh database query check (lightweight SELECT status, boost_expires_at)
-      final response = await _client
-          .from('ads')
-          .select('status, id, ad_boosts(expires_at)')
-          .eq('id', ad['id'])
-          .maybeSingle();
+      final response = await _repository.adBoostStatus(ad['id']);
 
       if (response == null) {
         state = state.copyWith(
@@ -206,17 +190,11 @@ class BoostController extends StateNotifier<BoostState> {
       }
 
       // 2. Call the serverless create-payment stub
-      final functionResponse = await _client.functions.invoke(
-        'create-payment',
-        body: {
-          'package_id': package.key,
-          'ad_id': ad['id'],
-        },
-      );
+      final checkout = await _repository.createPayment({'package_id': package.key, 'ad_id': ad['id']});
 
       state = state.copyWith(isVerifying: false);
 
-      return functionResponse.data as Map<String, dynamic>;
+      return checkout;
 
     } catch (e) {
       // A refusal from create-payment (FunctionException) carries its own message.
@@ -230,7 +208,6 @@ class BoostController extends StateNotifier<BoostState> {
 }
 
 final boostControllerProvider = StateNotifierProvider.autoDispose<BoostController, BoostState>((ref) {
-  final client = ref.watch(supabaseClientProvider);
   final userId = ref.watch(currentUserIdProvider);
-  return BoostController(client, userId);
+  return BoostController(ref.watch(paymentsRepositoryProvider), userId);
 });

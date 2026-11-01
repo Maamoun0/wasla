@@ -2,28 +2,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/push_notification_service.dart';
+import '../../../data/repositories/auth_repository.dart';
 import '../../saved/providers/saved_ads_provider.dart';
 
-// ── Supabase Client Provider ─────────────────────────────────────
-final supabaseClientProvider = Provider<SupabaseClient>(
-  (ref) => Supabase.instance.client,
-);
+export '../../../core/supabase/supabase_client_provider.dart';
 
 // ── Auth State (Stream) ──────────────────────────────────────────
-final authStateProvider = StreamProvider<AuthState>((ref) {
-  final client = ref.watch(supabaseClientProvider);
-  return client.auth.onAuthStateChange;
-});
+final authStateProvider = StreamProvider<AuthState>((ref) => ref.watch(authRepositoryProvider).authStateChanges);
 
 // ── Current Session ──────────────────────────────────────────────
-final currentSessionProvider = Provider<Session?>((ref) {
-  return Supabase.instance.client.auth.currentSession;
-});
+final currentSessionProvider = Provider<Session?>((ref) => ref.watch(authRepositoryProvider).currentSession);
 
 // ── Current User ID ──────────────────────────────────────────────
-final currentUserIdProvider = Provider<String?>((ref) {
-  return Supabase.instance.client.auth.currentUser?.id;
-});
+final currentUserIdProvider = Provider<String?>((ref) => ref.watch(authRepositoryProvider).currentUserId);
 
 // ── Is Logged In ─────────────────────────────────────────────────
 final isLoggedInProvider = Provider<bool>((ref) {
@@ -35,12 +26,8 @@ final currentUserProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return null;
 
-  final client = ref.watch(supabaseClientProvider);
   try {
-    // phone/email/user_type are only readable by the owner through this RPC.
-    final response = await client.rpc('get_my_profile').maybeSingle();
-
-    return response;
+    return await ref.watch(authRepositoryProvider).myProfile();
   } catch (_) {
     return null;
   }
@@ -71,16 +58,15 @@ OtpRateLimitedException? otpRateLimitFrom(AuthException e) {
 
 // ── Auth Notifier ─────────────────────────────────────────────────
 class AuthNotifier extends StateNotifier<AsyncValue<void>> {
-  final SupabaseClient _client;
+  final AuthRepository _repository;
 
-  AuthNotifier(this._client) : super(const AsyncValue.data(null));
+  AuthNotifier(this._repository) : super(const AsyncValue.data(null));
 
-  // Send an SMS OTP. Limits are enforced by Supabase Auth itself (one code per
-  // number per minute, hourly project cap, per-IP request limits).
+  // Send an SMS OTP.
   Future<void> sendOtp(String phone) async {
     state = const AsyncValue.loading();
     try {
-      await _client.auth.signInWithOtp(phone: phone, shouldCreateUser: true);
+      await _repository.sendOtp(phone);
       state = const AsyncValue.data(null);
     } on AuthException catch (e, st) {
       final limited = otpRateLimitFrom(e);
@@ -114,11 +100,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      await _client.auth.verifyOTP(
-        phone: phone,
-        token: token,
-        type: OtpType.sms,
-      );
+      await _repository.verifyOtp(phone: phone, token: token);
       
       // Sync FCM token after successful login (Piece 1.3)
       await PushNotificationService.syncToken();
@@ -134,11 +116,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> signInWithGoogle() async {
     state = const AsyncValue.loading();
     try {
-      await _client.auth.signInWithOAuth(
-        OAuthProvider.google,
-        redirectTo: 'wasla://login-callback',
-        authScreenLaunchMode: LaunchMode.externalApplication,
-      );
+      await _repository.signInWithOAuth(OAuthProvider.google);
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -151,12 +129,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> signInWithFacebook() async {
     state = const AsyncValue.loading();
     try {
-      await _client.auth.signInWithOAuth(
-        OAuthProvider.facebook,
-        redirectTo: 'wasla://login-callback',
-        scopes: 'email,public_profile',
-        authScreenLaunchMode: LaunchMode.externalApplication,
-      );
+      await _repository.signInWithOAuth(OAuthProvider.facebook, scopes: 'email,public_profile');
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -173,7 +146,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
       // Nothing personal stays on the device after sign-out.
       await SavedAdsCache.clearAll();
 
-      await _client.auth.signOut();
+      await _repository.signOut();
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -188,19 +161,19 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
     String? bio,
     int? cityId,
   }) async {
-    final userId = _client.auth.currentUser?.id;
+    final userId = _repository.currentUserId;
     if (userId == null) return;
 
-    await _client.from('users').update({
+    await _repository.updateProfile(userId, {
       if (fullName != null) 'full_name': fullName,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
       if (bio != null) 'bio': bio,
       if (cityId != null) 'city_id': cityId,
       'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', userId);
+    });
   }
 }
 
 final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<void>>(
-  (ref) => AuthNotifier(ref.watch(supabaseClientProvider)),
+  (ref) => AuthNotifier(ref.watch(authRepositoryProvider)),
 );

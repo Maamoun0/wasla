@@ -13,6 +13,7 @@ import '../../../shared/widgets/trust_badge.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../profile/providers/ad_performance_provider.dart';
 import '../../../core/utils/image_utils.dart';
+import '../../../data/repositories/ads_repository.dart';
 
 class AdDetailScreen extends ConsumerStatefulWidget {
   const AdDetailScreen({super.key, required this.adId});
@@ -39,15 +40,9 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
   Future<void> _checkFavorited() async {
     final uid = ref.read(currentUserIdProvider);
     if (uid == null) return;
-    final client = ref.read(supabaseClientProvider);
     try {
-      final res = await client
-          .from('favorites')
-          .select('id')
-          .eq('user_id', uid)
-          .eq('ad_id', widget.adId)
-          .maybeSingle();
-      if (mounted) setState(() => _isFavorited = res != null);
+      final favorite = await ref.read(adsRepositoryProvider).isFavorite(userId: uid, adId: widget.adId);
+      if (mounted) setState(() => _isFavorited = favorite);
     } catch (_) {
       // Offline or a server error: the heart just stays empty; the page still works.
     }
@@ -56,9 +51,8 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
   Future<void> _toggleFavorite() async {
     final uid = ref.read(currentUserIdProvider);
     if (uid == null) { context.push(authLocation(from: '/ad/${widget.adId}')); return; }
-    final client = ref.read(supabaseClientProvider);
     await toggleFavorite(
-      client: client,
+      repository: ref.read(adsRepositoryProvider),
       adId: widget.adId,
       userId: uid,
       isFavorited: _isFavorited,
@@ -558,9 +552,7 @@ class _ReportSheet extends ConsumerWidget {
             onTap: () async {
               final uid = ref.read(currentUserIdProvider);
               if (uid == null) { Navigator.pop(context); return; }
-              await ref.read(supabaseClientProvider).from('reports').insert({
-                'reporter_id': uid, 'target_type': 'ad', 'target_id': adId, 'reason': r.$1,
-              });
+              await ref.read(adsRepositoryProvider).reportAd(reporterId: uid, adId: adId, reason: r.$1);
               if (context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(

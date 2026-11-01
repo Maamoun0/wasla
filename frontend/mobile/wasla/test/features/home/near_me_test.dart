@@ -5,10 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wasla/core/location/location_service.dart';
 import 'package:wasla/features/home/screens/home_screen.dart';
 import 'package:wasla/features/notifications/providers/notifications_provider.dart';
+import 'package:wasla/data/repositories/ads_repository.dart';
 import 'package:wasla/shared/providers/ads_provider.dart';
 
 class _RecordingFeed extends AdsNotifier {
-  _RecordingFeed() : super(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false)));
+  _RecordingFeed() 
+      : super(AdsRepository(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false))));
   final params = <Map<String, dynamic>>[];
 
   @override

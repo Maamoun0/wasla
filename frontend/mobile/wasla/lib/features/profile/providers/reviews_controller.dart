@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../data/repositories/users_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class ReviewsState {
@@ -47,11 +48,11 @@ class ReviewsState {
 }
 
 class ReviewsController extends StateNotifier<ReviewsState> {
-  final SupabaseClient _client;
+  final UsersRepository _repository;
   final String? _userId;
   static const int pageSize = 20;
 
-  ReviewsController(this._client, this._userId) : super(ReviewsState()) {
+  ReviewsController(this._repository, this._userId) : super(ReviewsState()) {
     refreshAll();
   }
 
@@ -76,15 +77,7 @@ class ReviewsController extends StateNotifier<ReviewsState> {
       final from = isLoadMore ? state.receivedReviews.length : 0;
       final to = from + pageSize - 1;
 
-      final response = await _client
-          .from('reviews')
-          .select('id, rating, comment, created_at, reviewer:reviewer_id(full_name, avatar_url), review_responses(response, created_at)')
-          .eq('reviewed_user_id', _userId)
-          .eq('status', 'active')
-          .order('created_at', ascending: false)
-          .range(from, to);
-
-      final List<Map<String, dynamic>> newReviews = List<Map<String, dynamic>>.from(response);
+      final newReviews = await _repository.reviewsReceived(_userId, from: from, to: to);
 
       state = state.copyWith(
         receivedReviews: isLoadMore ? [...state.receivedReviews, ...newReviews] : newReviews,
@@ -112,15 +105,7 @@ class ReviewsController extends StateNotifier<ReviewsState> {
       final from = isLoadMore ? state.sentReviews.length : 0;
       final to = from + pageSize - 1;
 
-      final response = await _client
-          .from('reviews')
-          .select('id, rating, comment, created_at, reviewed:reviewed_user_id(full_name, avatar_url), review_responses(response, created_at)')
-          .eq('reviewer_id', _userId)
-          .eq('status', 'active')
-          .order('created_at', ascending: false)
-          .range(from, to);
-
-      final List<Map<String, dynamic>> newReviews = List<Map<String, dynamic>>.from(response);
+      final newReviews = await _repository.reviewsSent(_userId, from: from, to: to);
 
       state = state.copyWith(
         sentReviews: isLoadMore ? [...state.sentReviews, ...newReviews] : newReviews,
@@ -144,12 +129,7 @@ class ReviewsController extends StateNotifier<ReviewsState> {
     );
 
     try {
-      // Insert to review_responses
-      await _client.from('review_responses').insert({
-        'review_id': reviewId,
-        'user_id': _userId,
-        'response': replyText.trim(),
-      });
+      await _repository.replyToReview(reviewId: reviewId, userId: _userId, response: replyText.trim());
 
       // Update local state: add reply to the corresponding review
       final updatedReceived = state.receivedReviews.map((r) {
@@ -184,7 +164,7 @@ class ReviewsController extends StateNotifier<ReviewsState> {
 // ── Providers ────────────────────────────────────────────────────
 final reviewsControllerProvider =
     StateNotifierProvider.autoDispose<ReviewsController, ReviewsState>((ref) {
-  final client = ref.watch(supabaseClientProvider);
+  final repository = ref.watch(usersRepositoryProvider);
   final userId = ref.watch(currentUserIdProvider);
-  return ReviewsController(client, userId);
+  return ReviewsController(repository, userId);
 });

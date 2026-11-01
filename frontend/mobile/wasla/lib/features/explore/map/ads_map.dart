@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../shared/providers/ads_provider.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../data/repositories/ads_repository.dart';
 
 /// One map cell from ads_map_clusters: a group of ads, or a single ad.
 class MapCluster {
@@ -66,8 +66,8 @@ const egyptCenter = LatLng(26.8, 30.8);
 
 final mapClustersProvider = FutureProvider.autoDispose.family<List<MapCluster>, MapViewport>((ref, viewport) async {
   final filter = ref.watch(adsNotifierProvider.select((s) => s.filter));
-  final rows = await ref.watch(supabaseClientProvider).rpc('ads_map_clusters', params: mapClusterParams(viewport, filter));
-  return (rows as List).cast<Map<String, dynamic>>().map(MapCluster.fromJson).toList();
+  final rows = await ref.watch(adsRepositoryProvider).mapClusters(mapClusterParams(viewport, filter));
+  return rows.map(MapCluster.fromJson).toList();
 });
 
 /// Explore's map view (FR-2.4). Needs a Google Maps key in the build

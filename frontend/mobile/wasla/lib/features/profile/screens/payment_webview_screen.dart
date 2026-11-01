@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../data/repositories/payments_repository.dart';
 
 class PaymentWebViewScreen extends ConsumerStatefulWidget {
   const PaymentWebViewScreen({
@@ -87,29 +87,14 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
       _isConfirming = true;
     });
 
-    final supabase = ref.read(supabaseClientProvider);
-
-    // Subscribe to Realtime transaction updates
-    _realtimeChannel = supabase.channel('public:transactions:id=eq.${widget.transactionId}')
-      ..onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'transactions',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.eq,
-          column: 'id',
-          value: widget.transactionId,
-        ),
-        callback: (payload) {
-          final status = payload.newRecord['status'] as String?;
-          if (status == 'completed') {
-            _handlePaymentSuccess();
-          } else if (status == 'failed') {
-            _handlePaymentFailure();
-          }
-        },
-      )
-      ..subscribe();
+    // Realtime transaction updates
+    _realtimeChannel = ref.read(paymentsRepositoryProvider).watchTransaction(widget.transactionId, (status) {
+      if (status == 'completed') {
+        _handlePaymentSuccess();
+      } else if (status == 'failed') {
+        _handlePaymentFailure();
+      }
+    });
 
     // Set 45 seconds timeout timer
     _timeoutTimer = Timer(const Duration(seconds: 45), () {
@@ -230,8 +215,7 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
       final channel = _realtimeChannel!;
       _realtimeChannel = null;
       try {
-        final supabase = ref.read(supabaseClientProvider);
-        supabase.removeChannel(channel);
+        ref.read(paymentsRepositoryProvider).stopWatching(channel);
       } catch (_) {
         // Safe fallback if ref is already disposed
       }

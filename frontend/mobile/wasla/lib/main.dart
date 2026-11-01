@@ -80,9 +80,6 @@ void main() async {
   }
 }
 
-// ── Supabase Client Shortcut ──────────────────────────────────
-final supabase = Supabase.instance.client;
-
 class WaslaApp extends ConsumerStatefulWidget {
   const WaslaApp({super.key});
 

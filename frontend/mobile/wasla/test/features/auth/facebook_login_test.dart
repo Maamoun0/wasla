@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wasla/features/auth/providers/auth_provider.dart';
+import 'package:wasla/data/repositories/auth_repository.dart';
 import 'package:wasla/features/auth/screens/auth_screen.dart';
 
 class _RecordingAuth extends AuthNotifier {
-  _RecordingAuth() : super(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false)));
+  _RecordingAuth() 
+      : super(AuthRepository(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false))));
   final calls = <String>[];
   @override
   Future<void> signInWithFacebook() async => calls.add('facebook');

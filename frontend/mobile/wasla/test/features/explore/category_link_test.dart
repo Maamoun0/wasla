@@ -7,6 +7,7 @@ import 'package:wasla/core/router/app_router.dart';
 import 'package:wasla/features/explore/screens/explore_screen.dart';
 import 'package:wasla/features/home/screens/home_screen.dart';
 import 'package:wasla/features/notifications/providers/notifications_provider.dart';
+import 'package:wasla/data/repositories/ads_repository.dart';
 import 'package:wasla/shared/providers/ads_provider.dart';
 
 // Vehicles (1) has the subcategory Cars (11); Real estate (2) is unrelated.
@@ -35,7 +36,8 @@ final _allAds = [
 /// Answers like search_ads: a category includes its subcategories. Records the
 /// RPC parameters the app would send.
 class _FakeSearch extends AdsNotifier {
-  _FakeSearch() : super(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false)));
+  _FakeSearch() 
+      : super(AdsRepository(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false))));
   final sentParams = <Map<String, dynamic>>[];
 
   @override

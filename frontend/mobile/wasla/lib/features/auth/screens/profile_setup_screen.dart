@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
@@ -10,6 +9,7 @@ import '../../../core/router/app_router.dart';
 import '../../../shared/providers/locations_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart';
 import '../providers/auth_provider.dart';
+import '../../../data/repositories/auth_repository.dart';
 
 class ProfileSetupScreen extends ConsumerStatefulWidget {
   const ProfileSetupScreen({super.key, this.returnTo});
@@ -41,21 +41,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
     final image  = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80, maxWidth: 1024, maxHeight: 1024);
     if (image == null) return;
 
-    final uid    = Supabase.instance.client.auth.currentUser?.id;
+    final uid    = ref.read(currentUserIdProvider);
     if (uid == null) return;
 
     setState(() => _isLoading = true);
     try {
       final bytes = await image.readAsBytes();
-      // Storage policies only allow writes inside the user's own `{uid}/` folder.
-      final path  = '$uid/avatar.jpg';
 
-      await Supabase.instance.client.storage
-          .from('avatars')
-          .uploadBinary(path, bytes, fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true));
-
-      // Same object name on every change: version the URL so caches pick up the new photo.
-      final url = '${Supabase.instance.client.storage.from('avatars').getPublicUrl(path)}?v=${DateTime.now().millisecondsSinceEpoch}';
+      final url = await ref.read(authRepositoryProvider).uploadAvatar(uid, bytes);
       setState(() => _avatarUrl = url);
     } catch (e) {
       _showError('حدث خطأ في رفع الصورة');

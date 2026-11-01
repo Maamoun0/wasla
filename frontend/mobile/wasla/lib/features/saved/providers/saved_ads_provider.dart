@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../auth/providers/auth_provider.dart';
+import '../../../data/repositories/saved_repository.dart';
 
 /// The last list of saved ads, kept on the device per user so the Saved tab
 /// works offline (NFR-3.2). Photos are cached separately by
@@ -53,13 +53,7 @@ class SavedAdsResult {
 /// Loads the user's saved ads from the server. Overridable in tests.
 final savedAdsFetcherProvider = Provider<Future<List<Map<String, dynamic>>> Function(String userId)>((ref) {
   return (userId) async {
-    final rows = await ref.read(supabaseClientProvider).from('favorites').select('''
-        id, notes, created_at,
-        ads(id, title, price, price_type, status, city_id,
-          ad_media(url, is_primary),
-          cities(name_ar))
-      ''').eq('user_id', userId).order('created_at', ascending: false);
-    return rows.cast<Map<String, dynamic>>();
+    return ref.read(savedRepositoryProvider).favoritesWithAds(userId);
   };
 });
 

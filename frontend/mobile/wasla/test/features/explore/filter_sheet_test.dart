@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wasla/data/repositories/ads_repository.dart';
 import 'package:wasla/features/explore/screens/explore_screen.dart';
 import 'package:wasla/shared/providers/ads_provider.dart';
 import 'package:wasla/shared/providers/locations_provider.dart';
 
 /// Records the filters Explore applies instead of calling search_ads.
 class _RecordingAdsNotifier extends AdsNotifier {
-  _RecordingAdsNotifier(AdsFilter initial) : super(SupabaseClient('http://localhost:1', 'test-key', authOptions: const AuthClientOptions(autoRefreshToken: false))) {
+  _RecordingAdsNotifier(AdsFilter initial)
+      : super(AdsRepository(SupabaseClient('http://localhost:1', 'test-key', authOptions: const AuthClientOptions(autoRefreshToken: false)))) {
     state = AdsState(filter: initial, hasMore: false);
   }
   final applied = <AdsFilter>[];

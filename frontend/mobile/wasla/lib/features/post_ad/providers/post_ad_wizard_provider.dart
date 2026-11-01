@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:equatable/equatable.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import '../../../data/repositories/post_ad_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/draft_ad.dart';
 import '../../../core/supabase/function_errors.dart';
@@ -40,32 +40,22 @@ class PostAdWizardState extends Equatable {
   }
 }
 
-/// Uploads one ad image and returns its public URL.
-/// Paths are `{userId}/{draftId}/{imageId}.jpg`: storage policies only allow
-/// writes inside the caller's own `{userId}/` folder.
+/// Uploads one ad image and returns its public URL (see
+/// [PostAdRepository.uploadImage]). Overridable in tests.
 typedef AdImageUploader = Future<String> Function(String path, File file);
 
-AdImageUploader supabaseAdImageUploader(SupabaseClient client) => (path, file) async {
-      await client.storage.from('ads').upload(
-            path,
-            file,
-            fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
-          );
-      return client.storage.from('ads').getPublicUrl(path);
-    };
-
 class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
-  final SupabaseClient? _client;
+  final PostAdRepository? _repository;
   final String? _userId;
   final AdImageUploader? _uploader;
 
   PostAdWizardNotifier({
-    SupabaseClient? client,
+    PostAdRepository? repository,
     String? userId,
     AdImageUploader? uploader,
-  })  : _client = client,
+  })  : _repository = repository,
         _userId = userId,
-        _uploader = uploader ?? (client != null ? supabaseAdImageUploader(client) : null),
+        _uploader = uploader ?? repository?.uploadImage,
         super(PostAdWizardState(
           draft: DraftAd(tempDraftId: const Uuid().v4()),
         ));
@@ -259,12 +249,11 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
     );
 
     // Delete from Supabase Storage if it was uploaded
-    final client = _client;
+    final repository = _repository;
     final userId = _userId;
-    if (client != null && userId != null && removed.remoteUrl != null) {
+    if (repository != null && userId != null && removed.remoteUrl != null) {
       try {
-        final path = '$userId/${state.draft.tempDraftId}/${removed.id}.jpg';
-        await client.storage.from('ads').remove([path]);
+        await repository.removeImage('$userId/${state.draft.tempDraftId}/${removed.id}.jpg');
       } catch (e) {
         debugPrint('Error deleting image from storage: $e');
       }
@@ -379,9 +368,9 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
 
   // Publish the ad using create-ad Edge Function
   Future<String?> publishAd() async {
-    final client = _client;
-    if (client == null) {
-      throw Exception('SupabaseClient is not initialized.');
+    final repository = _repository;
+    if (repository == null) {
+      throw Exception('PostAdRepository is not initialized.');
     }
 
     state = state.copyWith(isSubmitting: true, errorMessage: () => null);
@@ -412,12 +401,7 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
       };
 
       // Non-2xx answers throw FunctionException (handled below).
-      final response = await client.functions.invoke(
-        'create-ad',
-        body: body,
-      );
-
-      final resData = response.data;
+      final resData = await repository.publish(body);
       String? adId;
       if (resData is Map) {
         adId = resData['ad_id']?.toString();
@@ -437,8 +421,7 @@ class PostAdWizardNotifier extends StateNotifier<PostAdWizardState> {
 
 // Provider definition
 final postAdWizardProvider = StateNotifierProvider.autoDispose<PostAdWizardNotifier, PostAdWizardState>((ref) {
-  final client = ref.watch(supabaseClientProvider);
   final userId = ref.watch(currentUserIdProvider);
-  return PostAdWizardNotifier(client: client, userId: userId);
+  return PostAdWizardNotifier(repository: ref.watch(postAdRepositoryProvider), userId: userId);
 });
 

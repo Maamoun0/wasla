@@ -1,27 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../features/auth/providers/auth_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/repositories/ads_repository.dart';
+
 // ── Ad Detail Provider ────────────────────────────────────────────
-final adDetailProvider =
-    FutureProvider.family<Map<String, dynamic>?, String>((ref, id) async {
-  final client = ref.watch(supabaseClientProvider);
-  final response = await client
-      .from('ads')
-      .select('''
-        *,
-        ad_media(*),
-        ad_fields(*, category_fields(label_ar, label_en, field_type)),
-        users(full_name, avatar_url, trust_score, is_id_verified),
-        cities(name_ar),
-        districts(name_ar),
-        categories(name_ar, name_en)
-      ''')
-      .eq('id', id)
-      .single();
-  return response;
-});
+final adDetailProvider = FutureProvider.family<Map<String, dynamic>?, String>(
+    (ref, id) => ref.watch(adsRepositoryProvider).getAd(id));
 
 // ── Ads List State ────────────────────────────────────────────────
 class AdsFilter {
@@ -240,9 +224,9 @@ Map<String, dynamic> searchAdsParams(AdsFilter f, {required int offset}) {
 }
 
 class AdsNotifier extends StateNotifier<AdsState> {
-  final SupabaseClient _client;
+  final AdsRepository _repository;
 
-  AdsNotifier(this._client) : super(const AdsState());
+  AdsNotifier(this._repository) : super(const AdsState());
 
   static const String _adSelect = '''
     id, title, price, price_type, city_id, is_featured, is_urgent,
@@ -265,13 +249,8 @@ class AdsNotifier extends StateNotifier<AdsState> {
     );
 
     try {
-      // search_ads applies the text query (Arabic-normalised, prefix and
-      // typo tolerant) and every filter, and orders featured ads first.
       final offset = refresh ? 0 : state.ads.length;
-      final List<dynamic> results = await _client
-          .rpc('search_ads', params: searchAdsParams(f, offset: offset))
-          .select(_adSelect);
-      final newAds = results.cast<Map<String, dynamic>>();
+      final newAds = await _repository.searchAds(searchAdsParams(f, offset: offset), _adSelect);
 
       state = state.copyWith(
         ads:       refresh ? newAds : [...state.ads, ...newAds],
@@ -293,89 +272,43 @@ class AdsNotifier extends StateNotifier<AdsState> {
 
 /// Explore's search (driven by the /explore URL).
 final adsNotifierProvider = StateNotifierProvider<AdsNotifier, AdsState>((ref) {
-  return AdsNotifier(ref.watch(supabaseClientProvider));
+  return AdsNotifier(ref.watch(adsRepositoryProvider));
 });
 
 /// Home's "latest ads" feed, separate so a search never changes it.
 final homeAdsNotifierProvider = StateNotifierProvider<AdsNotifier, AdsState>((ref) {
-  return AdsNotifier(ref.watch(supabaseClientProvider));
+  return AdsNotifier(ref.watch(adsRepositoryProvider));
 });
 
 // ── Featured Ads ──────────────────────────────────────────────────
-final featuredAdsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final client = ref.watch(supabaseClientProvider);
-  final res = await client
-      .from('ads')
-      .select('id,title,price,price_type,city_id,ad_media(url,is_primary),cities(name_ar)')
-      .eq('status', 'active')
-      .eq('is_featured', true)
-      .order('published_at', ascending: false)
-      .limit(10);
-  return (res as List).cast<Map<String, dynamic>>();
-});
+final featuredAdsProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) => ref.watch(adsRepositoryProvider).featuredAds());
 
 // ── Categories Provider ────────────────────────────────────────────
-final categoriesProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final client = ref.watch(supabaseClientProvider);
-  final res = await client
-      .from('categories')
-      .select()
-      .eq('is_active', true)
-      .eq('level', 1)
-      .order('sort_order');
-  return (res as List).cast<Map<String, dynamic>>();
-});
+final categoriesProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) => ref.watch(adsRepositoryProvider).topCategories());
 
-final subCategoriesProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, int>((ref, parentId) async {
-  final client = ref.watch(supabaseClientProvider);
-  final res = await client
-      .from('categories')
-      .select()
-      .eq('parent_id', parentId)
-      .eq('is_active', true)
-      .order('sort_order');
-  return (res as List).cast<Map<String, dynamic>>();
-});
+final subCategoriesProvider = FutureProvider.family<List<Map<String, dynamic>>, int>(
+    (ref, parentId) => ref.watch(adsRepositoryProvider).subCategories(parentId));
 
 // ── Favorites Provider ─────────────────────────────────────────────
 final favoritesProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
-  final client = ref.watch(supabaseClientProvider);
-  final userId = client.auth.currentUser?.id;
+  final repository = ref.watch(adsRepositoryProvider);
+  final userId = repository.currentUserId;
   if (userId == null) return Stream.value([]);
-
-  return client
-      .from('favorites')
-      .stream(primaryKey: ['id'])
-      .eq('user_id', userId)
-      .map((data) => data.cast<Map<String, dynamic>>());
+  return repository.watchFavorites(userId);
 });
 
 // Toggle favorite
 Future<void> toggleFavorite({
-  required SupabaseClient client,
+  required AdsRepository repository,
   required String adId,
   required String userId,
   required bool isFavorited,
-}) async {
-  if (isFavorited) {
-    await client
-        .from('favorites')
-        .delete()
-        .eq('user_id', userId)
-        .eq('ad_id', adId);
-  } else {
-    await client.from('favorites').insert({
-      'user_id': userId,
-      'ad_id': adId,
-    });
-  }
-}
+}) =>
+    repository.setFavorite(userId: userId, adId: adId, favorite: !isFavorited);
 
 // ── Seller Contact ─────────────────────────────────────────────────
-// The seller's phone is not readable from `users`. reveal_seller_phone
-// returns it to signed-in users for active ads, rate-limited per user,
-// and records the contact.
 sealed class SellerPhoneResult {
   const SellerPhoneResult();
 }
@@ -408,16 +341,11 @@ SellerPhoneResult parseSellerPhoneResponse(Object? res) {
 }
 
 Future<SellerPhoneResult> revealSellerPhone({
-  required SupabaseClient client,
+  required AdsRepository repository,
   required String adId,
   required String contactType,
-}) async {
-  final res = await client.rpc('reveal_seller_phone', params: {
-    'p_ad_id': adId,
-    'p_contact_type': contactType,
-  });
-  return parseSellerPhoneResponse(res);
-}
+}) async =>
+    parseSellerPhoneResponse(await repository.revealSellerPhone(adId: adId, contactType: contactType));
 
 // Notifications providers live in features/notifications/providers.
 
@@ -440,7 +368,7 @@ Uri? sellerContactUri(String type, String phone, String adTitle) {
 /// the contact in contact_logs (review eligibility). Overridable in tests.
 final sellerPhoneRevealerProvider = Provider<Future<SellerPhoneResult> Function(String adId, String contactType)>(
   (ref) => (adId, contactType) =>
-      revealSellerPhone(client: ref.read(supabaseClientProvider), adId: adId, contactType: contactType),
+      revealSellerPhone(repository: ref.read(adsRepositoryProvider), adId: adId, contactType: contactType),
 );
 
 /// Opens a tel: / https: link. Overridable in tests.

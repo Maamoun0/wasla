@@ -7,12 +7,13 @@ import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../auth/providers/auth_provider.dart';
 import '../providers/notifications_provider.dart';
+import '../../../data/repositories/notifications_repository.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   Future<void> _markRead(WidgetRef ref, {List<String>? ids}) async {
-    await ref.read(supabaseClientProvider).rpc('mark_notifications_read', params: {'p_ids': ids});
+    await ref.read(notificationsRepositoryProvider).markRead(ids);
     ref.invalidate(unreadCountProvider);
   }
 

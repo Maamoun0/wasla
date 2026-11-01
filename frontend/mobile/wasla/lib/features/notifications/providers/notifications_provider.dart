@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/router/app_router.dart';
+import '../../../data/repositories/notifications_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// How many notifications the center shows (newest first).
@@ -45,19 +46,12 @@ String relativeTimeAr(DateTime time, {DateTime? now}) {
 final notificationsProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return Stream.value(const []);
-  return ref.watch(supabaseClientProvider)
-      .from('notifications')
-      .stream(primaryKey: ['id'])
-      .eq('user_id', userId)
-      .order('created_at', ascending: false)
-      .limit(notificationsPageSize)
-      .map((rows) => rows.cast<Map<String, dynamic>>());
+  return ref.watch(notificationsRepositoryProvider).watch(userId, limit: notificationsPageSize);
 });
 
 /// Badge count from the server, refreshed whenever the live list changes.
 final unreadCountProvider = FutureProvider<int>((ref) async {
   if (ref.watch(currentUserIdProvider) == null) return 0;
   ref.watch(notificationsProvider);
-  final count = await ref.watch(supabaseClientProvider).rpc<int>('unread_notifications_count');
-  return count;
+  return ref.watch(notificationsRepositoryProvider).unreadCount();
 });

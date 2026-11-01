@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/repositories/ads_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// Owners may renew an expired ad, or an active one in its last 3 days
@@ -27,18 +28,12 @@ String? expiryLabel(String status, DateTime? expiresAt, {DateTime? now}) {
 final myAdsProvider = FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, status) async {
   final uid = ref.watch(currentUserIdProvider);
   if (uid == null) return const [];
-  final rows = await ref.watch(supabaseClientProvider).from('ads').select('''
-        id, title, price, price_type, views_count, contacts_count, favorites_count,
-        created_at, expires_at, rejection_reason, is_featured,
-        ad_media(url, is_primary),
-        cities(name_ar)
-      ''').eq('user_id', uid).eq('status', status).order('created_at', ascending: false);
-  return rows.cast<Map<String, dynamic>>();
+  return ref.watch(adsRepositoryProvider).myAds(uid, status);
 });
 
 /// Renews an ad through renew_ad. Returns null on success, else a message.
 Future<String?> renewAd(Ref ref, String adId) async {
-  final res = await ref.read(supabaseClientProvider).rpc('renew_ad', params: {'p_ad_id': adId});
+  final res = await ref.read(adsRepositoryProvider).renewAd(adId);
   final map = res is Map ? res : const {};
   if (map['success'] == true) {
     ref.invalidate(myAdsProvider);

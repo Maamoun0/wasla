@@ -11,6 +11,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../saved/providers/saved_searches_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show AdCard, AdCardShimmer, EmptyState;
 import '../map/ads_map.dart';
+import '../../../data/repositories/saved_repository.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key, this.initialFilter});
@@ -100,7 +101,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final row = savedSearchRow(filter, userId: userId, name: name);
     if (row == null) return;
     try {
-      await saveSearch(ref.read(supabaseClientProvider), row);
+      await saveSearch(ref.read(savedRepositoryProvider), row);
       ref.invalidate(savedSearchesProvider);
       messenger.showSnackBar(const SnackBar(content: Text('تم حفظ البحث. هنبعتلك تنبيه أول ما ينزل إعلان مطابق.')));
     } on SavedSearchLimitReached catch (e) {

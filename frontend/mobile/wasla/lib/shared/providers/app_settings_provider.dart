@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/auth/providers/auth_provider.dart';
+import '../../data/repositories/config_repository.dart';
 
 /// The admin switches the app reflects. The server enforces each of them;
 /// the app only hides what would be refused and explains maintenance.
@@ -30,11 +30,10 @@ class AppSettings {
 
 final appSettingsProvider = FutureProvider<AppSettings>((ref) async {
   try {
-    final rows = await ref.watch(supabaseClientProvider)
-        .from('app_configs')
-        .select('key, value')
-        .inFilter('key', ['maintenance_mode', 'enable_boost_feature', 'enable_kyc_verification']);
-    return AppSettings.fromRows(rows.cast<Map<String, dynamic>>());
+    final rows = await ref
+        .watch(configRepositoryProvider)
+        .configs(['maintenance_mode', 'enable_boost_feature', 'enable_kyc_verification']);
+    return AppSettings.fromRows(rows);
   } catch (_) {
     return const AppSettings();
   }

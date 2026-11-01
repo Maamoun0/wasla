@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../data/repositories/payments_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../core/supabase/function_errors.dart';
 
@@ -38,10 +39,10 @@ class SubscriptionState {
 }
 
 class SubscriptionController extends StateNotifier<SubscriptionState> {
-  final SupabaseClient _client;
+  final PaymentsRepository _repository;
   final String? _userId;
 
-  SubscriptionController(this._client, this._userId) : super(SubscriptionState()) {
+  SubscriptionController(this._repository, this._userId) : super(SubscriptionState()) {
     init();
   }
 
@@ -64,14 +65,7 @@ class SubscriptionController extends StateNotifier<SubscriptionState> {
   // Fetch plans from subscription_plans table ordered by sort_order
   Future<void> fetchPlans() async {
     try {
-      // Each plan carries its purchasable package (price charged by create-payment).
-      final response = await _client
-          .from('subscription_plans')
-          .select('*, payment_packages(id, price_egp, duration_days)')
-          .eq('is_active', true)
-          .order('sort_order', ascending: true);
-
-      state = state.copyWith(plans: List<Map<String, dynamic>>.from(response));
+      state = state.copyWith(plans: await _repository.subscriptionPlans());
     } catch (e) {
       rethrow;
     }
@@ -81,12 +75,7 @@ class SubscriptionController extends StateNotifier<SubscriptionState> {
   Future<void> fetchActiveSubscription() async {
     if (_userId == null) return;
     try {
-      final response = await _client
-          .from('user_subscriptions')
-          .select('*, subscription_plans(name, name_ar)')
-          .eq('user_id', _userId)
-          .eq('status', 'active')
-          .maybeSingle();
+      final response = await _repository.activeSubscription(_userId);
 
       state = state.copyWith(activeSubscription: () => response);
     } catch (e) {
@@ -121,14 +110,11 @@ class SubscriptionController extends StateNotifier<SubscriptionState> {
         return null;
       }
 
-      final functionResponse = await _client.functions.invoke(
-        'create-payment',
-        body: {'package_id': package['id']},
-      );
+      final checkout = await _repository.createPayment({'package_id': package['id']});
 
       state = state.copyWith(isVerifying: false);
 
-      return functionResponse.data as Map<String, dynamic>;
+      return checkout;
 
     } catch (e) {
       // A refusal from create-payment (FunctionException) carries its own message.
@@ -151,7 +137,6 @@ Map<String, dynamic>? monthlyPackageOf(Map<String, dynamic> plan) {
 }
 
 final subscriptionControllerProvider = StateNotifierProvider.autoDispose<SubscriptionController, SubscriptionState>((ref) {
-  final client = ref.watch(supabaseClientProvider);
   final userId = ref.watch(currentUserIdProvider);
-  return SubscriptionController(client, userId);
+  return SubscriptionController(ref.watch(paymentsRepositoryProvider), userId);
 });

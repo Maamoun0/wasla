@@ -5,10 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wasla/core/router/app_router.dart';
 import 'package:wasla/features/auth/providers/auth_provider.dart';
+import 'package:wasla/data/repositories/auth_repository.dart';
 import 'package:wasla/features/auth/screens/auth_screen.dart';
 
 class _FakeAuth extends AuthNotifier {
-  _FakeAuth() : super(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false)));
+  _FakeAuth() 
+      : super(AuthRepository(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false))));
   @override
   Future<void> sendOtp(String phone) async {}
 }

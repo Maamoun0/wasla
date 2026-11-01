@@ -12,6 +12,7 @@ import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
 import '../providers/saved_searches_provider.dart';
 import '../providers/saved_ads_provider.dart';
+import '../../../data/repositories/saved_repository.dart';
 
 class SavedScreen extends ConsumerStatefulWidget {
   const SavedScreen({super.key, this.initialTab = 0});
@@ -118,7 +119,7 @@ class _FavoritesTab extends ConsumerWidget {
           itemBuilder: (_, i) => _FavoriteCard(
             fav: favs[i],
             onRemove: () async {
-              await ref.read(supabaseClientProvider).from('favorites').delete().eq('id', favs[i]['id']);
+              await ref.read(savedRepositoryProvider).removeFavorite(favs[i]['id']);
               ref.invalidate(favoritesProvider);
               ref.invalidate(savedAdsProvider(userId));
             },
@@ -252,7 +253,7 @@ class _WatchlistTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final client = ref.watch(supabaseClientProvider);
+    final repository = ref.watch(savedRepositoryProvider);
     final searches = ref.watch(savedSearchesProvider);
 
     return searches.when(
@@ -289,9 +290,7 @@ class _WatchlistTab extends ConsumerWidget {
               context.go(AppRoutes.explore);
             },
             onToggle: (active) async {
-              await client
-                  .from('saved_searches')
-                  .update({'is_active': active}).eq('id', list[i]['id']);
+              await repository.setSavedSearchActive(list[i]['id'], active);
             },
             onDelete: () async {
               final confirmed = await showDialog<bool>(
@@ -310,10 +309,7 @@ class _WatchlistTab extends ConsumerWidget {
                 ),
               );
               if (confirmed != true) return;
-              await client
-                  .from('saved_searches')
-                  .delete()
-                  .eq('id', list[i]['id']);
+              await repository.deleteSavedSearch(list[i]['id']);
               ref.invalidate(savedSearchesProvider);
             },
           ),

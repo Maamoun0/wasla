@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../data/repositories/post_ad_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// The caller's plan limits and usage (my_plan_usage). The server enforces
@@ -40,6 +41,6 @@ const fallbackMaxImages = 8;
 
 final planUsageProvider = FutureProvider.autoDispose<PlanUsage?>((ref) async {
   if (ref.watch(currentUserIdProvider) == null) return null;
-  final res = await ref.watch(supabaseClientProvider).rpc('my_plan_usage');
+  final res = await ref.watch(postAdRepositoryProvider).planUsage();
   return res is Map ? PlanUsage.fromJson(res.cast<String, dynamic>()) : null;
 });

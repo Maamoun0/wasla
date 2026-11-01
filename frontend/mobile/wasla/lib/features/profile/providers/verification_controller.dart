@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/national_id_validator.dart';
+import '../../../data/repositories/kyc_repository.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../core/supabase/function_errors.dart';
 
@@ -67,11 +67,11 @@ const selfieStep = 3;
 const reviewStep = 4;
 
 class VerificationController extends StateNotifier<VerificationState> {
-  final SupabaseClient _client;
+  final KycRepository _repository;
   final String? _userId;
   final ImagePicker _picker = ImagePicker();
 
-  VerificationController(this._client, this._userId) : super(VerificationState()) {
+  VerificationController(this._repository, this._userId) : super(VerificationState()) {
     fetchExistingVerification();
   }
 
@@ -81,18 +81,11 @@ class VerificationController extends StateNotifier<VerificationState> {
     state = state.copyWith(isFetchingExisting: true);
 
     try {
-      final response = await _client
-          .from('user_verifications')
-          // Explicit columns: the HMAC and code hash are not readable by clients.
-          .select('id, status, created_at, decided_at, national_id_last4, rejection_reason')
-          .eq('user_id', _userId)
-          .eq('type', 'national_id')
-          .order('created_at', ascending: false)
-          .limit(1);
+      final latest = await _repository.latestRequest(_userId);
 
-      if (response.isNotEmpty) {
+      if (latest != null) {
         state = state.copyWith(
-          existingVerification: () => response.first,
+          existingVerification: () => latest,
           isFetchingExisting: false,
         );
       } else {
@@ -206,9 +199,7 @@ class VerificationController extends StateNotifier<VerificationState> {
       final base64Selfie = base64Encode(await state.selfieFile!.readAsBytes());
 
       // Invoke submit-kyc-request
-      await _client.functions.invoke(
-        'submit-kyc-request',
-        body: {
+      await _repository.submit({
           'full_name': state.fullName.trim(),
           // Plain ID over TLS; the server keeps only the last 4 digits and an HMAC.
           'national_id': NationalIdValidator.normalize(state.nationalId),
@@ -235,7 +226,6 @@ class VerificationController extends StateNotifier<VerificationState> {
 // ── Providers ────────────────────────────────────────────────────
 final verificationControllerProvider =
     StateNotifierProvider.autoDispose<VerificationController, VerificationState>((ref) {
-  final client = ref.watch(supabaseClientProvider);
   final userId = ref.watch(currentUserIdProvider);
-  return VerificationController(client, userId);
+  return VerificationController(ref.watch(kycRepositoryProvider), userId);
 });

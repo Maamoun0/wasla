@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../auth/providers/auth_provider.dart';
+import '../../../data/repositories/ads_repository.dart';
 
 class DailyStat {
   const DailyStat(this.day, this.views, this.contacts);
@@ -52,14 +52,13 @@ class AdPerformance {
 }
 
 final adPerformanceProvider = FutureProvider.autoDispose.family<AdPerformance, String>((ref, adId) async {
-  final res = await ref.watch(supabaseClientProvider).rpc('ad_performance', params: {'p_ad_id': adId});
-  return AdPerformance.fromJson((res as Map).cast<String, dynamic>());
+  return AdPerformance.fromJson(await ref.watch(adsRepositoryProvider).adPerformance(adId));
 });
 
 /// Counts a view of an ad page (record_ad_view decides what counts). Never
 /// blocks or fails the page.
 final adViewRecorderProvider = Provider<Future<void> Function(String adId)>((ref) => (adId) async {
       try {
-        await ref.read(supabaseClientProvider).rpc('record_ad_view', params: {'p_ad_id': adId, 'p_source': 'app'});
+        await ref.read(adsRepositoryProvider).recordAdView(adId);
       } catch (_) {}
     });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../data/repositories/auth_repository.dart';
 
 class NotificationSettingsScreen extends ConsumerStatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -47,12 +48,9 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
     setState(() => _prefs = updatedPrefs);
 
     try {
-      final client = ref.read(supabaseClientProvider);
       final userId = ref.read(currentUserIdProvider);
       if (userId != null) {
-        await client.from('users').update({
-          'notification_preferences': updatedPrefs,
-        }).eq('id', userId);
+        await ref.read(authRepositoryProvider).updateProfile(userId, {'notification_preferences': updatedPrefs});
         ref.invalidate(currentUserProvider);
       }
     } catch (e) {

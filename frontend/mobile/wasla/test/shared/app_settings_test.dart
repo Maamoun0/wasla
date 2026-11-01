@@ -4,12 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wasla/features/home/screens/home_screen.dart';
 import 'package:wasla/features/notifications/providers/notifications_provider.dart';
+import 'package:wasla/data/repositories/ads_repository.dart';
 import 'package:wasla/shared/providers/ads_provider.dart';
 import 'package:wasla/shared/providers/app_settings_provider.dart';
 
 /// A feed that never calls the server.
 class _NoopFeed extends AdsNotifier {
-  _NoopFeed() : super(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false)));
+  _NoopFeed() 
+      : super(AdsRepository(SupabaseClient('http://localhost:1', 'k', authOptions: const AuthClientOptions(autoRefreshToken: false))));
 
   @override
   Future<void> load({AdsFilter? filter, bool refresh = false}) async {

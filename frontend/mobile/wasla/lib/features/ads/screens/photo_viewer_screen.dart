@@ -4,22 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../data/repositories/ads_repository.dart';
 
 // FutureProvider to dynamically fetch image URLs for a specific ad ID
-final adMediaUrlsProvider = FutureProvider.family.autoDispose<List<String>, String>((ref, adId) async {
-  final supabase = ref.watch(supabaseClientProvider);
-  final response = await supabase
-      .from('ad_media')
-      .select('url')
-      .eq('ad_id', adId)
-      .order('sort_order', ascending: true);
-
-  if (response.isEmpty) {
-    return [];
-  }
-  return response.map<String>((media) => media['url'] as String).toList();
-});
+final adMediaUrlsProvider = FutureProvider.family.autoDispose<List<String>, String>(
+    (ref, adId) => ref.watch(adsRepositoryProvider).photoUrls(adId));
 
 class PhotoViewerScreen extends ConsumerStatefulWidget {
   const PhotoViewerScreen({

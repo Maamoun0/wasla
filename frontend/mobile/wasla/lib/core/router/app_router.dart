@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../data/repositories/auth_repository.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
@@ -328,8 +328,7 @@ bool isPublicLocation(String location) {
 }
 
 String? _authGuard(BuildContext context, GoRouterState state, Ref ref) {
-  final session = Supabase.instance.client.auth.currentSession;
-  final isLoggedIn = session != null;
+  final isLoggedIn = ref.read(authRepositoryProvider).currentSession != null;
 
   return authRedirect(isLoggedIn: isLoggedIn, matchedLocation: state.matchedLocation, uri: state.uri);
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/repositories/config_repository.dart';
 import '../auth/providers/auth_provider.dart';
 
 /// 'terms' or 'privacy'.
@@ -39,10 +40,7 @@ class LegalDocument {
 }
 
 final legalDocumentsProvider = FutureProvider<Map<LegalKind, LegalDocument>>((ref) async {
-  final rows = await ref.watch(supabaseClientProvider)
-      .from('app_configs')
-      .select('key, value')
-      .inFilter('key', ['legal_terms', 'legal_privacy']);
+  final rows = await ref.watch(configRepositoryProvider).configs(['legal_terms', 'legal_privacy']);
   final byKey = {for (final r in rows) r['key'] as String: r['value']};
   return {for (final k in LegalKind.values) k: LegalDocument.fromConfig(k, byKey['legal_${k.id}'])};
 });
@@ -50,17 +48,16 @@ final legalDocumentsProvider = FutureProvider<Map<LegalKind, LegalDocument>>((re
 /// Whether the signed-in user accepted the current versions (legal_status).
 final legalStatusProvider = FutureProvider.autoDispose<bool?>((ref) async {
   if (ref.watch(currentUserIdProvider) == null) return null;
-  final res = await ref.watch(supabaseClientProvider).rpc('legal_status');
+  final res = await ref.watch(configRepositoryProvider).legalStatus();
   return res is Map ? res['accepted'] == true : null;
 });
 
 /// Records acceptance of the versions the user was shown. Returns false when
 /// a newer version was published meanwhile (the user must see it first).
 Future<bool> acceptLegalDocuments(Ref ref, {required int termsVersion, required int privacyVersion}) async {
-  final res = await ref.read(supabaseClientProvider).rpc('accept_legal_documents', params: {
-    'p_terms_version': termsVersion,
-    'p_privacy_version': privacyVersion,
-  });
+  final res = await ref
+      .read(configRepositoryProvider)
+      .acceptLegalDocuments(termsVersion: termsVersion, privacyVersion: privacyVersion);
   ref.invalidate(legalStatusProvider);
   if (res is Map && res['success'] == true) return true;
   ref.invalidate(legalDocumentsProvider);

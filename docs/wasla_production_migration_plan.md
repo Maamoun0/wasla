@@ -56,6 +56,10 @@ select vault.create_secret('<service_role key>', 'service_role_key');
 
 Until both secrets exist, the `dispatch-notifications`, `purge-deleted-accounts` and `purge-kyc-documents` cron ticks do nothing: notifications stay queued in `notifications_outbox`, due account deletions stay pending, and identity documents are not deleted on schedule.
 
+## 3.1 Storage image transformation
+
+The app loads photos through `/storage/v1/render/image` (resized, compressed, WebP when supported: NFR-1.2). On hosted Supabase this is **Image Transformations, a Pro-plan feature billed per origin image**; enable it on the production project. Without it the render URLs fail and photos do not load.
+
 ## 4. Auth
 
 - Enable TOTP MFA (Authentication → Multi-Factor). It is mandatory for admin-panel staff and enforced server-side at `aal2`.

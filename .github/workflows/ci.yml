@@ -65,7 +65,7 @@ jobs:
           sed -i "s|^SEND_SMS_HOOK_SECRETS=.*|SEND_SMS_HOOK_SECRETS=$secret|" supabase/.env
 
       - name: Start local Supabase (migrations applied from scratch)
-        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,supavisor,realtime,postgres-meta
+        run: supabase start -x studio,mailpit,logflare,vector,supavisor,realtime,postgres-meta
 
       - name: pgTAP
         run: supabase test db
@@ -84,10 +84,11 @@ jobs:
 
       - name: Integration tests (Auth, Storage, KYC)
         run: >-
-          deno test --config supabase/functions/deno.json --no-lock --no-check --allow-env --allow-net --allow-run=docker
+          deno test --config supabase/functions/deno.json --no-lock --no-check --allow-env --allow-net --allow-run=docker --allow-read
           supabase/tests/auth/otp_rate_limit.local.ts
           supabase/tests/auth/send_sms_hook.local.ts
           supabase/tests/storage/buckets.local.ts
+          supabase/tests/storage/image_transform.local.ts
           supabase/tests/kyc/kyc_flow.local.ts
 
       - name: Admin integration tests

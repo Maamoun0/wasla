@@ -32,6 +32,11 @@ enabled = false
 enabled = true
 file_size_limit = "50MiB"
 
+# NFR-1.2: resized, compressed images (WebP when the device accepts it) from
+# /storage/v1/render/image. Hosted projects need the Pro plan for this.
+[storage.image_transformation]
+enabled = true
+
 [auth]
 enabled = true
 site_url = "http://localhost:3000"

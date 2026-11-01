@@ -12,6 +12,7 @@ import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../shared/widgets/trust_badge.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../profile/providers/ad_performance_provider.dart';
+import '../../../core/utils/image_utils.dart';
 
 class AdDetailScreen extends ConsumerStatefulWidget {
   const AdDetailScreen({super.key, required this.adId});
@@ -164,7 +165,7 @@ class _AdDetailScreenState extends ConsumerState<AdDetailScreen> {
                               itemBuilder: (_, i) => GestureDetector(
                                 onTap: () => context.push('/photos/${widget.adId}?index=$i'),
                                 child: CachedNetworkImage(
-                                  imageUrl: media[i]['url'] as String,
+                                  imageUrl: ImageUtils.fullQuality(media[i]['url'] as String),
                                   fit: BoxFit.cover,
                                   placeholder: (_, __) => Container(color: AppColors.neutral200),
                                 ),

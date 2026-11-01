@@ -225,6 +225,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               appContext: context,
               length: 6,
               controller: _otpController,
+              // The screen owns and disposes the controller (dispose()).
+              autoDisposeControllers: false,
               keyboardType: TextInputType.number,
               textStyle: const TextStyle(
                 fontFamily: 'Cairo',

@@ -18,13 +18,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isLoading = false;
 
   Future<void> _showDeleteConfirmationDialog() async {
-    final reasonController = TextEditingController();
     bool dialogSubmitting = false;
 
     await showDialog(
       context: context,
       barrierDismissible: !_isLoading,
-      builder: (ctx) {
+      // The dialog owns the reason field's controller: it must outlive the
+      // closing animation, so it is disposed with the dialog, not after showDialog.
+      builder: (ctx) => _WithTextController(builder: (reasonController) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return Directionality(
@@ -179,9 +180,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             );
           },
         );
-      },
+      }),
     );
-    reasonController.dispose();
   }
 
   @override
@@ -332,4 +332,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
   }
+}
+
+/// Gives [builder] a TextEditingController that lives as long as this widget.
+class _WithTextController extends StatefulWidget {
+  const _WithTextController({required this.builder});
+  final Widget Function(TextEditingController controller) builder;
+
+  @override
+  State<_WithTextController> createState() => _WithTextControllerState();
+}
+
+class _WithTextControllerState extends State<_WithTextController> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(_controller);
 }

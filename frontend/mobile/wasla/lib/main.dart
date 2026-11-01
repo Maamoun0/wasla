@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants/app_colors.dart';
 import 'core/constants/app_constants.dart';
+import 'core/observability/error_reporting.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/supabase/push_notification_service.dart';
@@ -43,7 +44,7 @@ void main() async {
     // ── Firebase & Notifications (بعد Supabase) ──────────────────
     await PushNotificationService.initialize();
 
-    runApp(
+    await ErrorReporting.run(() => runApp(
       ProviderScope(
         child: EasyLocalization(
           supportedLocales: const [Locale('en', 'US'), Locale('ar', 'EG')],
@@ -52,10 +53,11 @@ void main() async {
           child: const WaslaApp(),
         ),
       ),
-    );
+    ));
   } catch (e, stack) {
     debugPrint("CRITICAL ERROR DURING STARTUP: $e");
     debugPrint(stack.toString());
+    await ErrorReporting.capture(e, stack);
 
     
     // Fallback app to show the error instead of a black screen

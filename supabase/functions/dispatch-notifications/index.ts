@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { handleDispatch } from "./handler.ts";
 import { supabaseDeps } from "./deps.ts";
 import { FcmClient, ServiceAccount } from "./fcm.ts";
+import { reportError } from "../_shared/error_reporting.ts";
 
 serve(async (req) => {
   try {
@@ -24,6 +25,7 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("dispatch-notifications: unhandled error", error instanceof Error ? error.message : error);
+    await reportError("dispatch-notifications", error);
     return new Response(JSON.stringify({ error: "internal error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

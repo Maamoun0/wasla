@@ -61,6 +61,8 @@ Until both secrets exist, the `dispatch-notifications`, `purge-deleted-accounts`
 
 The app loads photos through `/storage/v1/render/image` (resized, compressed, WebP when supported: NFR-1.2). On hosted Supabase this is **Image Transformations, a Pro-plan feature billed per origin image**; enable it on the production project. Without it the render URLs fail and photos do not load.
 
+**Decision (2026-11-01): the Pro plan is approved** for the production project, for Image Transformations.
+
 ## 4. Auth
 
 - Enable TOTP MFA (Authentication → Multi-Factor). It is mandatory for admin-panel staff and enforced server-side at `aal2`.
@@ -89,3 +91,15 @@ When an account is purged 30 days after a deletion request, its payment transact
 ## 6. Flutter production config
 
 Build with `--dart-define=SUPABASE_URL=...` and `--dart-define=SUPABASE_ANON_KEY=...` for the new project. Use the production `google-services.json` and `GoogleService-Info.plist`.
+
+## 7. Crash reporting (Sentry)
+
+Off until a DSN is set, in each of the three places:
+
+| Where | Setting |
+|---|---|
+| Flutter app | `--dart-define=SENTRY_DSN=...` (optional `SENTRY_ENVIRONMENT`) |
+| Admin panel | `SENTRY_DSN` (server) and `NEXT_PUBLIC_SENTRY_DSN` (browser), optional `NEXT_PUBLIC_SENTRY_ENVIRONMENT` |
+| Edge Functions | `supabase secrets set SENTRY_DSN=...` (optional `SENTRY_ENVIRONMENT`) |
+
+All three send no default PII, and strip phone numbers, emails and tokens before sending (`beforeSend`). Choose the Sentry data region and retention before launch; both are listed as open in `docs/legal/DATA_INVENTORY.md`. Product analytics (PostHog) is deferred.

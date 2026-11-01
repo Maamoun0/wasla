@@ -117,7 +117,7 @@ jobs:
       - name: Lint
         run: deno lint
       - name: Unit tests
-        run: deno test --no-lock --allow-net=127.0.0.1
+        run: deno test --no-lock --allow-net=127.0.0.1 --allow-env=SENTRY_DSN,SENTRY_ENVIRONMENT
 
   admin:
     name: Admin panel (typecheck, lint, build, test)

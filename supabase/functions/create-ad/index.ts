@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders, handleCreateAd, POSTING_BLOCKS, PostingBlock, PostingBlockedError } from "./handler.ts";
 import type { FieldDefinition } from "./fields.ts";
 import { anthropicClassifier, configFromEnv, moderateAd } from "./moderation.ts";
+import { reportError } from "../_shared/error_reporting.ts";
 
 serve(async (req) => {
   try {
@@ -104,6 +105,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("create-ad: unhandled error", error instanceof Error ? error.message : error);
+    await reportError("create-ad", error);
     return new Response(JSON.stringify({ error: "حدث خطأ أثناء معالجة طلب نشر الإعلان." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

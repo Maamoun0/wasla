@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders, handleCreatePayment } from "./handler.ts";
 import { createPaymobPayment } from "./paymob.ts";
+import { reportError } from "../_shared/error_reporting.ts";
 
 serve(async (req) => {
   try {
@@ -87,6 +88,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("create-payment: unhandled error", error instanceof Error ? error.message : error);
+    await reportError("create-payment", error);
     return new Response(
       JSON.stringify({ error: "حدث خطأ غير متوقع أثناء معالجة طلبك" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

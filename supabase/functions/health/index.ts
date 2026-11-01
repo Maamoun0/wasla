@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { handleHealth } from "./handler.ts";
+import { reportError } from "../_shared/error_reporting.ts";
 
 serve(async (req) => {
   try {
@@ -25,6 +26,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("health: unhandled error", error instanceof Error ? error.message : error);
+    await reportError("health", error);
     return new Response(JSON.stringify({ status: "down" }), {
       status: 503,
       headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },

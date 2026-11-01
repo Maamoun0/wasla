@@ -34,6 +34,7 @@
 | موقع الإعلان على الخريطة (وقت النشر) | عرض مكان الإعلان | `ads.latitude/longitude` | الكل | زي الإعلان | Google Maps SDK (عرض الخريطة) |
 | موافقة الشروط والخصوصية | إثبات الموافقة على نسخة معينة | `legal_acceptances` (رقم النسخة والوقت) | صاحبها، والإدارة | لحد حذف الحساب | — |
 | سجل إجراءات الإدارة | المساءلة | `audit_logs`، `ad_moderation_log` | الإدارة | بيفضل بعد حذف الحساب من غير ربط بالمنفّذ | — |
+| تقارير الأعطال (نوع الخطأ ورسالته، مسار الكود، الجهاز ونظام التشغيل وإصدار التطبيق، ومعرّف المستخدم بس) | إصلاح الأعطال | Sentry (برّه قاعدة بياناتنا) | فريق التطوير | ⚠️ **حسب خطة Sentry، ولسه مااتحددتش** | **Sentry**: من غير بيانات شخصية افتراضية (`sendDefaultPii = false`)، وقبل الإرسال بيتشال أي رقم موبايل أو بريد أو token من النص، وبتتشال الـ headers والـ cookies ومحتوى الطلبات. مش شغال غير لما `SENTRY_DSN` يتحدد |
 
 ## 2. الأطراف التالتة
 | الطرف | إيه اللي بيوصله | ليه | فين في الكود |
@@ -45,6 +46,7 @@
 | Paymob | الاسم والبريد والموبايل والمبلغ ورقم الطلب. والكارت بيتكتب عندهم | الدفع | `supabase/functions/create-payment/paymob.ts` |
 | Google | البريد والاسم والصورة (لو دخلت بجوجل). وخرائط Google في شاشة تحديد المكان | الدخول، والخريطة | `auth_provider.dart`، `location_price_screen.dart` |
 | WhatsApp / تطبيق الهاتف | رقم البائع، ورسالة فيها عنوان الإعلان | لما المشتري يختار يتواصل | `sellerContactUri` في `ads_provider.dart` |
+| Sentry | تقارير الأعطال: نوع الخطأ ورسالته بعد شيل الأرقام والبريد والـ tokens، والجهاز وإصدار التطبيق، ومعرّف المستخدم بس | إصلاح الأعطال | `lib/core/observability/error_reporting.dart`، `frontend/admin/lib/observability/scrub.ts`، `supabase/functions/_shared/error_reporting.ts`. ⚠️ **منطقة التخزين (US/EU) ومدة الاحتفاظ لسه مااتحددوش** |
 
 ## 2.1 مصادر بيانات مرجعية (مش بيانات مستخدمين)
 بيانات التقسيم الإداري (المحافظات، والمراكز، والأقسام، والـ P-codes) مصدرها: Central Agency for Public Mobilization and Statistics (CAPMAS)، "Egypt - Subnational Administrative Boundaries" (COD-AB)، منشورة على Humanitarian Data Exchange: https://data.humdata.org/dataset/cod-ab-egy، بترخيص Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO). الإصدار v01، صالح من 2017-04-21. واتعدّلت: اتصنّفت لمدن وأحياء، واتصلّحت المسافات في بعض الأسماء.

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders, FulfilResult, handleWebhook } from "./handler.ts";
+import { reportError } from "../_shared/error_reporting.ts";
 
 serve(async (req) => {
   try {
@@ -49,6 +50,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("payment-webhook: unhandled error", error instanceof Error ? error.message : error);
+    await reportError("payment-webhook", error);
     return new Response(
       JSON.stringify({ error: "حدث خطأ داخلي أثناء معالجة الطلب" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

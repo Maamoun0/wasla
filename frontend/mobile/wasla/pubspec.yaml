@@ -66,6 +66,7 @@ dependencies:
   json_annotation: ^4.9.0
   dio: ^5.4.3+1
   easy_localization: ^3.0.8
+  sentry_flutter: ^9.6.0
 
 dev_dependencies:
   flutter_test:

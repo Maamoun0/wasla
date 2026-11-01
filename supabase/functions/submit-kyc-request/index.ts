@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { corsHeaders, handleSubmitKyc } from "./handler.ts";
 import { supabaseDeps } from "./deps.ts";
 import { hmacSecretFrom } from "./national_id.ts";
+import { reportError } from "../_shared/error_reporting.ts";
 
 serve(async (req) => {
   try {
@@ -20,6 +21,7 @@ serve(async (req) => {
   } catch (error) {
     // Log without request data: it carries identity documents.
     console.error("submit-kyc-request: unhandled error", error instanceof Error ? error.message : error);
+    await reportError("submit-kyc-request", error);
     return new Response(JSON.stringify({ error: "حدث خطأ غير متوقع أثناء معالجة طلبك" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

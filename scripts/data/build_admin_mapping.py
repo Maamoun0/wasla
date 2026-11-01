@@ -35,8 +35,8 @@ NEIGHBORHOOD_DRAFT = {
     'مصر الجديدة': ('area', 'EG0128', 'قسم مصر الجديدة بعد تصليح المسافة'),
     'العباسية': ('district', 'EG0122', 'الوايلي'),
     'المهندسين': ('district', 'EG2102', 'العجوزة'),
-    'الهرم': ('area', None, '⚠️ «قسم الهرم» مش في المصدر (فيه «قسم الأهرام» EG2106، ومش نفس القسم)'),
-    'فيصل': ('district', None, '⚠️ «قسم الطالبية» مش في المصدر (اتعمل بعد 2017 غالباً)'),
+    'الهرم': ('area', 'EG2106', 'قسم الأهرام، والاسم المعروض «الهرم» (قرار 2026-11-01)'),
+    'فيصل': ('district', 'EG2118', 'العمرانية مؤقتاً، ويتنقل للطالبية لما تظهر في مصدر رسمي أحدث'),
     'سموحة': ('district', 'EG0203', 'سيدى جابر'),
     'العجمي': ('district', 'EG0212', 'الدخيلة (مفيش «قسم العجمي» في المصدر)'),
     'مصطفى كامل': ('district', 'EG0203', 'سيدى جابر'),
@@ -78,9 +78,13 @@ NUCA_CITIES = [
 UNVERIFIED_CITIES = ['الجلالة', 'ناصر', 'الإسماعيلية الجديدة', 'بئر العبد الجديدة', 'رفح الجديدة',
                      'النوبارية الجديدة']
 
+# Display names decided by hand; the official name stays in name_official.
+DISPLAY_NAMES = {'EG2106': 'الهرم'}
+
 # Search aliases: a neighborhood name finds every area it spans.
 SEARCH_ALIASES = {
     'فيصل': ['EG2118', 'EG2105'],  # العمرانية، بولاق الدكرور (+ الطالبية لما تتضاف)
+    'الأهرام': ['EG2106'],  # الاسم الرسمي للهرم
     'وسط البلد': ['EG0111', 'EG0109', 'EG0113'],  # قصر النيل، عابدين، الأزبكية
 }
 
@@ -218,7 +222,9 @@ def main(xlsx, cities_psv, out_md, out_json):
         if r['adm2_pcode'] in fixes:
             item['review'] = True
             item['rule'] += f" — تصحيح مسافات: «{fixes[r['adm2_pcode']][0]}» ← «{fixes[r['adm2_pcode']][1]}»"
-        item['name_official'] = r['adm2_name1']  # kept for search; display name drops قسم/مركز
+        item['name_official'] = r['adm2_name1']
+        if r['adm2_pcode'] in DISPLAY_NAMES:
+            item['name_ar'] = DISPLAY_NAMES[r['adm2_pcode']]  # kept for search; display name drops قسم/مركز
         rows.append(item)
 
     # One area per (governorate, name): numbered qisms, and a qism and a markaz

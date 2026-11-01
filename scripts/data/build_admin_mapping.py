@@ -24,6 +24,36 @@ ORDINALS = {
 }
 EXCLUDE_PREFIXES = ('خارج الزمام', 'صحراء', 'إدارة شرطة', 'إداره شرطه', 'اداره شرطه')
 
+# Spacing fixes decided by hand (2026-11-01), on top of the automatic ones.
+MANUAL_SPACING = {'EG0128': 'قسم مصر الجديدة'}
+
+# Draft from the owner (2026-11-01, pending "مؤكد"): existing city -> area
+# ('area', P-code) or district under an area ('district', parent P-code).
+# None = the named qism is not in the 2017 source, so nothing is guessed.
+NEIGHBORHOOD_DRAFT = {
+    'وسط القاهرة': ('district', 'EG0111', 'قصر النيل'),
+    'مصر الجديدة': ('area', 'EG0128', 'قسم مصر الجديدة بعد تصليح المسافة'),
+    'العباسية': ('district', 'EG0122', 'الوايلي'),
+    'المهندسين': ('district', 'EG2102', 'العجوزة'),
+    'الهرم': ('area', None, '⚠️ «قسم الهرم» مش في المصدر (فيه «قسم الأهرام» EG2106، ومش نفس القسم)'),
+    'فيصل': ('district', None, '⚠️ «قسم الطالبية» مش في المصدر (اتعمل بعد 2017 غالباً)'),
+    'سموحة': ('district', 'EG0203', 'سيدى جابر'),
+    'العجمي': ('district', 'EG0212', 'الدخيلة (مفيش «قسم العجمي» في المصدر)'),
+    'مصطفى كامل': ('district', 'EG0203', 'سيدى جابر'),
+    'ميامي': ('district', 'EG0201', 'المنتزة'),
+    'التجمع الخامس': ('area', None, 'منطقة مستقلة في القاهرة (مش في مصدر 2017)'),
+    'مدينتي': ('area', None, 'منطقة مستقلة في القاهرة (مش في مصدر 2017)'),
+    'الرحاب': ('area', None, 'منطقة مستقلة في القاهرة (مش في مصدر 2017)'),
+    'شبرا الخيمة': ('area', None, 'تتنقل للقليوبية، وأقسامها EG1406 وEG1407 أحياء تحتها'),
+    'حدائق الأهرام': ('area', None, 'تتنقل للجيزة (مش في مصدر 2017)'),
+}
+
+# Search aliases: a neighborhood name finds every area it spans.
+SEARCH_ALIASES = {
+    'فيصل': ['EG2118', 'EG2105'],  # العمرانية، بولاق الدكرور (+ الطالبية لما تتضاف)
+    'وسط البلد': ['EG0111', 'EG0109', 'EG0113'],  # قصر النيل، عابدين، الأزبكية
+}
+
 
 def norm(text):
     """Same idea as public.normalize_arabic + place_name_key in the database."""
@@ -90,6 +120,9 @@ def main(xlsx, cities_psv, out_md, out_json):
         if fixed != raw:
             fixes[r['adm2_pcode']] = (raw, fixed)
             r['adm2_name1'] = fixed
+        if r['adm2_pcode'] in MANUAL_SPACING:
+            fixes[r['adm2_pcode']] = (raw, MANUAL_SPACING[r['adm2_pcode']])
+            r['adm2_name1'] = MANUAL_SPACING[r['adm2_pcode']]
 
     existing = []
     for line in open(cities_psv, encoding='utf-8'):
@@ -180,7 +213,12 @@ def main(xlsx, cities_psv, out_md, out_json):
         other_gov = [r for r in rows if r['type'] in ('city', 'district')
                      and norm(r['name_ar'] if r['type'] == 'city' else (r['parent'] or '')) == norm(e['name'])
                      and r not in gov_rows]
-        if city_hit:
+        draft = NEIGHBORHOOD_DRAFT.get(e['name'])
+        if draft:
+            kind, pc, note = draft
+            label = 'منطقة مستقلة' if kind == 'area' else 'حي تحت'
+            links.append((e, pc, f"مسودة: {label} — {note}"))
+        elif city_hit:
             links.append((e, '، '.join(city_hit[0]['pcodes']), 'نفس اسم المنطقة'))
         elif parent_hit:
             links.append((e, None, 'مدينة أم لأقسام: ' + '، '.join(r['pcode'] for r in parent_hit)))
@@ -191,7 +229,7 @@ def main(xlsx, cities_psv, out_md, out_json):
 
     json.dump({'adm2': rows, 'existing_links': [
         {'city_id': e['id'], 'name': e['name'], 'pcode': pc, 'note': note} for e, pc, note in links
-    ]}, open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1, default=str)
+    ], 'search_aliases': SEARCH_ALIASES},open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1, default=str)
 
     # ── Markdown for review ──────────────────────────────────────────
     from collections import Counter
@@ -226,17 +264,24 @@ def main(xlsx, cities_psv, out_md, out_json):
     # Signs of a dropped space: "ال" inside a word, or "ة" not at a word's end.
     glued_left = [r for r in rows if re.search(r'\S{2}ال\S{2}|ة\S', r['name_ar_source']) and r['type'] != 'exclude'
                   and 'تصحيح مسافات' not in (r['rule'] or '')]
-    out.append('\n## محتاج قرارك\n')
-    out.append('1. **المدن الحالية اللي مالقتلهاش مطابقة** (علامة ⚠️ في الجدول اللي فوق). أغلبها أحياء أصغر من القسم (العباسية، المهندسين، سموحة، ميامي…)، '
-               'أو مدن جديدة (التجمع الخامس، مدينتي، الرحاب). مش هخمّن هي تبع أنهي قسم. محتاج تحدد لكل واحدة: تفضل مدينة، ولا تبقى حي تحت مدينة معينة.\n')
-    out.append('2. **غلطات في البيانات الحالية:** "شبرا الخيمة" متسجلة في القاهرة، وهي في القليوبية (EG1406). و"حدائق الأهرام" متسجلة في القاهرة، وهي في الجيزة. '
-               'و"فيصل" في الجيزة ليها نفس اسم قسم في السويس (EG0404)، يعني الاسم مش كفاية للربط.\n')
-    out.append('3. **أسماء في المصدر ممكن تكون لازقة من غير مسافات** (الفحص آلي: "ال" في نص الكلمة، أو "ة" مش في آخرها). فيها أسماء سليمة كمان، زي الجمالية وسمالوط. التصحيح الآلي اتعمل بس لما الجزئين كانوا موجودين ككلمات في أسماء المستوى 3، والباقي محتاج نظرتك:\n')
+    by_pc = {r['pcode']: r for r in rows}
+    out.append('\n## أسماء البحث البديلة (مسودة)\n')
+    out.append('اسم الحي بيلاقي المنطقة (أو المناطق) اللي هو فيها. الأحياء اللي في المسودة فوق بتلاقي منطقتها تلقائي، والجدول ده للأحياء الممتدة على أكتر من قسم.\n\n')
+    out.append('| الاسم | بيلاقي |\n|---|---|\n')
+    for alias, codes in SEARCH_ALIASES.items():
+        out.append(f"| {alias} | {'، '.join(by_pc[c]['name_ar'] + ' (' + c + ')' for c in codes)} |\n")
+
+    review = [r for r in rows if r['review'] and r['type'] != 'exclude']
+    out.append(f'\n## الصفوف اللي محتاجة مراجعتك ({len(review)})\n')
+    out.append('الـ 18 استبعاد اتوافق عليهم. دول الباقيين: الاسم من المصدر ← الاقتراح.\n\n')
+    for r in review:
+        sug = r['name_ar'] if r['type'] == 'city' else f"{r['name_ar']} (حي تحت «{r['parent']}»)"
+        why = 'تصحيح مسافة' if 'تصحيح مسافات' in r['rule'] else (
+            'من غير بادئة' if r['type'] == 'city' else 'مفيش مركز بالاسم ده، فالمنطقة الأم جديدة')
+        out.append(f"- {r['pcode']} {r['gov_ar']}: {r['name_ar_source']} ← {sug} — {why}\n")
+    out.append('\n**أسماء ممكن تكون لازقة ومااتصلحتش** (الفحص آلي، وفيها أسماء سليمة زي الجمالية):\n')
     for r in glued_left:
-        out.append(f"   - {r['pcode']}: {r['name_ar_source']}\n")
-    out.append('4. **الاستبعادات المقترحة** (خارج الزمام، الصحراء، إدارات شرطة الموانئ): موافق؟\n')
-    out.append('5. **المحافظات الحضرية** (القاهرة، والإسكندرية، وبورسعيد، والسويس…) مافيهاش مراكز، فكل اسم قسم بقى مدينة أم. '
-               'ده بيطلّع "مدن" كتير في القاهرة (التبين، طره، عابدين…). البديل إن المحافظة كلها تبقى مدينة واحدة (مثلاً القاهرة)، والأقسام أحياء تحتها. أنهي الاتنين؟\n')
+        out.append(f"- {r['pcode']}: {r['name_ar_source']}\n")
 
     # ── Post-2017 cities: listed for verification, never added ────────
     cands = ['العاصمة الإدارية الجديدة', 'العلمين الجديدة', 'المنصورة الجديدة', 'الجلالة', 'شرق بورسعيد', 'ناصر',

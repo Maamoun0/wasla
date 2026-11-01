@@ -40,5 +40,8 @@
 ## 8. وضع الصيانة
 ممكن نوقّف النشر والدفع والتوثيق مؤقتاً للصيانة. التصفح بيفضل شغال.
 
+## 8.1 مصادر البيانات
+بيانات التقسيم الإداري (المحافظات، والمراكز، والأقسام، والـ P-codes) مصدرها: Central Agency for Public Mobilization and Statistics (CAPMAS)، "Egypt - Subnational Administrative Boundaries" (COD-AB)، منشورة على Humanitarian Data Exchange: https://data.humdata.org/dataset/cod-ab-egy، بترخيص Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO). الإصدار v01، صالح من 2017-04-21. واتعدّلت: اتصنّفت لمدن وأحياء، واتصلّحت المسافات في بعض الأسماء.
+
 ## 9. التعديلات والقانون
 لو عدّلنا الشروط، هنطلب موافقتك على الإصدار الجديد. والشروط دي بيحكمها القانون المصري، [والمحكمة المختصة: …].

@@ -45,6 +45,9 @@
 | Google | البريد والاسم والصورة (لو دخلت بجوجل). وخرائط Google في شاشة تحديد المكان | الدخول، والخريطة | `auth_provider.dart`، `location_price_screen.dart` |
 | WhatsApp / تطبيق الهاتف | رقم البائع، ورسالة فيها عنوان الإعلان | لما المشتري يختار يتواصل | `sellerContactUri` في `ads_provider.dart` |
 
+## 2.1 مصادر بيانات مرجعية (مش بيانات مستخدمين)
+بيانات التقسيم الإداري (المحافظات، والمراكز، والأقسام، والـ P-codes) مصدرها: Central Agency for Public Mobilization and Statistics (CAPMAS)، "Egypt - Subnational Administrative Boundaries" (COD-AB)، منشورة على Humanitarian Data Exchange: https://data.humdata.org/dataset/cod-ab-egy، بترخيص Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO). الإصدار v01، صالح من 2017-04-21. واتعدّلت: اتصنّفت لمدن وأحياء، واتصلّحت المسافات في بعض الأسماء.
+
 ## 3. حذف الحساب (`request_account_deletion` + `purge-deleted-accounts`)
 1. **فوراً:**
    - الملف الشخصي والإعلانات بيتخفوا.

@@ -271,6 +271,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     }
                   },
                 ),
+                const SizedBox(height: 12),
+                _SocialLoginButton(
+                  icon: Icons.facebook_rounded,
+                  label: 'تابع بـ Facebook',
+                  onPressed: () async {
+                    try {
+                      await ref.read(authNotifierProvider.notifier).signInWithFacebook();
+                    } catch (_) {
+                      _showError(AppStrings.errorGeneral);
+                    }
+                  },
+                ),
                 const SizedBox(height: 28),
 
                 // ── Guest Mode ────────────────────────────────

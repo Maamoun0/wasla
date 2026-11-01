@@ -75,6 +75,13 @@ auth_token = "local-dev-placeholder"
 
 # Server-side Auth limits. The hosted project's values are set in the dashboard
 # (Authentication -> Rate Limits); see docs/wasla_production_migration_plan.md.
+# Facebook sign-in (FR-1.2). Off locally (needs a Meta app); hosted projects
+# enable it in Authentication -> Providers -> Facebook (INTEGRATION_CHECKLIST §7).
+[auth.external.facebook]
+enabled = false
+client_id = ""
+secret = ""
+
 [auth.rate_limit]
 # SMS messages per hour for the whole project (caps SMS-pumping cost).
 sms_sent = 30

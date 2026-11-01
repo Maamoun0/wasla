@@ -142,6 +142,17 @@ MAPS_API_KEY=<KEY> flutter build apk --debug
 
 **النجاح:** على جهاز، افتح البحث ← زرار الخريطة. الإعلانات تظهر مجمّعة، والضغط على مجموعة بيقرّب، والضغط على إعلان لوحده بيفتح صفحته. وشاشة تحديد المكان في نشر الإعلان بتعرض الخريطة.
 
+## 7. Facebook (تسجيل الدخول)
+
+| | |
+|---|---|
+| المطلوب | تطبيق على Meta for Developers فيه **Facebook Login**، والـ App ID والـ App Secret |
+| فين | لوحة Supabase ← Authentication ← Providers ← Facebook. وفي تطبيق Meta، الـ Valid OAuth Redirect URI هو `https://<DEV_REF>.supabase.co/auth/v1/callback` |
+| التطبيق | زرار "تابع بـ Facebook" بيرجع على `wasla://login-callback` (نفس جوجل). وبعد الدخول بيطلب الموافقة على الشروط لو مااتسجلتش |
+| مراجعة Meta | الصلاحيات المطلوبة `email` و`public_profile` بس، وطلبهم مابيحتاجش App Review. التطبيق لازم يبقى Live عشان أي حد يدخل |
+
+**النجاح:** على جهاز، دوس "تابع بـ Facebook". المفروض يتفتح Facebook، وبعد الموافقة ترجع للتطبيق وإنت داخل، ويطلع حساب جديد في Authentication ← Users بالـ provider `facebook`.
+
 ---
 
 ## الحالة
@@ -154,3 +165,4 @@ MAPS_API_KEY=<KEY> flutter build apk --debug
 | Paymob Sandbox | ⬜ | `paymob_sandbox.live.ts` + الدورة اليدوية | لم يُشغَّل |
 | KYC HMAC | ⬜ | `curl` أعلاه | لم يُشغَّل |
 | Google Maps | ⬜ | تجربة على جهاز | لم يُشغَّل |
+| Facebook | ⬜ | تجربة على جهاز | لم يُشغَّل |

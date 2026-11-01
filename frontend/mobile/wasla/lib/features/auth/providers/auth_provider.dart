@@ -145,6 +145,24 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
     }
   }
 
+  // Sign in with Facebook (FR-1.2). The provider is enabled in Supabase
+  // Auth (Authentication -> Providers -> Facebook) with the Meta app's id.
+  Future<void> signInWithFacebook() async {
+    state = const AsyncValue.loading();
+    try {
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.facebook,
+        redirectTo: 'wasla://login-callback',
+        scopes: 'email,public_profile',
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   // Sign out
   Future<void> signOut() async {
     state = const AsyncValue.loading();

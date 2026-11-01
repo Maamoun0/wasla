@@ -110,28 +110,38 @@
 - EG2408: مركز سمالوط
 - EG3308: قسم الساحل الشمالى-جزء
 
-## مدن جديدة بعد 2017 (مش هتتضاف)
-بيانات المصدر من 2017. الأسماء دي اتكتبت هنا عشان تتراجع بس، ومش هتتضاف لحد ما تيجي من مصدر رسمي. عمود "في المصدر" معناه إن الاسم ظهر كجزء من اسم في المستوى 2 أو 3، وده مش بيأكد إنه نفس المكان.
+## مدن جديدة مش في مصدر 2017
+**من موقع هيئة المجتمعات العمرانية الجديدة** ([قائمة المدن](http://www.newcities.gov.eg/know_cities/default.aspx)، اتراجعت 2026-11-01). الاسم من عنوان صفحة المدينة. أغلب الصفحات مش مكتوب فيها المحافظة، فعمود المحافظة اقتراح محتاج تأكيدك، إلا لو مكتوب «من الصفحة».
 
-| المدينة | في المصدر؟ |
-|---|---|
-| العاصمة الإدارية الجديدة | لأ |
-| العلمين الجديدة | لأ |
-| المنصورة الجديدة | لأ |
-| الجلالة | لأ |
-| شرق بورسعيد | لأ |
-| ناصر | ظهر جزء من الاسم (غالباً مكان تاني، زي "منشأة ناصر") |
-| ملوي الجديدة | لأ |
-| رشيد الجديدة | لأ |
-| العبور الجديدة | لأ |
-| أكتوبر الجديدة | لأ |
-| حدائق أكتوبر | لأ |
-| الإسماعيلية الجديدة | لأ |
-| بئر العبد الجديدة | لأ |
-| رفح الجديدة | لأ |
-| الفشن الجديدة | لأ |
-| سفنكس الجديدة | لأ |
-| النوبارية الجديدة | لأ |
+| المدينة | المصدر | المحافظة | في COD-AB؟ |
+|---|---|---|---|
+| العاصمة الإدارية الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewCapital/default.aspx) | 🔎 القاهرة (اقتراح) | لأ |
+| العلمين الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/alameen_new/default.aspx) | 🔎 مطروح (اقتراح) | لأ |
+| المنصورة الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewMansoura/default.aspx) | الدقهلية (من الصفحة) | لأ |
+| شرق بور سعيد | [NUCA](http://www.newcities.gov.eg/know_cities/CityMillions/default.aspx) | 🔎 بورسعيد (اقتراح) | لأ |
+| غرب أسيوط | [NUCA](http://www.newcities.gov.eg/know_cities/West_Assiut_City/default.aspx) | 🔎 أسيوط (اقتراح) | لأ |
+| غرب قنا | [NUCA](http://www.newcities.gov.eg/know_cities/West_Qena_City/default.aspx) | 🔎 قنا (اقتراح) | لأ |
+| الأقصر الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/newLuxor/default.aspx) | 🔎 الأقصر (اقتراح) | لأ |
+| الإسكندرية الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewAlex/default.aspx) | 🔎 الإسكندرية (اقتراح) | لأ |
+| رشيد الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewRashid/default.aspx) | 🔎 البحيرة (اقتراح) | لأ |
+| الفشن الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewFashn/default.aspx) | 🔎 بني سويف (اقتراح) | لأ |
+| ملوي الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewMallawi/default.aspx) | 🔎 المنيا (اقتراح) | لأ |
+| 6 أكتوبر الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewOctober/default.aspx) | 🔎 الجيزة (اقتراح) | لأ |
+| العبور الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/NewObour/default.aspx) | 🔎 القليوبية (اقتراح) | لأ |
+| امتداد الشيخ زايد | [NUCA](http://www.newcities.gov.eg/know_cities/Ext_Zayed/default.aspx) | 🔎 الجيزة (اقتراح) | لأ |
+| حدائق أكتوبر | [NUCA](http://www.newcities.gov.eg/know_cities/October_Gardens/default.aspx) | 🔎 الجيزة (اقتراح) | لأ |
+| سفنكس الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/New_Sphinx/default.aspx) | 🔎 الجيزة (اقتراح) | لأ |
+| حدائق العاصمة | [NUCA](http://www.newcities.gov.eg/know_cities/Capital_Gardens/default.aspx) | 🔎 القاهرة (اقتراح) | لأ |
+| توشكى الجديدة | [NUCA](http://www.newcities.gov.eg/know_cities/Toshka/default.aspx) | 🔎 أسوان (اقتراح) | ظهر جزء من الاسم |
+| شرق العوينات | [NUCA](http://www.newcities.gov.eg/know_cities/EastOwaynat/default.aspx) | 🔎 الوادي الجديد (اقتراح) | لأ |
+
+**تحت التحقق** (مش لاقيها في موقع الهيئة، ومش هتتضاف):
+- الجلالة
+- ناصر
+- الإسماعيلية الجديدة
+- بئر العبد الجديدة
+- رفح الجديدة
+- النوبارية الجديدة
 
 ## المحافظات (المستوى 1)
 | P-code | الاسم في المصدر |

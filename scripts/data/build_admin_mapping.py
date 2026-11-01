@@ -48,6 +48,36 @@ NEIGHBORHOOD_DRAFT = {
     'حدائق الأهرام': ('area', None, 'تتنقل للجيزة (مش في مصدر 2017)'),
 }
 
+# Cities after the 2017 source, from the New Urban Communities Authority
+# (checked 2026-11-01): (name from the page title, page slug, governorate,
+# whether the page itself names the governorate).
+NUCA_INDEX = 'http://www.newcities.gov.eg/know_cities/default.aspx'
+NUCA_PAGE = 'http://www.newcities.gov.eg/know_cities/{}/default.aspx'
+NUCA_CITIES = [
+    ('العاصمة الإدارية الجديدة', 'NewCapital', 'القاهرة', False),
+    ('العلمين الجديدة', 'alameen_new', 'مطروح', False),
+    ('المنصورة الجديدة', 'NewMansoura', 'الدقهلية', True),
+    ('شرق بور سعيد', 'CityMillions', 'بورسعيد', False),
+    ('غرب أسيوط', 'West_Assiut_City', 'أسيوط', False),
+    ('غرب قنا', 'West_Qena_City', 'قنا', False),
+    ('الأقصر الجديدة', 'newLuxor', 'الأقصر', False),
+    ('الإسكندرية الجديدة', 'NewAlex', 'الإسكندرية', False),
+    ('رشيد الجديدة', 'NewRashid', 'البحيرة', False),
+    ('الفشن الجديدة', 'NewFashn', 'بني سويف', False),
+    ('ملوي الجديدة', 'NewMallawi', 'المنيا', False),
+    ('6 أكتوبر الجديدة', 'NewOctober', 'الجيزة', False),
+    ('العبور الجديدة', 'NewObour', 'القليوبية', False),
+    ('امتداد الشيخ زايد', 'Ext_Zayed', 'الجيزة', False),
+    ('حدائق أكتوبر', 'October_Gardens', 'الجيزة', False),
+    ('سفنكس الجديدة', 'New_Sphinx', 'الجيزة', False),
+    ('حدائق العاصمة', 'Capital_Gardens', 'القاهرة', False),
+    ('توشكى الجديدة', 'Toshka', 'أسوان', False),
+    ('شرق العوينات', 'EastOwaynat', 'الوادي الجديد', False),
+]
+# Mentioned before but not on the NUCA site: listed, never added.
+UNVERIFIED_CITIES = ['الجلالة', 'ناصر', 'الإسماعيلية الجديدة', 'بئر العبد الجديدة', 'رفح الجديدة',
+                     'النوبارية الجديدة']
+
 # Search aliases: a neighborhood name finds every area it spans.
 SEARCH_ALIASES = {
     'فيصل': ['EG2118', 'EG2105'],  # العمرانية، بولاق الدكرور (+ الطالبية لما تتضاف)
@@ -284,18 +314,19 @@ def main(xlsx, cities_psv, out_md, out_json):
         out.append(f"- {r['pcode']}: {r['name_ar_source']}\n")
 
     # ── Post-2017 cities: listed for verification, never added ────────
-    cands = ['العاصمة الإدارية الجديدة', 'العلمين الجديدة', 'المنصورة الجديدة', 'الجلالة', 'شرق بورسعيد', 'ناصر',
-             'ملوي الجديدة', 'رشيد الجديدة', 'العبور الجديدة', 'أكتوبر الجديدة', 'حدائق أكتوبر', 'الإسماعيلية الجديدة',
-             'بئر العبد الجديدة', 'رفح الجديدة', 'الفشن الجديدة', 'سفنكس الجديدة', 'النوبارية الجديدة']
     all_names = [norm(r['adm2_name1'] or '') for r in adm2] + [norm(r.get('adm3_name1') or '') for r in adm3]
-    out.append('\n## مدن جديدة بعد 2017 (مش هتتضاف)\n')
-    out.append('بيانات المصدر من 2017. الأسماء دي اتكتبت هنا عشان تتراجع بس، ومش هتتضاف لحد ما تيجي من مصدر رسمي. '
-               'عمود "في المصدر" معناه إن الاسم ظهر كجزء من اسم في المستوى 2 أو 3، وده مش بيأكد إنه نفس المكان.\n\n')
-    out.append('| المدينة | في المصدر؟ |\n|---|---|\n')
-    for cname in cands:
+    out.append('\n## مدن جديدة مش في مصدر 2017\n')
+    out.append(f'**من موقع هيئة المجتمعات العمرانية الجديدة** ([قائمة المدن]({NUCA_INDEX})، اتراجعت 2026-11-01). '
+               'الاسم من عنوان صفحة المدينة. أغلب الصفحات مش مكتوب فيها المحافظة، فعمود المحافظة اقتراح محتاج تأكيدك، '
+               'إلا لو مكتوب «من الصفحة».\n\n')
+    out.append('| المدينة | المصدر | المحافظة | في COD-AB؟ |\n|---|---|---|---|\n')
+    for cname, slug, gov, from_page in NUCA_CITIES:
         hit = any(norm(cname) in n for n in all_names)
-        note = 'ظهر جزء من الاسم (غالباً مكان تاني، زي "منشأة ناصر")' if hit else 'لأ'
-        out.append(f'| {cname} | {note} |\n')
+        gov_note = f'{gov} (من الصفحة)' if from_page else f'🔎 {gov} (اقتراح)'
+        out.append(f"| {cname} | [NUCA]({NUCA_PAGE.format(slug)}) | {gov_note} | {'ظهر جزء من الاسم' if hit else 'لأ'} |\n")
+    out.append('\n**تحت التحقق** (مش لاقيها في موقع الهيئة، ومش هتتضاف):\n')
+    for cname in UNVERIFIED_CITIES:
+        out.append(f'- {cname}\n')
 
     out.append('\n## المحافظات (المستوى 1)\n| P-code | الاسم في المصدر |\n|---|---|\n')
     for r in sorted(adm1, key=lambda x: x['adm1_pcode']):

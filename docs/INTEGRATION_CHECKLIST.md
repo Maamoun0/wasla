@@ -159,7 +159,7 @@ MAPS_API_KEY=<KEY> flutter build apk --debug
 |---|---|
 | جاهز | دالة `health`: بترجع 200 لو قاعدة البيانات وStorage شغالين، و503 مع اسم الفحص اللي فشل لو لأ. من غير أي تفاصيل خطأ أو أسرار |
 | فين | أي خدمة uptime (UptimeRobot، Better Stack…) بتعمل GET على `https://<REF>.supabase.co/functions/v1/health` كل دقيقة، وتنبّه لو الرد مش 200 |
-| **محتاج قرارك** | تتبّع الأخطاء (Sentry) والتحليلات (PostHog). الاتنين محتاجين SDK جديد في التطبيق، وبيبعتوا بيانات لطرف تالت جديد، فمحتاجين موافقة واتفاقية معالجة بيانات وإضافة في جرد البيانات |
+| Sentry | جاهز في الكود ومقفول لحد ما الـ DSN يتحدد: `SENTRY_DSN` للتطبيق (`--dart-define`)، و`SENTRY_DSN`/`NEXT_PUBLIC_SENTRY_DSN` للوحة، و`SENTRY_DSN` كسر للدوال (production plan §7). PostHog اتأجل |
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}

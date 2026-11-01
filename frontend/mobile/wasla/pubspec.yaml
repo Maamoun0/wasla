@@ -71,6 +71,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_lints: ^4.0.0
   build_runner: ^2.4.11
   riverpod_generator: ^2.4.0
@@ -79,6 +81,7 @@ dev_dependencies:
   webview_flutter_platform_interface: ^2.10.0
   flutter_launcher_icons: ^0.13.1
   http: ^1.6.0
+  image_picker_platform_interface: 2.11.1  # same version the app resolves; tests fake the picker
 
 flutter_launcher_icons:
   android: true

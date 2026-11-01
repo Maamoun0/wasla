@@ -106,6 +106,10 @@ def main(xlsx, cities_psv, out_md, out_json):
         if ar.startswith('مركز'):
             markaz[(r['adm1_pcode'], norm(strip_prefix(ar, 'مركز')))] = r['adm2_pcode']
 
+    # Decision 2026-11-01: these governorates, and any made of qisms only.
+    urban = {'EG01', 'EG02', 'EG03', 'EG04', 'EG21'} | (
+        {r['adm1_pcode'] for r in adm1} - {g for g, _ in markaz})
+
     for r in sorted(adm2, key=lambda x: x['adm2_pcode']):
         ar = (r['adm2_name1'] or '').strip()
         gov = r['adm1_pcode']
@@ -120,6 +124,13 @@ def main(xlsx, cities_psv, out_md, out_json):
             item.update(type='city', name_ar=re.sub(r'^مدين[ةه]\s+', '', ar), rule='مدينة جديدة ← مدينة')
         elif ar.startswith(EXCLUDE_PREFIXES):
             item.update(type='exclude', rule='منطقة غير سكنية/إدارية: استبعاد مقترح', review=True)
+        elif gov in urban:
+            # Decision 2026-11-01: in urban governorates each qism is an area at
+            # the city level; numbered qisms (أول/ثان…) merge into one area below.
+            bases = qism_bases(ar) if ar.startswith('قسم') else [ar]
+            item.update(type='city', name_ar=bases[0], rule='قسم ← منطقة (محافظة حضرية)')
+            if not ar.startswith('قسم'):
+                item['review'] = True
         else:
             bases = qism_bases(ar) if ar.startswith('قسم') else [ar]
             parent = None
@@ -144,7 +155,21 @@ def main(xlsx, cities_psv, out_md, out_json):
         if r['adm2_pcode'] in fixes:
             item['review'] = True
             item['rule'] += f" — تصحيح مسافات: «{fixes[r['adm2_pcode']][0]}» ← «{fixes[r['adm2_pcode']][1]}»"
+        item['name_official'] = r['adm2_name1']  # kept for search; display name drops قسم/مركز
         rows.append(item)
+
+    # One area per (governorate, name): numbered qisms, and a qism and a markaz
+    # with the same name in an urban governorate, share it with all P-codes.
+    groups = {}
+    for item in rows:
+        if item['type'] == 'city':
+            groups.setdefault((item['gov_pcode'], norm(item['name_ar'])), []).append(item)
+    for members in groups.values():
+        codes = [m['pcode'] for m in members]
+        for m in members:
+            m['pcodes'] = codes
+            if len(members) > 1:
+                m['rule'] += ' — مدموجة: ' + '، '.join(codes)
 
     # Existing cities: linked to a P-code (markaz) or to a proposed parent city.
     links = []
@@ -156,7 +181,7 @@ def main(xlsx, cities_psv, out_md, out_json):
                      and norm(r['name_ar'] if r['type'] == 'city' else (r['parent'] or '')) == norm(e['name'])
                      and r not in gov_rows]
         if city_hit:
-            links.append((e, city_hit[0]['pcode'], 'نفس اسم المركز'))
+            links.append((e, '، '.join(city_hit[0]['pcodes']), 'نفس اسم المنطقة'))
         elif parent_hit:
             links.append((e, None, 'مدينة أم لأقسام: ' + '، '.join(r['pcode'] for r in parent_hit)))
         elif other_gov:
@@ -182,16 +207,15 @@ def main(xlsx, cities_psv, out_md, out_json):
     out.append(f"- المستوى 1: **{len(adm1)} محافظة**، وكلها مطابقة للـ 27 الموجودين، بفروق إملائية بس (جدول تحت).\n"
                f"- المستوى 2: **{len(rows)} صف**: {c['city']} مدينة (مراكز ومدن جديدة)، و{c['district']} حي (أقسام)، و{c['exclude']} استبعاد مقترح.\n"
                f"- الصفوف اللي محتاجة نظرتك متعلّمة بـ 🔎 ({sum(r['review'] for r in rows)} صف).\n")
-    out.append('\n## قواعد التصنيف\n')
+    out.append('\n## قواعد التصنيف (حسب قرارات 2026-11-01)\n')
     out.append('| القاعدة | النتيجة |\n|---|---|\n'
-               '| `مركز X` | مدينة اسمها X (المركز كله، يعني المدينة والقرى اللي حواليها) |\n'
-               '| `مدينة X الجديدة` | مدينة |\n'
-               '| `قسم … X` واسم X هو اسم مركز في نفس المحافظة | حي تحت مدينة المركز ده |\n'
-               '| `قسم … X` واسم X هو اسم مدينة عندنا | حي تحت المدينة دي |\n'
-               '| `قسم … X` ومفيش مركز بالاسم ده (المحافظات الحضرية والمدن الجديدة) | 🔎 حي تحت مدينة جديدة اسمها X. الأقسام اللي ليها نفس الاسم (أول وثان) بتتجمّع تحت مدينة واحدة |\n'
-               '| `خارج الزمام`، `صحراء …`، `إدارة شرطة ميناء …` | 🔎 استبعاد مقترح (مش أماكن سكن ينفع ينشر منها إعلان) |\n'
+               '| `مركز X` | منطقة في مستوى المدن اسمها X (المركز كله، المدينة والقرى اللي حواليها) |\n'
+               '| `مدينة X الجديدة` | منطقة في مستوى المدن |\n'
+               '| المحافظات الحضرية (القاهرة، الجيزة، الإسكندرية، بورسعيد، السويس، وأي محافظة كلها أقسام): `قسم … X` | منطقة في مستوى المدن اسمها X. الأقسام المرقّمة (أول/ثان/ثالث) بتتدمج في منطقة واحدة، والـ P-codes كلها بتتخزن عليها |\n'
+               '| باقي المحافظات: `قسم … X` | حي تحت منطقة المركز X (أو المنطقة اللي بنفس الاسم) |\n'
+               '| `خارج الزمام`، `صحراء …`، `إدارة شرطة ميناء …` | استبعاد (اتوافق عليه) |\n'
                '| أسماء من غير بادئة (`منشأةناصر`، `مصرالقديمة`، `الساحل الشمالى`) | 🔎 اتعاملت معاملة القسم |\n')
-    out.append('\n**التخزين المقترح:** كل صف هيتخزن معاه `source_pcode` (P-code). المدينة الأم اللي اتكونت من تجميع أقسام مالهاش P-code واحد، فالـ `source_pcode` بتاعها هيبقى NULL، والأقسام اللي تحتها هي اللي شايلة الـ P-codes.\n')
+    out.append('\n**الأسماء والتخزين:** الاسم المعروض من غير "قسم" و"مركز" (دسوق مش مركز دسوق). الاسم الرسمي بيتخزن في عمود منفصل، والبحث بيلاقي الاتنين. كل منطقة بتخزن كل الـ P-codes بتاعتها، وكل حي بيخزن الـ P-code بتاعه.\n')
 
     out.append('\n## المدن الـ 29 الحالية ← الـ P-code\n')
     out.append('| id | المدينة | P-code | الملاحظة |\n|---|---|---|---|\n')

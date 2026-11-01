@@ -13,7 +13,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG0101",
@@ -23,12 +24,16 @@
    "name_en_source": "Al Tibbin",
    "lat": 29.78062223,
    "lng": 31.33665594,
-   "type": "district",
+   "type": "city",
    "name_ar": "التبين",
-   "parent": "التبين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم التبين",
+   "pcodes": [
+    "EG0101"
+   ]
   },
   {
    "pcode": "EG0102",
@@ -38,12 +43,16 @@
    "name_en_source": "Hilwan",
    "lat": 29.85378844,
    "lng": 31.32893498,
-   "type": "district",
+   "type": "city",
    "name_ar": "حلوان",
-   "parent": "حلوان",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم حلوان",
+   "pcodes": [
+    "EG0102"
+   ]
   },
   {
    "pcode": "EG0103",
@@ -53,12 +62,16 @@
    "name_en_source": "15 Mayu",
    "lat": 29.85339077,
    "lng": 31.38734968,
-   "type": "district",
+   "type": "city",
    "name_ar": "15 مايو",
-   "parent": "15 مايو",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم 15 مايو",
+   "pcodes": [
+    "EG0103"
+   ]
   },
   {
    "pcode": "EG0104",
@@ -68,12 +81,16 @@
    "name_en_source": "Maadi",
    "lat": 29.96342541,
    "lng": 31.36791677,
-   "type": "district",
+   "type": "city",
    "name_ar": "المعادي",
-   "parent": "المعادي",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المعادي",
+   "pcodes": [
+    "EG0104"
+   ]
   },
   {
    "pcode": "EG0105",
@@ -83,12 +100,16 @@
    "name_en_source": "Tura",
    "lat": 29.93903558,
    "lng": 31.38029291,
-   "type": "district",
+   "type": "city",
    "name_ar": "طره",
-   "parent": "طره",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم طره",
+   "pcodes": [
+    "EG0105"
+   ]
   },
   {
    "pcode": "EG0106",
@@ -98,12 +119,16 @@
    "name_en_source": "Misr Al-Qadima",
    "lat": 30.00550963,
    "lng": 31.24188728,
-   "type": "district",
+   "type": "city",
    "name_ar": "مصرالقديمة",
-   "parent": "مصرالقديمة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": true,
+   "name_official": "مصرالقديمة",
+   "pcodes": [
+    "EG0106"
+   ]
   },
   {
    "pcode": "EG0107",
@@ -113,12 +138,16 @@
    "name_en_source": "Sayyida Zainab",
    "lat": 30.0298408,
    "lng": 31.24183483,
-   "type": "district",
+   "type": "city",
    "name_ar": "السيدة زينب",
-   "parent": "السيدة زينب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم السيدة زينب",
+   "pcodes": [
+    "EG0107"
+   ]
   },
   {
    "pcode": "EG0108",
@@ -128,12 +157,16 @@
    "name_en_source": "Al Khalifa",
    "lat": 30.01036599,
    "lng": 31.29601008,
-   "type": "district",
+   "type": "city",
    "name_ar": "الخليفة",
-   "parent": "الخليفة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الخليفة",
+   "pcodes": [
+    "EG0108"
+   ]
   },
   {
    "pcode": "EG0109",
@@ -143,12 +176,16 @@
    "name_en_source": "Abdin",
    "lat": 30.04602082,
    "lng": 31.24521898,
-   "type": "district",
+   "type": "city",
    "name_ar": "عابدين",
-   "parent": "عابدين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم عابدين",
+   "pcodes": [
+    "EG0109"
+   ]
   },
   {
    "pcode": "EG0110",
@@ -158,12 +195,16 @@
    "name_en_source": "Muski",
    "lat": 30.0504347,
    "lng": 31.25239218,
-   "type": "district",
+   "type": "city",
    "name_ar": "الموسكي",
-   "parent": "الموسكي",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الموسكي",
+   "pcodes": [
+    "EG0110"
+   ]
   },
   {
    "pcode": "EG0111",
@@ -173,12 +214,16 @@
    "name_en_source": "Qasr Al-Nile",
    "lat": 30.04308012,
    "lng": 31.23513065,
-   "type": "district",
+   "type": "city",
    "name_ar": "قصر النيل",
-   "parent": "قصر النيل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم قصر النيل",
+   "pcodes": [
+    "EG0111"
+   ]
   },
   {
    "pcode": "EG0112",
@@ -188,12 +233,16 @@
    "name_en_source": "Bulaq",
    "lat": 30.06202785,
    "lng": 31.23415993,
-   "type": "district",
+   "type": "city",
    "name_ar": "بولاق",
-   "parent": "بولاق",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم بولاق",
+   "pcodes": [
+    "EG0112"
+   ]
   },
   {
    "pcode": "EG0113",
@@ -203,12 +252,16 @@
    "name_en_source": "Al Azbakiyya",
    "lat": 30.0600347,
    "lng": 31.24585442,
-   "type": "district",
+   "type": "city",
    "name_ar": "الأزبكية",
-   "parent": "الأزبكية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الأزبكية",
+   "pcodes": [
+    "EG0113"
+   ]
   },
   {
    "pcode": "EG0114",
@@ -218,12 +271,16 @@
    "name_en_source": "Al Darb al-Ahmar",
    "lat": 30.04140441,
    "lng": 31.26011199,
-   "type": "district",
+   "type": "city",
    "name_ar": "الدرب الأحمر",
-   "parent": "الدرب الأحمر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الدرب الأحمر",
+   "pcodes": [
+    "EG0114"
+   ]
   },
   {
    "pcode": "EG0115",
@@ -233,12 +290,16 @@
    "name_en_source": "Gamaliyya",
    "lat": 30.05366362,
    "lng": 31.26455471,
-   "type": "district",
+   "type": "city",
    "name_ar": "الجمالية",
-   "parent": "الجمالية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الجمالية",
+   "pcodes": [
+    "EG0115"
+   ]
   },
   {
    "pcode": "EG0116",
@@ -248,12 +309,16 @@
    "name_en_source": "Bab Al-Shariyya",
    "lat": 30.05877007,
    "lng": 31.25799446,
-   "type": "district",
+   "type": "city",
    "name_ar": "باب الشعرية",
-   "parent": "باب الشعرية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم باب الشعرية",
+   "pcodes": [
+    "EG0116"
+   ]
   },
   {
    "pcode": "EG0117",
@@ -263,12 +328,16 @@
    "name_en_source": "Al Zahir",
    "lat": 30.06279613,
    "lng": 31.26809428,
-   "type": "district",
+   "type": "city",
    "name_ar": "الظاهر",
-   "parent": "الظاهر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الظاهر",
+   "pcodes": [
+    "EG0117"
+   ]
   },
   {
    "pcode": "EG0118",
@@ -278,12 +347,16 @@
    "name_en_source": "Al Sharabiyya",
    "lat": 30.08196457,
    "lng": 31.26412388,
-   "type": "district",
+   "type": "city",
    "name_ar": "الشرابية",
-   "parent": "الشرابية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الشرابية",
+   "pcodes": [
+    "EG0118"
+   ]
   },
   {
    "pcode": "EG0119",
@@ -293,12 +366,16 @@
    "name_en_source": "Shubra",
    "lat": 30.07175894,
    "lng": 31.25032001,
-   "type": "district",
+   "type": "city",
    "name_ar": "شبرا",
-   "parent": "شبرا",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم شبرا",
+   "pcodes": [
+    "EG0119"
+   ]
   },
   {
    "pcode": "EG0120",
@@ -308,12 +385,16 @@
    "name_en_source": "Rud Al-Farag",
    "lat": 30.07468275,
    "lng": 31.23754308,
-   "type": "district",
+   "type": "city",
    "name_ar": "روضالفرج",
-   "parent": "روضالفرج",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم روضالفرج",
+   "pcodes": [
+    "EG0120"
+   ]
   },
   {
    "pcode": "EG0121",
@@ -323,12 +404,16 @@
    "name_en_source": "Al Sahil",
    "lat": 30.09212796,
    "lng": 31.24721676,
-   "type": "district",
+   "type": "city",
    "name_ar": "الساحل",
-   "parent": "الساحل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الساحل",
+   "pcodes": [
+    "EG0121"
+   ]
   },
   {
    "pcode": "EG0122",
@@ -338,12 +423,16 @@
    "name_en_source": "Al Wayli",
    "lat": 30.07160933,
    "lng": 31.28341275,
-   "type": "district",
+   "type": "city",
    "name_ar": "الوايلي",
-   "parent": "الوايلي",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الوايلي",
+   "pcodes": [
+    "EG0122"
+   ]
   },
   {
    "pcode": "EG0123",
@@ -353,12 +442,16 @@
    "name_en_source": "Hadaiq Al-Qubba",
    "lat": 30.08554385,
    "lng": 31.28290808,
-   "type": "district",
+   "type": "city",
    "name_ar": "حدائقالقبة",
-   "parent": "حدائقالقبة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم حدائقالقبة",
+   "pcodes": [
+    "EG0123"
+   ]
   },
   {
    "pcode": "EG0124",
@@ -368,12 +461,16 @@
    "name_en_source": "Al Zaytun",
    "lat": 30.100449,
    "lng": 31.30125807,
-   "type": "district",
+   "type": "city",
    "name_ar": "الزيتون",
-   "parent": "الزيتون",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الزيتون",
+   "pcodes": [
+    "EG0124"
+   ]
   },
   {
    "pcode": "EG0125",
@@ -383,12 +480,16 @@
    "name_en_source": "Al Matariyya",
    "lat": 30.12796892,
    "lng": 31.30398167,
-   "type": "district",
+   "type": "city",
    "name_ar": "المطرية",
-   "parent": "المطرية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المطرية",
+   "pcodes": [
+    "EG0125"
+   ]
   },
   {
    "pcode": "EG0126",
@@ -398,12 +499,17 @@
    "name_en_source": "Nasr City",
    "lat": 30.0320702,
    "lng": 31.3694274,
-   "type": "district",
-   "name_ar": "أول مدينة نصر",
-   "parent": "مدينة نصر",
+   "type": "city",
+   "name_ar": "مدينة نصر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0126، EG0127",
+   "review": false,
+   "name_official": "قسم أول مدينة نصر",
+   "pcodes": [
+    "EG0126",
+    "EG0127"
+   ]
   },
   {
    "pcode": "EG0127",
@@ -413,12 +519,17 @@
    "name_en_source": "Madinat Nasr-2",
    "lat": 30.04817479,
    "lng": 31.30859273,
-   "type": "district",
-   "name_ar": "ثان مدينة نصر",
-   "parent": "مدينة نصر",
+   "type": "city",
+   "name_ar": "مدينة نصر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة — تصحيح مسافات: «قسم ثانمدينةنصر» ← «قسم ثان مدينة نصر»",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — تصحيح مسافات: «قسم ثانمدينةنصر» ← «قسم ثان مدينة نصر» — مدموجة: EG0126، EG0127",
+   "review": true,
+   "name_official": "قسم ثان مدينة نصر",
+   "pcodes": [
+    "EG0126",
+    "EG0127"
+   ]
   },
   {
    "pcode": "EG0128",
@@ -428,12 +539,16 @@
    "name_en_source": "Misr al-Gadida",
    "lat": 30.0907133,
    "lng": 31.32733026,
-   "type": "district",
+   "type": "city",
    "name_ar": "مصرالجديدة",
-   "parent": "مصرالجديدة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم مصرالجديدة",
+   "pcodes": [
+    "EG0128"
+   ]
   },
   {
    "pcode": "EG0129",
@@ -443,12 +558,16 @@
    "name_en_source": "Nuzha",
    "lat": 30.11522515,
    "lng": 31.3887951,
-   "type": "district",
+   "type": "city",
    "name_ar": "النزهة",
-   "parent": "النزهة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم النزهة",
+   "pcodes": [
+    "EG0129"
+   ]
   },
   {
    "pcode": "EG0130",
@@ -458,12 +577,16 @@
    "name_en_source": "Ain Shams",
    "lat": 30.12265349,
    "lng": 31.33003863,
-   "type": "district",
+   "type": "city",
    "name_ar": "عين شمس",
-   "parent": "عين شمس",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة — تصحيح مسافات: «قسم عينشمس» ← «قسم عين شمس»",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — تصحيح مسافات: «قسم عينشمس» ← «قسم عين شمس»",
+   "review": true,
+   "name_official": "قسم عين شمس",
+   "pcodes": [
+    "EG0130"
+   ]
   },
   {
    "pcode": "EG0131",
@@ -473,12 +596,16 @@
    "name_en_source": "Zawiyya Al-Hamra",
    "lat": 30.09765937,
    "lng": 31.26971678,
-   "type": "district",
+   "type": "city",
    "name_ar": "الزاويةالحمراء",
-   "parent": "الزاويةالحمراء",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الزاويةالحمراء",
+   "pcodes": [
+    "EG0131"
+   ]
   },
   {
    "pcode": "EG0132",
@@ -488,12 +615,16 @@
    "name_en_source": "Al Salam",
    "lat": 30.1622057,
    "lng": 31.42819373,
-   "type": "district",
+   "type": "city",
    "name_ar": "السلام",
-   "parent": "السلام",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم السلام",
+   "pcodes": [
+    "EG0132"
+   ]
   },
   {
    "pcode": "EG0133",
@@ -503,12 +634,16 @@
    "name_en_source": "Zamalik",
    "lat": 30.05629301,
    "lng": 31.22319433,
-   "type": "district",
+   "type": "city",
    "name_ar": "الزمالك",
-   "parent": "الزمالك",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الزمالك",
+   "pcodes": [
+    "EG0133"
+   ]
   },
   {
    "pcode": "EG0134",
@@ -518,12 +653,16 @@
    "name_en_source": "Minshat Nasir",
    "lat": 30.04284771,
    "lng": 31.28396176,
-   "type": "district",
+   "type": "city",
    "name_ar": "منشأةناصر",
-   "parent": "منشأةناصر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": true,
+   "name_official": "منشأةناصر",
+   "pcodes": [
+    "EG0134"
+   ]
   },
   {
    "pcode": "EG0135",
@@ -533,12 +672,16 @@
    "name_en_source": "Basatin",
    "lat": 29.98022105,
    "lng": 31.29304583,
-   "type": "district",
+   "type": "city",
    "name_ar": "البساتين",
-   "parent": "البساتين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم البساتين",
+   "pcodes": [
+    "EG0135"
+   ]
   },
   {
    "pcode": "EG0136",
@@ -548,12 +691,16 @@
    "name_en_source": "Marg",
    "lat": 30.15581506,
    "lng": 31.34620156,
-   "type": "district",
+   "type": "city",
    "name_ar": "المرج",
-   "parent": "المرج",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المرج",
+   "pcodes": [
+    "EG0136"
+   ]
   },
   {
    "pcode": "EG0137",
@@ -563,12 +710,18 @@
    "name_en_source": "New Cairo-1",
    "lat": 30.0242492,
    "lng": 31.54960872,
-   "type": "district",
-   "name_ar": "أول القاهرة الجديدة",
-   "parent": "القاهرة الجديدة",
+   "type": "city",
+   "name_ar": "القاهرة الجديدة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0137، EG0138، EG0139",
+   "review": false,
+   "name_official": "قسم أول القاهرة الجديدة",
+   "pcodes": [
+    "EG0137",
+    "EG0138",
+    "EG0139"
+   ]
   },
   {
    "pcode": "EG0138",
@@ -578,12 +731,18 @@
    "name_en_source": "New Cairo-2",
    "lat": 30.07352277,
    "lng": 31.58236481,
-   "type": "district",
-   "name_ar": "ثان القاهرة الجديدة",
-   "parent": "القاهرة الجديدة",
+   "type": "city",
+   "name_ar": "القاهرة الجديدة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0137، EG0138، EG0139",
+   "review": false,
+   "name_official": "قسم ثان القاهرة الجديدة",
+   "pcodes": [
+    "EG0137",
+    "EG0138",
+    "EG0139"
+   ]
   },
   {
    "pcode": "EG0139",
@@ -593,12 +752,18 @@
    "name_en_source": "New Cairo-3",
    "lat": 29.97752694,
    "lng": 31.45574128,
-   "type": "district",
-   "name_ar": "ثالث القاهرة الجديدة",
-   "parent": "القاهرة الجديدة",
+   "type": "city",
+   "name_ar": "القاهرة الجديدة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0137، EG0138، EG0139",
+   "review": false,
+   "name_official": "قسم ثالث القاهرة الجديدة",
+   "pcodes": [
+    "EG0137",
+    "EG0138",
+    "EG0139"
+   ]
   },
   {
    "pcode": "EG0140",
@@ -608,12 +773,16 @@
    "name_en_source": "Shroq",
    "lat": 30.13299876,
    "lng": 31.54747487,
-   "type": "district",
+   "type": "city",
    "name_ar": "الشروق",
-   "parent": "الشروق",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الشروق",
+   "pcodes": [
+    "EG0140"
+   ]
   },
   {
    "pcode": "EG0141",
@@ -623,12 +792,16 @@
    "name_en_source": "Badr",
    "lat": 30.1363098,
    "lng": 31.70628631,
-   "type": "district",
+   "type": "city",
    "name_ar": "بدر",
-   "parent": "بدر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم بدر",
+   "pcodes": [
+    "EG0141"
+   ]
   },
   {
    "pcode": "EG0200",
@@ -643,7 +816,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG0201",
@@ -653,12 +827,16 @@
    "name_en_source": "Muntazah",
    "lat": 31.26426137,
    "lng": 30.03048135,
-   "type": "district",
+   "type": "city",
    "name_ar": "المنتزة",
-   "parent": "المنتزه",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المنتزة",
+   "pcodes": [
+    "EG0201"
+   ]
   },
   {
    "pcode": "EG0202",
@@ -668,12 +846,17 @@
    "name_en_source": "Al Raml",
    "lat": 31.23674335,
    "lng": 29.98579268,
-   "type": "district",
-   "name_ar": "أول الرمل",
-   "parent": "الرمل",
+   "type": "city",
+   "name_ar": "الرمل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0202، EG0217",
+   "review": false,
+   "name_official": "قسم أول الرمل",
+   "pcodes": [
+    "EG0202",
+    "EG0217"
+   ]
   },
   {
    "pcode": "EG0203",
@@ -683,12 +866,16 @@
    "name_en_source": "Sidi Gabir",
    "lat": 31.21634408,
    "lng": 29.94853089,
-   "type": "district",
+   "type": "city",
    "name_ar": "سيدى جابر",
-   "parent": "سيدي جابر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم سيدى جابر",
+   "pcodes": [
+    "EG0203"
+   ]
   },
   {
    "pcode": "EG0204",
@@ -698,12 +885,16 @@
    "name_en_source": "Bab Sharqi",
    "lat": 31.20502404,
    "lng": 29.92102924,
-   "type": "district",
+   "type": "city",
    "name_ar": "باب شرقى",
-   "parent": "باب شرقى",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم باب شرقى",
+   "pcodes": [
+    "EG0204"
+   ]
   },
   {
    "pcode": "EG0205",
@@ -713,12 +904,16 @@
    "name_en_source": "Muharam Bik",
    "lat": 31.18402265,
    "lng": 29.93882596,
-   "type": "district",
+   "type": "city",
    "name_ar": "محرم بك",
-   "parent": "محرم بك",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم محرم بك",
+   "pcodes": [
+    "EG0205"
+   ]
   },
   {
    "pcode": "EG0206",
@@ -728,12 +923,16 @@
    "name_en_source": "Al Attarin",
    "lat": 31.19811328,
    "lng": 29.90400845,
-   "type": "district",
+   "type": "city",
    "name_ar": "العطارين",
-   "parent": "العطارين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم العطارين",
+   "pcodes": [
+    "EG0206"
+   ]
   },
   {
    "pcode": "EG0207",
@@ -743,12 +942,16 @@
    "name_en_source": "Al Manshiyya",
    "lat": 31.1984817,
    "lng": 29.8922597,
-   "type": "district",
+   "type": "city",
    "name_ar": "المنشية",
-   "parent": "المنشية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المنشية",
+   "pcodes": [
+    "EG0207"
+   ]
   },
   {
    "pcode": "EG0208",
@@ -758,12 +961,16 @@
    "name_en_source": "Karmuz",
    "lat": 31.17936477,
    "lng": 29.9037698,
-   "type": "district",
+   "type": "city",
    "name_ar": "كرموز",
-   "parent": "كرموز",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم كرموز",
+   "pcodes": [
+    "EG0208"
+   ]
   },
   {
    "pcode": "EG0209",
@@ -773,12 +980,16 @@
    "name_en_source": "A L Labban",
    "lat": 31.19072847,
    "lng": 29.89239598,
-   "type": "district",
+   "type": "city",
    "name_ar": "اللبان",
-   "parent": "اللبان",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم اللبان",
+   "pcodes": [
+    "EG0209"
+   ]
   },
   {
    "pcode": "EG0210",
@@ -788,12 +999,16 @@
    "name_en_source": "Al Gumruk",
    "lat": 31.20348379,
    "lng": 29.87851276,
-   "type": "district",
+   "type": "city",
    "name_ar": "الجمرك",
-   "parent": "الجمرك",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الجمرك",
+   "pcodes": [
+    "EG0210"
+   ]
   },
   {
    "pcode": "EG0211",
@@ -803,12 +1018,16 @@
    "name_en_source": "Mina Al-Basal",
    "lat": 31.16717534,
    "lng": 29.88017089,
-   "type": "district",
+   "type": "city",
    "name_ar": "مينا البصل",
-   "parent": "مينا البصل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم مينا البصل",
+   "pcodes": [
+    "EG0211"
+   ]
   },
   {
    "pcode": "EG0212",
@@ -818,12 +1037,16 @@
    "name_en_source": "Al Dikhila",
    "lat": 31.1185624,
    "lng": 29.80608436,
-   "type": "district",
+   "type": "city",
    "name_ar": "الدخيلة",
-   "parent": "الدخيلة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الدخيلة",
+   "pcodes": [
+    "EG0212"
+   ]
   },
   {
    "pcode": "EG0213",
@@ -833,12 +1056,16 @@
    "name_en_source": "Al Amreia",
    "lat": 30.95892416,
    "lng": 29.82759488,
-   "type": "district",
+   "type": "city",
    "name_ar": "العامرية",
-   "parent": "العامرية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم العامرية",
+   "pcodes": [
+    "EG0213"
+   ]
   },
   {
    "pcode": "EG0214",
@@ -848,12 +1075,16 @@
    "name_en_source": "Burg al-Arab",
    "lat": 30.90121245,
    "lng": 29.49397559,
-   "type": "district",
+   "type": "city",
    "name_ar": "برج العرب",
-   "parent": "برج العرب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم برج العرب",
+   "pcodes": [
+    "EG0214"
+   ]
   },
   {
    "pcode": "EG0215",
@@ -868,7 +1099,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "اداره شرطه ميناء الأسكندريه"
   },
   {
    "pcode": "EG0216",
@@ -883,7 +1115,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينه برج العرب الجديده",
+   "pcodes": [
+    "EG0216"
+   ]
   },
   {
    "pcode": "EG0217",
@@ -893,12 +1129,17 @@
    "name_en_source": "Kesm than Al Raml",
    "lat": 31.21127748,
    "lng": 29.99447711,
-   "type": "district",
-   "name_ar": "ثان الرمل",
-   "parent": "الرمل",
+   "type": "city",
+   "name_ar": "الرمل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0202، EG0217",
+   "review": false,
+   "name_official": "قسم ثان الرمل",
+   "pcodes": [
+    "EG0202",
+    "EG0217"
+   ]
   },
   {
    "pcode": "EG0218",
@@ -908,12 +1149,16 @@
    "name_en_source": "North Coast",
    "lat": 30.93455288,
    "lng": 29.47512969,
-   "type": "district",
+   "type": "city",
    "name_ar": "الساحل الشمالى",
-   "parent": "الساحل الشمالى",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": true,
+   "name_official": "الساحل الشمالى",
+   "pcodes": [
+    "EG0218"
+   ]
   },
   {
    "pcode": "EG0301",
@@ -923,12 +1168,16 @@
    "name_en_source": "Al-Sharq",
    "lat": 31.26312596,
    "lng": 32.30730045,
-   "type": "district",
+   "type": "city",
    "name_ar": "الشرق",
-   "parent": "الشرق",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الشرق",
+   "pcodes": [
+    "EG0301"
+   ]
   },
   {
    "pcode": "EG0302",
@@ -938,12 +1187,16 @@
    "name_en_source": "Al-Arab",
    "lat": 31.26190402,
    "lng": 32.29399453,
-   "type": "district",
+   "type": "city",
    "name_ar": "العرب",
-   "parent": "العرب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم العرب",
+   "pcodes": [
+    "EG0302"
+   ]
   },
   {
    "pcode": "EG0303",
@@ -953,12 +1206,16 @@
    "name_en_source": "Al-Munakh",
    "lat": 31.26496764,
    "lng": 32.28727198,
-   "type": "district",
+   "type": "city",
    "name_ar": "المناخ",
-   "parent": "المناخ",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المناخ",
+   "pcodes": [
+    "EG0303"
+   ]
   },
   {
    "pcode": "EG0304",
@@ -968,12 +1225,17 @@
    "name_en_source": "Port Fuad",
    "lat": 31.23554228,
    "lng": 32.33039249,
-   "type": "district",
+   "type": "city",
    "name_ar": "بور فؤاد",
-   "parent": "بور فؤاد",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0304، EG0308",
+   "review": false,
+   "name_official": "قسم بور فؤاد",
+   "pcodes": [
+    "EG0304",
+    "EG0308"
+   ]
   },
   {
    "pcode": "EG0305",
@@ -983,12 +1245,16 @@
    "name_en_source": "Al-Dawahy",
    "lat": 31.24625424,
    "lng": 32.27951804,
-   "type": "district",
+   "type": "city",
    "name_ar": "الضواحى",
-   "parent": "الضواحى",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الضواحى",
+   "pcodes": [
+    "EG0305"
+   ]
   },
   {
    "pcode": "EG0306",
@@ -998,12 +1264,17 @@
    "name_en_source": "Al-Ganoub",
    "lat": 31.14080705,
    "lng": 32.29136884,
-   "type": "district",
+   "type": "city",
    "name_ar": "الجنوب",
-   "parent": "الجنوب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0306، EG0311",
+   "review": false,
+   "name_official": "قسم الجنوب",
+   "pcodes": [
+    "EG0306",
+    "EG0311"
+   ]
   },
   {
    "pcode": "EG0307",
@@ -1013,12 +1284,16 @@
    "name_en_source": "Al-Zohour",
    "lat": 31.26572572,
    "lng": 32.26583991,
-   "type": "district",
+   "type": "city",
    "name_ar": "الزهور",
-   "parent": "الزهور",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الزهور",
+   "pcodes": [
+    "EG0307"
+   ]
   },
   {
    "pcode": "EG0308",
@@ -1028,12 +1303,17 @@
    "name_en_source": "Port Fuad 2",
    "lat": 31.16965408,
    "lng": 32.31776337,
-   "type": "district",
-   "name_ar": "ثان بور فؤاد",
-   "parent": "بور فؤاد",
+   "type": "city",
+   "name_ar": "بور فؤاد",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0304، EG0308",
+   "review": false,
+   "name_official": "قسم ثان بور فؤاد",
+   "pcodes": [
+    "EG0304",
+    "EG0308"
+   ]
   },
   {
    "pcode": "EG0309",
@@ -1043,12 +1323,16 @@
    "name_en_source": "Mubark-Sharq Tafrea",
    "lat": 31.06697658,
    "lng": 32.4299708,
-   "type": "district",
-   "name_ar": "مبارك - شرق التفريعة",
-   "parent": "مبارك - التفريعة",
+   "type": "city",
+   "name_ar": "مبارك - التفريعة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم مبارك - شرق التفريعة",
+   "pcodes": [
+    "EG0309"
+   ]
   },
   {
    "pcode": "EG0310",
@@ -1058,12 +1342,16 @@
    "name_en_source": "Al-Manasra",
    "lat": 31.2371881,
    "lng": 32.17303588,
-   "type": "district",
+   "type": "city",
    "name_ar": "المناصرة",
-   "parent": "المناصرة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم المناصرة",
+   "pcodes": [
+    "EG0310"
+   ]
   },
   {
    "pcode": "EG0311",
@@ -1073,12 +1361,17 @@
    "name_en_source": "Al-Ganoub 2",
    "lat": 30.99327443,
    "lng": 32.25397259,
-   "type": "district",
-   "name_ar": "ثان الجنوب",
-   "parent": "الجنوب",
+   "type": "city",
+   "name_ar": "الجنوب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG0306، EG0311",
+   "review": false,
+   "name_official": "قسم ثان الجنوب",
+   "pcodes": [
+    "EG0306",
+    "EG0311"
+   ]
   },
   {
    "pcode": "EG0312",
@@ -1093,7 +1386,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "إدارة شرطة ميناء بورسعيد"
   },
   {
    "pcode": "EG0401",
@@ -1103,12 +1397,16 @@
    "name_en_source": "Suez",
    "lat": 29.96128978,
    "lng": 32.56934356,
-   "type": "district",
+   "type": "city",
    "name_ar": "السويس",
-   "parent": "السويس",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم السويس",
+   "pcodes": [
+    "EG0401"
+   ]
   },
   {
    "pcode": "EG0402",
@@ -1118,12 +1416,16 @@
    "name_en_source": "Al-Arbiin",
    "lat": 29.98007116,
    "lng": 32.5356173,
-   "type": "district",
+   "type": "city",
    "name_ar": "الأربعين",
-   "parent": "الأربعين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الأربعين",
+   "pcodes": [
+    "EG0402"
+   ]
   },
   {
    "pcode": "EG0403",
@@ -1133,12 +1435,16 @@
    "name_en_source": "Ataqa",
    "lat": 29.53854369,
    "lng": 32.12799945,
-   "type": "district",
+   "type": "city",
    "name_ar": "عتاقة",
-   "parent": "عتاقة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم عتاقة",
+   "pcodes": [
+    "EG0403"
+   ]
   },
   {
    "pcode": "EG0404",
@@ -1148,12 +1454,16 @@
    "name_en_source": "Faysal",
    "lat": 30.11799049,
    "lng": 32.18073587,
-   "type": "district",
+   "type": "city",
    "name_ar": "فيصل",
-   "parent": "فيصل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم فيصل",
+   "pcodes": [
+    "EG0404"
+   ]
   },
   {
    "pcode": "EG0405",
@@ -1163,12 +1473,16 @@
    "name_en_source": "Al-Ganayin",
    "lat": 30.06291036,
    "lng": 32.70256254,
-   "type": "district",
+   "type": "city",
    "name_ar": "الجناين",
-   "parent": "الجناين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الجناين",
+   "pcodes": [
+    "EG0405"
+   ]
   },
   {
    "pcode": "EG0406",
@@ -1183,7 +1497,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "إدارة شرطة ميناء السويس"
   },
   {
    "pcode": "EG1101",
@@ -1198,7 +1513,8 @@
    "parent": "دمياط",
    "parent_pcode": "EG1102",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم أول دمياط"
   },
   {
    "pcode": "EG1102",
@@ -1213,7 +1529,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دمياط",
+   "pcodes": [
+    "EG1102"
+   ]
   },
   {
    "pcode": "EG1103",
@@ -1228,7 +1548,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز فارسكور",
+   "pcodes": [
+    "EG1103"
+   ]
   },
   {
    "pcode": "EG1104",
@@ -1243,7 +1567,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كفر سعد",
+   "pcodes": [
+    "EG1104"
+   ]
   },
   {
    "pcode": "EG1105",
@@ -1258,7 +1586,8 @@
    "parent": "دمياط الجديده",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم مدينه دمياط الجديده"
   },
   {
    "pcode": "EG1106",
@@ -1273,7 +1602,8 @@
    "parent": "رأس البر",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم رأس البر"
   },
   {
    "pcode": "EG1107",
@@ -1288,7 +1618,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الزرقا",
+   "pcodes": [
+    "EG1107"
+   ]
   },
   {
    "pcode": "EG1108",
@@ -1303,7 +1637,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "إداره شرطه ميناء دمياط الجديد"
   },
   {
    "pcode": "EG1109",
@@ -1318,7 +1653,8 @@
    "parent": "دمياط",
    "parent_pcode": "EG1102",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان دمياط"
   },
   {
    "pcode": "EG1201",
@@ -1333,7 +1669,8 @@
    "parent": "المنصورة",
    "parent_pcode": "EG1203",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم اول المنصورة"
   },
   {
    "pcode": "EG1202",
@@ -1348,7 +1685,8 @@
    "parent": "المنصورة",
    "parent_pcode": "EG1203",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان المنصورة"
   },
   {
    "pcode": "EG1203",
@@ -1363,7 +1701,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المنصورة",
+   "pcodes": [
+    "EG1203"
+   ]
   },
   {
    "pcode": "EG1204",
@@ -1378,7 +1720,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أجا",
+   "pcodes": [
+    "EG1204"
+   ]
   },
   {
    "pcode": "EG1205",
@@ -1393,7 +1739,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز السنبلاوين",
+   "pcodes": [
+    "EG1205"
+   ]
   },
   {
    "pcode": "EG1206",
@@ -1408,7 +1758,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المطرية",
+   "pcodes": [
+    "EG1206"
+   ]
   },
   {
    "pcode": "EG1207",
@@ -1423,7 +1777,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المنزلة",
+   "pcodes": [
+    "EG1207"
+   ]
   },
   {
    "pcode": "EG1208",
@@ -1438,7 +1796,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بلقاس",
+   "pcodes": [
+    "EG1208"
+   ]
   },
   {
    "pcode": "EG1209",
@@ -1453,7 +1815,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دكرنس",
+   "pcodes": [
+    "EG1209"
+   ]
   },
   {
    "pcode": "EG1210",
@@ -1468,7 +1834,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز شربين",
+   "pcodes": [
+    "EG1210"
+   ]
   },
   {
    "pcode": "EG1211",
@@ -1483,7 +1853,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز طلخا",
+   "pcodes": [
+    "EG1211"
+   ]
   },
   {
    "pcode": "EG1212",
@@ -1498,7 +1872,8 @@
    "parent": "ميت غمر",
    "parent_pcode": "EG1213",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ميت غمر"
   },
   {
    "pcode": "EG1213",
@@ -1513,7 +1888,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ميت غمر",
+   "pcodes": [
+    "EG1213"
+   ]
   },
   {
    "pcode": "EG1214",
@@ -1528,7 +1907,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز منية النصر",
+   "pcodes": [
+    "EG1214"
+   ]
   },
   {
    "pcode": "EG1215",
@@ -1543,7 +1926,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الجمالية",
+   "pcodes": [
+    "EG1215"
+   ]
   },
   {
    "pcode": "EG1216",
@@ -1558,7 +1945,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز تمى الأمديد",
+   "pcodes": [
+    "EG1216"
+   ]
   },
   {
    "pcode": "EG1217",
@@ -1573,7 +1964,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ميت سلسيل",
+   "pcodes": [
+    "EG1217"
+   ]
   },
   {
    "pcode": "EG1218",
@@ -1588,7 +1983,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بنى عبيد",
+   "pcodes": [
+    "EG1218"
+   ]
   },
   {
    "pcode": "EG1219",
@@ -1603,7 +2002,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز محلة دمنة",
+   "pcodes": [
+    "EG1219"
+   ]
   },
   {
    "pcode": "EG1220",
@@ -1618,7 +2021,8 @@
    "parent": "جمصة",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم جمصة"
   },
   {
    "pcode": "EG1221",
@@ -1633,7 +2037,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز نبروة",
+   "pcodes": [
+    "EG1221"
+   ]
   },
   {
    "pcode": "EG1300",
@@ -1648,7 +2056,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG1301",
@@ -1663,7 +2072,8 @@
    "parent": "الزقازيق",
    "parent_pcode": "EG1303",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم اول الزقازيق"
   },
   {
    "pcode": "EG1302",
@@ -1678,7 +2088,8 @@
    "parent": "الزقازيق",
    "parent_pcode": "EG1303",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان الزقازيق"
   },
   {
    "pcode": "EG1303",
@@ -1693,7 +2104,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الزقازيق",
+   "pcodes": [
+    "EG1303"
+   ]
   },
   {
    "pcode": "EG1304",
@@ -1708,7 +2123,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أبو حماد",
+   "pcodes": [
+    "EG1304"
+   ]
   },
   {
    "pcode": "EG1305",
@@ -1723,7 +2142,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة — تصحيح مسافات: «مركز أبوكبير» ← «مركز أبو كبير»",
-   "review": true
+   "review": true,
+   "name_official": "مركز أبو كبير",
+   "pcodes": [
+    "EG1305"
+   ]
   },
   {
    "pcode": "EG1306",
@@ -1738,7 +2161,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الحسينية",
+   "pcodes": [
+    "EG1306"
+   ]
   },
   {
    "pcode": "EG1307",
@@ -1753,7 +2180,8 @@
    "parent": "الصالحية الجديدة",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم الصالحية الجديدة"
   },
   {
    "pcode": "EG1308",
@@ -1768,7 +2196,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بلبيس",
+   "pcodes": [
+    "EG1308"
+   ]
   },
   {
    "pcode": "EG1309",
@@ -1783,7 +2215,8 @@
    "parent": "العاشر من رمضان",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم اول مدينة العاشر من رمضان"
   },
   {
    "pcode": "EG1310",
@@ -1798,7 +2231,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ديرب نجم",
+   "pcodes": [
+    "EG1310"
+   ]
   },
   {
    "pcode": "EG1311",
@@ -1813,7 +2250,8 @@
    "parent": "فاقوس",
    "parent_pcode": "EG1312",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم فاقوس"
   },
   {
    "pcode": "EG1312",
@@ -1828,7 +2266,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز فاقوس",
+   "pcodes": [
+    "EG1312"
+   ]
   },
   {
    "pcode": "EG1313",
@@ -1843,7 +2285,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كفر صقر",
+   "pcodes": [
+    "EG1313"
+   ]
   },
   {
    "pcode": "EG1314",
@@ -1858,7 +2304,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز منيا القمح",
+   "pcodes": [
+    "EG1314"
+   ]
   },
   {
    "pcode": "EG1315",
@@ -1873,7 +2323,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ههيا",
+   "pcodes": [
+    "EG1315"
+   ]
   },
   {
    "pcode": "EG1316",
@@ -1888,7 +2342,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز مشتول السوق",
+   "pcodes": [
+    "EG1316"
+   ]
   },
   {
    "pcode": "EG1317",
@@ -1903,7 +2361,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الأبراهيمية",
+   "pcodes": [
+    "EG1317"
+   ]
   },
   {
    "pcode": "EG1318",
@@ -1918,7 +2380,8 @@
    "parent": "القنايات",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم القنايات"
   },
   {
    "pcode": "EG1319",
@@ -1933,7 +2396,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أولاد صقر",
+   "pcodes": [
+    "EG1319"
+   ]
   },
   {
    "pcode": "EG1320",
@@ -1948,7 +2415,8 @@
    "parent": "القرين",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم القرين"
   },
   {
    "pcode": "EG1321",
@@ -1963,7 +2431,8 @@
    "parent": "العاشر من رمضان",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم ثان مدينه العاشر من رمضان"
   },
   {
    "pcode": "EG1400",
@@ -1978,7 +2447,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG1401",
@@ -1993,7 +2463,8 @@
    "parent": "بنها",
    "parent_pcode": "EG1402",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم بنها"
   },
   {
    "pcode": "EG1402",
@@ -2008,7 +2479,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بنها",
+   "pcodes": [
+    "EG1402"
+   ]
   },
   {
    "pcode": "EG1403",
@@ -2023,7 +2498,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الخانكة",
+   "pcodes": [
+    "EG1403"
+   ]
   },
   {
    "pcode": "EG1404",
@@ -2038,7 +2517,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز القناطر الخيرية",
+   "pcodes": [
+    "EG1404"
+   ]
   },
   {
    "pcode": "EG1405",
@@ -2053,7 +2536,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز شبين القناطر",
+   "pcodes": [
+    "EG1405"
+   ]
   },
   {
    "pcode": "EG1406",
@@ -2068,7 +2555,8 @@
    "parent": "شبرا الخيمة",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم أول شبرا الخيمة"
   },
   {
    "pcode": "EG1407",
@@ -2083,7 +2571,8 @@
    "parent": "شبرا الخيمة",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم ثان شبرا الخيمة"
   },
   {
    "pcode": "EG1408",
@@ -2098,7 +2587,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز طوخ",
+   "pcodes": [
+    "EG1408"
+   ]
   },
   {
    "pcode": "EG1409",
@@ -2113,7 +2606,8 @@
    "parent": "قليوب",
    "parent_pcode": "EG1410",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم قليوب"
   },
   {
    "pcode": "EG1410",
@@ -2128,7 +2622,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قليوب",
+   "pcodes": [
+    "EG1410"
+   ]
   },
   {
    "pcode": "EG1411",
@@ -2143,7 +2641,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كفر شكر",
+   "pcodes": [
+    "EG1411"
+   ]
   },
   {
    "pcode": "EG1412",
@@ -2158,7 +2660,8 @@
    "parent": "الخصوص",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم الخصوص"
   },
   {
    "pcode": "EG1413",
@@ -2173,7 +2676,8 @@
    "parent": "العبور",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم العبور"
   },
   {
    "pcode": "EG1414",
@@ -2188,7 +2692,8 @@
    "parent": "قها",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم قها"
   },
   {
    "pcode": "EG1501",
@@ -2203,7 +2708,8 @@
    "parent": "كفر الشيخ",
    "parent_pcode": "EG1502",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم كفر الشيخ"
   },
   {
    "pcode": "EG1502",
@@ -2218,7 +2724,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كفر الشيخ",
+   "pcodes": [
+    "EG1502"
+   ]
   },
   {
    "pcode": "EG1503",
@@ -2233,7 +2743,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز البرلس",
+   "pcodes": [
+    "EG1503"
+   ]
   },
   {
    "pcode": "EG1504",
@@ -2248,7 +2762,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بيلا",
+   "pcodes": [
+    "EG1504"
+   ]
   },
   {
    "pcode": "EG1505",
@@ -2263,7 +2781,8 @@
    "parent": "دسوق",
    "parent_pcode": "EG1506",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم دسوق"
   },
   {
    "pcode": "EG1506",
@@ -2278,7 +2797,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دسوق",
+   "pcodes": [
+    "EG1506"
+   ]
   },
   {
    "pcode": "EG1507",
@@ -2293,7 +2816,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سيدى سالم",
+   "pcodes": [
+    "EG1507"
+   ]
   },
   {
    "pcode": "EG1508",
@@ -2308,7 +2835,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز فوه",
+   "pcodes": [
+    "EG1508"
+   ]
   },
   {
    "pcode": "EG1509",
@@ -2323,7 +2854,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قلين",
+   "pcodes": [
+    "EG1509"
+   ]
   },
   {
    "pcode": "EG1510",
@@ -2338,7 +2873,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز مطوبس",
+   "pcodes": [
+    "EG1510"
+   ]
   },
   {
    "pcode": "EG1511",
@@ -2353,7 +2892,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الحامول",
+   "pcodes": [
+    "EG1511"
+   ]
   },
   {
    "pcode": "EG1512",
@@ -2368,7 +2911,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الرياض",
+   "pcodes": [
+    "EG1512"
+   ]
   },
   {
    "pcode": "EG1601",
@@ -2383,7 +2930,8 @@
    "parent": "طنطا",
    "parent_pcode": "EG1603",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم أول طنطا"
   },
   {
    "pcode": "EG1602",
@@ -2398,7 +2946,8 @@
    "parent": "طنطا",
    "parent_pcode": "EG1603",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان طنطا"
   },
   {
    "pcode": "EG1603",
@@ -2413,7 +2962,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز طنطا",
+   "pcodes": [
+    "EG1603"
+   ]
   },
   {
    "pcode": "EG1604",
@@ -2428,7 +2981,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز السنطة",
+   "pcodes": [
+    "EG1604"
+   ]
   },
   {
    "pcode": "EG1605",
@@ -2443,7 +3000,8 @@
    "parent": "المحلة الكبرى",
    "parent_pcode": "EG1607",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم أول المحلة الكبرى"
   },
   {
    "pcode": "EG1606",
@@ -2458,7 +3016,8 @@
    "parent": "المحلة الكبرى",
    "parent_pcode": "EG1607",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان المحلة الكبرى"
   },
   {
    "pcode": "EG1607",
@@ -2473,7 +3032,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المحله الكبرى",
+   "pcodes": [
+    "EG1607"
+   ]
   },
   {
    "pcode": "EG1608",
@@ -2488,7 +3051,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بسيون",
+   "pcodes": [
+    "EG1608"
+   ]
   },
   {
    "pcode": "EG1609",
@@ -2503,7 +3070,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز زفتى",
+   "pcodes": [
+    "EG1609"
+   ]
   },
   {
    "pcode": "EG1610",
@@ -2518,7 +3089,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سمنود",
+   "pcodes": [
+    "EG1610"
+   ]
   },
   {
    "pcode": "EG1611",
@@ -2533,7 +3108,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قطور",
+   "pcodes": [
+    "EG1611"
+   ]
   },
   {
    "pcode": "EG1612",
@@ -2548,7 +3127,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كفر الزيات",
+   "pcodes": [
+    "EG1612"
+   ]
   },
   {
    "pcode": "EG1701",
@@ -2563,7 +3146,8 @@
    "parent": "شبين الكوم",
    "parent_pcode": "EG1702",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم شبين الكوم"
   },
   {
    "pcode": "EG1702",
@@ -2578,7 +3162,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز شبين الكوم",
+   "pcodes": [
+    "EG1702"
+   ]
   },
   {
    "pcode": "EG1703",
@@ -2593,7 +3181,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أشمون",
+   "pcodes": [
+    "EG1703"
+   ]
   },
   {
    "pcode": "EG1704",
@@ -2608,7 +3200,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الباجور",
+   "pcodes": [
+    "EG1704"
+   ]
   },
   {
    "pcode": "EG1705",
@@ -2623,7 +3219,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الشهداء",
+   "pcodes": [
+    "EG1705"
+   ]
   },
   {
    "pcode": "EG1706",
@@ -2638,7 +3238,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بركة السبع",
+   "pcodes": [
+    "EG1706"
+   ]
   },
   {
    "pcode": "EG1707",
@@ -2653,7 +3257,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز تلا",
+   "pcodes": [
+    "EG1707"
+   ]
   },
   {
    "pcode": "EG1708",
@@ -2668,7 +3276,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قويسنا",
+   "pcodes": [
+    "EG1708"
+   ]
   },
   {
    "pcode": "EG1709",
@@ -2683,7 +3295,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز منوف",
+   "pcodes": [
+    "EG1709"
+   ]
   },
   {
    "pcode": "EG1710",
@@ -2698,7 +3314,8 @@
    "parent": "سرس الليانة",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم مدينة سرس الليانة"
   },
   {
    "pcode": "EG1711",
@@ -2713,7 +3330,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز السادات",
+   "pcodes": [
+    "EG1711"
+   ]
   },
   {
    "pcode": "EG1712",
@@ -2728,7 +3349,8 @@
    "parent": "منوف",
    "parent_pcode": "EG1709",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم مدينة منوف"
   },
   {
    "pcode": "EG1800",
@@ -2743,7 +3365,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG1801",
@@ -2758,7 +3381,8 @@
    "parent": "دمنهور",
    "parent_pcode": "EG1802",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم دمنهور"
   },
   {
    "pcode": "EG1802",
@@ -2773,7 +3397,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دمنهور",
+   "pcodes": [
+    "EG1802"
+   ]
   },
   {
    "pcode": "EG1803",
@@ -2788,7 +3416,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ابوالمطامير",
+   "pcodes": [
+    "EG1803"
+   ]
   },
   {
    "pcode": "EG1804",
@@ -2803,7 +3435,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ابوحمص",
+   "pcodes": [
+    "EG1804"
+   ]
   },
   {
    "pcode": "EG1805",
@@ -2818,7 +3454,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الدلنجات",
+   "pcodes": [
+    "EG1805"
+   ]
   },
   {
    "pcode": "EG1806",
@@ -2833,7 +3473,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المحمودية",
+   "pcodes": [
+    "EG1806"
+   ]
   },
   {
    "pcode": "EG1807",
@@ -2848,7 +3492,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز إيتاى البارود",
+   "pcodes": [
+    "EG1807"
+   ]
   },
   {
    "pcode": "EG1808",
@@ -2863,7 +3511,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز حوش عيسى",
+   "pcodes": [
+    "EG1808"
+   ]
   },
   {
    "pcode": "EG1809",
@@ -2878,7 +3530,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز رشيد",
+   "pcodes": [
+    "EG1809"
+   ]
   },
   {
    "pcode": "EG1810",
@@ -2893,7 +3549,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز شبراخيت",
+   "pcodes": [
+    "EG1810"
+   ]
   },
   {
    "pcode": "EG1811",
@@ -2908,7 +3568,8 @@
    "parent": "كفرالدوار",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم كفرالدوار"
   },
   {
    "pcode": "EG1812",
@@ -2923,7 +3584,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كفر الدوار",
+   "pcodes": [
+    "EG1812"
+   ]
   },
   {
    "pcode": "EG1813",
@@ -2938,7 +3603,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كوم حمادة",
+   "pcodes": [
+    "EG1813"
+   ]
   },
   {
    "pcode": "EG1814",
@@ -2953,7 +3622,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز وادى النطرون",
+   "pcodes": [
+    "EG1814"
+   ]
   },
   {
    "pcode": "EG1815",
@@ -2968,7 +3641,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الرحمانية",
+   "pcodes": [
+    "EG1815"
+   ]
   },
   {
    "pcode": "EG1816",
@@ -2983,7 +3660,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز إدكو",
+   "pcodes": [
+    "EG1816"
+   ]
   },
   {
    "pcode": "EG1817",
@@ -2998,7 +3679,8 @@
    "parent": "النوبارية",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم غرب النوبارية"
   },
   {
    "pcode": "EG1818",
@@ -3013,7 +3695,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بدر",
+   "pcodes": [
+    "EG1818"
+   ]
   },
   {
    "pcode": "EG1901",
@@ -3028,7 +3714,8 @@
    "parent": "الاسماعيلية",
    "parent_pcode": "EG1904",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم أول الاسماعيلية"
   },
   {
    "pcode": "EG1902",
@@ -3043,7 +3730,8 @@
    "parent": "الاسماعيلية",
    "parent_pcode": "EG1904",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان الاسماعيلية"
   },
   {
    "pcode": "EG1903",
@@ -3058,7 +3746,8 @@
    "parent": "الاسماعيلية",
    "parent_pcode": "EG1904",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثالث الاسماعيلية"
   },
   {
    "pcode": "EG1904",
@@ -3073,7 +3762,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الاسماعيلية",
+   "pcodes": [
+    "EG1904"
+   ]
   },
   {
    "pcode": "EG1905",
@@ -3088,7 +3781,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز التل الكبير",
+   "pcodes": [
+    "EG1905"
+   ]
   },
   {
    "pcode": "EG1906",
@@ -3103,7 +3800,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز القنطرة",
+   "pcodes": [
+    "EG1906"
+   ]
   },
   {
    "pcode": "EG1907",
@@ -3118,7 +3819,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز فايد",
+   "pcodes": [
+    "EG1907"
+   ]
   },
   {
    "pcode": "EG1908",
@@ -3133,7 +3838,8 @@
    "parent": "القنطرة",
    "parent_pcode": "EG1906",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم القنطرة شرق"
   },
   {
    "pcode": "EG2100",
@@ -3148,7 +3854,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG2101",
@@ -3158,12 +3865,17 @@
    "name_en_source": "Imbaba",
    "lat": 30.08320418,
    "lng": 31.21038139,
-   "type": "district",
+   "type": "city",
    "name_ar": "امبابه",
-   "parent": "امبابه",
-   "parent_pcode": "EG2113",
-   "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "parent": null,
+   "parent_pcode": null,
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG2101، EG2113",
+   "review": false,
+   "name_official": "قسم امبابه",
+   "pcodes": [
+    "EG2101",
+    "EG2113"
+   ]
   },
   {
    "pcode": "EG2102",
@@ -3173,12 +3885,16 @@
    "name_en_source": "Al-Aguza",
    "lat": 30.05898821,
    "lng": 31.20432519,
-   "type": "district",
+   "type": "city",
    "name_ar": "العجوزة",
-   "parent": "العجوزة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم العجوزة",
+   "pcodes": [
+    "EG2102"
+   ]
   },
   {
    "pcode": "EG2103",
@@ -3188,12 +3904,16 @@
    "name_en_source": "DuqqI",
    "lat": 30.04242001,
    "lng": 31.20822266,
-   "type": "district",
+   "type": "city",
    "name_ar": "الدقي",
-   "parent": "الدقي",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الدقي",
+   "pcodes": [
+    "EG2103"
+   ]
   },
   {
    "pcode": "EG2104",
@@ -3203,12 +3923,17 @@
    "name_en_source": "Giza",
    "lat": 29.99947746,
    "lng": 31.21578804,
-   "type": "district",
+   "type": "city",
    "name_ar": "الجيزة",
-   "parent": "الجيزة",
-   "parent_pcode": "EG2109",
-   "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "parent": null,
+   "parent_pcode": null,
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG2104، EG2109",
+   "review": false,
+   "name_official": "قسم الجيزة",
+   "pcodes": [
+    "EG2104",
+    "EG2109"
+   ]
   },
   {
    "pcode": "EG2105",
@@ -3218,12 +3943,16 @@
    "name_en_source": "Bulaq Al-DakrUr",
    "lat": 30.03027274,
    "lng": 31.19001934,
-   "type": "district",
+   "type": "city",
    "name_ar": "بولاق الدكرور",
-   "parent": "بولاق الدكرور",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم بولاق الدكرور",
+   "pcodes": [
+    "EG2105"
+   ]
   },
   {
    "pcode": "EG2106",
@@ -3233,12 +3962,16 @@
    "name_en_source": "Al-Ahram",
    "lat": 29.99021265,
    "lng": 31.13634936,
-   "type": "district",
+   "type": "city",
    "name_ar": "الأهرام",
-   "parent": "الأهرام",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الأهرام",
+   "pcodes": [
+    "EG2106"
+   ]
   },
   {
    "pcode": "EG2107",
@@ -3248,12 +3981,17 @@
    "name_en_source": "6 October-1",
    "lat": 29.98537796,
    "lng": 30.96284219,
-   "type": "district",
-   "name_ar": "أول 6 أكتوبر",
-   "parent": "6 أكتوبر",
+   "type": "city",
+   "name_ar": "6 أكتوبر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG2107، EG2121",
+   "review": false,
+   "name_official": "قسم أول 6 أكتوبر",
+   "pcodes": [
+    "EG2107",
+    "EG2121"
+   ]
   },
   {
    "pcode": "EG2108",
@@ -3263,12 +4001,16 @@
    "name_en_source": "Hwamdeia",
    "lat": 29.90225318,
    "lng": 31.25279833,
-   "type": "district",
+   "type": "city",
    "name_ar": "الحوامدية",
-   "parent": "الحوامدية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الحوامدية",
+   "pcodes": [
+    "EG2108"
+   ]
   },
   {
    "pcode": "EG2109",
@@ -3282,8 +4024,13 @@
    "name_ar": "الجيزة",
    "parent": null,
    "parent_pcode": null,
-   "rule": "مركز ← مدينة",
-   "review": false
+   "rule": "مركز ← مدينة — مدموجة: EG2104، EG2109",
+   "review": false,
+   "name_official": "مركز الجيزة",
+   "pcodes": [
+    "EG2104",
+    "EG2109"
+   ]
   },
   {
    "pcode": "EG2110",
@@ -3298,7 +4045,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز البدرشين",
+   "pcodes": [
+    "EG2110"
+   ]
   },
   {
    "pcode": "EG2111",
@@ -3313,7 +4064,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الصف",
+   "pcodes": [
+    "EG2111"
+   ]
   },
   {
    "pcode": "EG2112",
@@ -3328,7 +4083,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز العياط",
+   "pcodes": [
+    "EG2112"
+   ]
   },
   {
    "pcode": "EG2113",
@@ -3342,8 +4101,13 @@
    "name_ar": "إمبابة",
    "parent": null,
    "parent_pcode": null,
-   "rule": "مركز ← مدينة",
-   "review": false
+   "rule": "مركز ← مدينة — مدموجة: EG2101، EG2113",
+   "review": false,
+   "name_official": "مركز إمبابة",
+   "pcodes": [
+    "EG2101",
+    "EG2113"
+   ]
   },
   {
    "pcode": "EG2114",
@@ -3353,12 +4117,16 @@
    "name_en_source": "Bahariya Oasis",
    "lat": 28.45212855,
    "lng": 28.8363314,
-   "type": "district",
+   "type": "city",
    "name_ar": "الواحاتالبحرية",
-   "parent": "الواحاتالبحرية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الواحاتالبحرية",
+   "pcodes": [
+    "EG2114"
+   ]
   },
   {
    "pcode": "EG2115",
@@ -3373,7 +4141,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أطفيح",
+   "pcodes": [
+    "EG2115"
+   ]
   },
   {
    "pcode": "EG2116",
@@ -3388,7 +4160,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أوسيم",
+   "pcodes": [
+    "EG2116"
+   ]
   },
   {
    "pcode": "EG2117",
@@ -3398,12 +4174,16 @@
    "name_en_source": "Waraq",
    "lat": 30.09681417,
    "lng": 31.18925128,
-   "type": "district",
+   "type": "city",
    "name_ar": "الوراق",
-   "parent": "الوراق",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الوراق",
+   "pcodes": [
+    "EG2117"
+   ]
   },
   {
    "pcode": "EG2118",
@@ -3413,12 +4193,16 @@
    "name_en_source": "Umraniyya",
    "lat": 29.99289058,
    "lng": 31.17743212,
-   "type": "district",
+   "type": "city",
    "name_ar": "العمرانية",
-   "parent": "العمرانية",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم العمرانية",
+   "pcodes": [
+    "EG2118"
+   ]
   },
   {
    "pcode": "EG2119",
@@ -3428,12 +4212,16 @@
    "name_en_source": "Shaykh Zayed",
    "lat": 30.04898325,
    "lng": 30.97796329,
-   "type": "district",
+   "type": "city",
    "name_ar": "الشيخ زايد",
-   "parent": "الشيخ زايد",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الشيخ زايد",
+   "pcodes": [
+    "EG2119"
+   ]
   },
   {
    "pcode": "EG2120",
@@ -3448,7 +4236,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كرداسة",
+   "pcodes": [
+    "EG2120"
+   ]
   },
   {
    "pcode": "EG2121",
@@ -3458,12 +4250,17 @@
    "name_en_source": "6 October-2",
    "lat": 29.94085955,
    "lng": 30.90785168,
-   "type": "district",
-   "name_ar": "ثان 6 أكتوبر",
-   "parent": "6 أكتوبر",
+   "type": "city",
+   "name_ar": "6 أكتوبر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي داخل مدينة موجودة",
-   "review": false
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG2107، EG2121",
+   "review": false,
+   "name_official": "قسم ثان 6 أكتوبر",
+   "pcodes": [
+    "EG2107",
+    "EG2121"
+   ]
   },
   {
    "pcode": "EG2200",
@@ -3478,7 +4275,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG2201",
@@ -3493,7 +4291,8 @@
    "parent": "بنى سويف",
    "parent_pcode": "EG2202",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم بنى سويف"
   },
   {
    "pcode": "EG2202",
@@ -3508,7 +4307,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بنى سويف",
+   "pcodes": [
+    "EG2202"
+   ]
   },
   {
    "pcode": "EG2203",
@@ -3523,7 +4326,8 @@
    "parent": "بنى سويف الجديدة",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم مدينة بنى سويف الجديدة"
   },
   {
    "pcode": "EG2204",
@@ -3538,7 +4342,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الفشن",
+   "pcodes": [
+    "EG2204"
+   ]
   },
   {
    "pcode": "EG2205",
@@ -3553,7 +4361,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الواسطى",
+   "pcodes": [
+    "EG2205"
+   ]
   },
   {
    "pcode": "EG2206",
@@ -3568,7 +4380,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أهناسيا",
+   "pcodes": [
+    "EG2206"
+   ]
   },
   {
    "pcode": "EG2207",
@@ -3583,7 +4399,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ببا",
+   "pcodes": [
+    "EG2207"
+   ]
   },
   {
    "pcode": "EG2208",
@@ -3598,7 +4418,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سمسطا",
+   "pcodes": [
+    "EG2208"
+   ]
   },
   {
    "pcode": "EG2209",
@@ -3613,7 +4437,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ناصر",
+   "pcodes": [
+    "EG2209"
+   ]
   },
   {
    "pcode": "EG2300",
@@ -3628,7 +4456,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG2301",
@@ -3643,7 +4472,8 @@
    "parent": "الفيوم",
    "parent_pcode": "EG2302",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم الفيوم"
   },
   {
    "pcode": "EG2302",
@@ -3658,7 +4488,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الفيوم",
+   "pcodes": [
+    "EG2302"
+   ]
   },
   {
    "pcode": "EG2303",
@@ -3673,7 +4507,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أبشواى",
+   "pcodes": [
+    "EG2303"
+   ]
   },
   {
    "pcode": "EG2304",
@@ -3688,7 +4526,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أطسا",
+   "pcodes": [
+    "EG2304"
+   ]
   },
   {
    "pcode": "EG2305",
@@ -3703,7 +4545,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سنورس",
+   "pcodes": [
+    "EG2305"
+   ]
   },
   {
    "pcode": "EG2306",
@@ -3718,7 +4564,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز طامية",
+   "pcodes": [
+    "EG2306"
+   ]
   },
   {
    "pcode": "EG2307",
@@ -3733,7 +4583,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز يوسف الصديق",
+   "pcodes": [
+    "EG2307"
+   ]
   },
   {
    "pcode": "EG2308",
@@ -3748,7 +4602,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة الفيوم الجديدة",
+   "pcodes": [
+    "EG2308"
+   ]
   },
   {
    "pcode": "EG2400",
@@ -3763,7 +4621,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG2401",
@@ -3778,7 +4637,8 @@
    "parent": "المنيا",
    "parent_pcode": "EG2402",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم المنيا"
   },
   {
    "pcode": "EG2402",
@@ -3793,7 +4653,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المنيا",
+   "pcodes": [
+    "EG2402"
+   ]
   },
   {
    "pcode": "EG2403",
@@ -3808,7 +4672,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة المنيا الجديدة",
+   "pcodes": [
+    "EG2403"
+   ]
   },
   {
    "pcode": "EG2404",
@@ -3823,7 +4691,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ابو قرقاص",
+   "pcodes": [
+    "EG2404"
+   ]
   },
   {
    "pcode": "EG2405",
@@ -3838,7 +4710,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز العدوة",
+   "pcodes": [
+    "EG2405"
+   ]
   },
   {
    "pcode": "EG2406",
@@ -3853,7 +4729,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز بنى مزار",
+   "pcodes": [
+    "EG2406"
+   ]
   },
   {
    "pcode": "EG2407",
@@ -3868,7 +4748,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دير مواس",
+   "pcodes": [
+    "EG2407"
+   ]
   },
   {
    "pcode": "EG2408",
@@ -3883,7 +4767,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سمالوط",
+   "pcodes": [
+    "EG2408"
+   ]
   },
   {
    "pcode": "EG2409",
@@ -3898,7 +4786,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز مطاى",
+   "pcodes": [
+    "EG2409"
+   ]
   },
   {
    "pcode": "EG2410",
@@ -3913,7 +4805,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز مغاغة",
+   "pcodes": [
+    "EG2410"
+   ]
   },
   {
    "pcode": "EG2411",
@@ -3928,7 +4824,8 @@
    "parent": "ملوى",
    "parent_pcode": "EG2412",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ملوى"
   },
   {
    "pcode": "EG2412",
@@ -3943,7 +4840,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ملوى",
+   "pcodes": [
+    "EG2412"
+   ]
   },
   {
    "pcode": "EG2500",
@@ -3958,7 +4859,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "صحراء أسيوط"
   },
   {
    "pcode": "EG2501",
@@ -3973,7 +4875,8 @@
    "parent": "أسيوط",
    "parent_pcode": "EG2503",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم أول أسيوط"
   },
   {
    "pcode": "EG2502",
@@ -3988,7 +4891,8 @@
    "parent": "أسيوط",
    "parent_pcode": "EG2503",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان أسيوط"
   },
   {
    "pcode": "EG2503",
@@ -4003,7 +4907,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أسيوط",
+   "pcodes": [
+    "EG2503"
+   ]
   },
   {
    "pcode": "EG2504",
@@ -4018,7 +4926,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أبنوب",
+   "pcodes": [
+    "EG2504"
+   ]
   },
   {
    "pcode": "EG2505",
@@ -4033,7 +4945,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة — تصحيح مسافات: «مركز أبوتيج» ← «مركز أبو تيج»",
-   "review": true
+   "review": true,
+   "name_official": "مركز أبو تيج",
+   "pcodes": [
+    "EG2505"
+   ]
   },
   {
    "pcode": "EG2506",
@@ -4048,7 +4964,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز البدارى",
+   "pcodes": [
+    "EG2506"
+   ]
   },
   {
    "pcode": "EG2507",
@@ -4063,7 +4983,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ساحل سليم",
+   "pcodes": [
+    "EG2507"
+   ]
   },
   {
    "pcode": "EG2508",
@@ -4078,7 +5002,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الغنايم",
+   "pcodes": [
+    "EG2508"
+   ]
   },
   {
    "pcode": "EG2509",
@@ -4093,7 +5021,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز القوصية",
+   "pcodes": [
+    "EG2509"
+   ]
   },
   {
    "pcode": "EG2510",
@@ -4108,7 +5040,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ديروط",
+   "pcodes": [
+    "EG2510"
+   ]
   },
   {
    "pcode": "EG2511",
@@ -4123,7 +5059,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز صدفا",
+   "pcodes": [
+    "EG2511"
+   ]
   },
   {
    "pcode": "EG2512",
@@ -4138,7 +5078,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز منفلوط",
+   "pcodes": [
+    "EG2512"
+   ]
   },
   {
    "pcode": "EG2513",
@@ -4153,7 +5097,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الفتح",
+   "pcodes": [
+    "EG2513"
+   ]
   },
   {
    "pcode": "EG2514",
@@ -4168,7 +5116,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة اسيوط الجديدة",
+   "pcodes": [
+    "EG2514"
+   ]
   },
   {
    "pcode": "EG2600",
@@ -4183,7 +5135,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "صحراء سوهاج"
   },
   {
    "pcode": "EG2601",
@@ -4198,7 +5151,8 @@
    "parent": "سوهاج",
    "parent_pcode": "EG2603",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم اول سوهاج"
   },
   {
    "pcode": "EG2602",
@@ -4213,7 +5167,8 @@
    "parent": "سوهاج",
    "parent_pcode": "EG2603",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم ثان سوهاج"
   },
   {
    "pcode": "EG2603",
@@ -4228,7 +5183,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سوهاج",
+   "pcodes": [
+    "EG2603"
+   ]
   },
   {
    "pcode": "EG2604",
@@ -4243,7 +5202,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أخميم",
+   "pcodes": [
+    "EG2604"
+   ]
   },
   {
    "pcode": "EG2605",
@@ -4258,7 +5221,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز البلينا",
+   "pcodes": [
+    "EG2605"
+   ]
   },
   {
    "pcode": "EG2606",
@@ -4273,7 +5240,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المراغة",
+   "pcodes": [
+    "EG2606"
+   ]
   },
   {
    "pcode": "EG2607",
@@ -4288,7 +5259,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز المنشأة",
+   "pcodes": [
+    "EG2607"
+   ]
   },
   {
    "pcode": "EG2608",
@@ -4303,7 +5278,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دار السلام",
+   "pcodes": [
+    "EG2608"
+   ]
   },
   {
    "pcode": "EG2609",
@@ -4318,7 +5297,8 @@
    "parent": "جرجا",
    "parent_pcode": "EG2610",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم جرجا"
   },
   {
    "pcode": "EG2610",
@@ -4333,7 +5313,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز جرجا",
+   "pcodes": [
+    "EG2610"
+   ]
   },
   {
    "pcode": "EG2611",
@@ -4348,7 +5332,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز جهينة الغربية",
+   "pcodes": [
+    "EG2611"
+   ]
   },
   {
    "pcode": "EG2612",
@@ -4363,7 +5351,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز ساقلته",
+   "pcodes": [
+    "EG2612"
+   ]
   },
   {
    "pcode": "EG2613",
@@ -4378,7 +5370,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز طما",
+   "pcodes": [
+    "EG2613"
+   ]
   },
   {
    "pcode": "EG2614",
@@ -4393,7 +5389,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز طهطا",
+   "pcodes": [
+    "EG2614"
+   ]
   },
   {
    "pcode": "EG2615",
@@ -4408,7 +5408,8 @@
    "parent": "طهطا",
    "parent_pcode": "EG2614",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم طهطا"
   },
   {
    "pcode": "EG2616",
@@ -4423,7 +5424,8 @@
    "parent": "الكوثر",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم الكوثر"
   },
   {
    "pcode": "EG2617",
@@ -4438,7 +5440,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز العسيرات",
+   "pcodes": [
+    "EG2617"
+   ]
   },
   {
    "pcode": "EG2618",
@@ -4453,7 +5459,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة أخميم الجديدة",
+   "pcodes": [
+    "EG2618"
+   ]
   },
   {
    "pcode": "EG2619",
@@ -4468,7 +5478,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة سوهاج الجديدة",
+   "pcodes": [
+    "EG2619"
+   ]
   },
   {
    "pcode": "EG2700",
@@ -4483,7 +5497,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "صحراء قنا"
   },
   {
    "pcode": "EG2701",
@@ -4498,7 +5513,8 @@
    "parent": "قنا",
    "parent_pcode": "EG2702",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم قنا"
   },
   {
    "pcode": "EG2702",
@@ -4513,7 +5529,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قنا",
+   "pcodes": [
+    "EG2702"
+   ]
   },
   {
    "pcode": "EG2703",
@@ -4528,7 +5548,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أبو طشت",
+   "pcodes": [
+    "EG2703"
+   ]
   },
   {
    "pcode": "EG2704",
@@ -4543,7 +5567,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أرمنت",
+   "pcodes": [
+    "EG2704"
+   ]
   },
   {
    "pcode": "EG2705",
@@ -4558,7 +5586,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز إسنا",
+   "pcodes": [
+    "EG2705"
+   ]
   },
   {
    "pcode": "EG2706",
@@ -4573,7 +5605,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دشنا",
+   "pcodes": [
+    "EG2706"
+   ]
   },
   {
    "pcode": "EG2707",
@@ -4588,7 +5624,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قوص",
+   "pcodes": [
+    "EG2707"
+   ]
   },
   {
    "pcode": "EG2708",
@@ -4603,7 +5643,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز نجع حمادى",
+   "pcodes": [
+    "EG2708"
+   ]
   },
   {
    "pcode": "EG2709",
@@ -4618,7 +5662,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز نقادة",
+   "pcodes": [
+    "EG2709"
+   ]
   },
   {
    "pcode": "EG2710",
@@ -4633,7 +5681,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز فرشوط",
+   "pcodes": [
+    "EG2710"
+   ]
   },
   {
    "pcode": "EG2711",
@@ -4648,7 +5700,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز قفط",
+   "pcodes": [
+    "EG2711"
+   ]
   },
   {
    "pcode": "EG2712",
@@ -4663,7 +5719,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الوقف",
+   "pcodes": [
+    "EG2712"
+   ]
   },
   {
    "pcode": "EG2713",
@@ -4678,7 +5738,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة قنا الجديدة",
+   "pcodes": [
+    "EG2713"
+   ]
   },
   {
    "pcode": "EG2800",
@@ -4693,7 +5757,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG2801",
@@ -4708,7 +5773,8 @@
    "parent": "أسوان",
    "parent_pcode": "EG2802",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم أسوان"
   },
   {
    "pcode": "EG2802",
@@ -4723,7 +5789,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أسوان",
+   "pcodes": [
+    "EG2802"
+   ]
   },
   {
    "pcode": "EG2803",
@@ -4738,7 +5808,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أدفو",
+   "pcodes": [
+    "EG2803"
+   ]
   },
   {
    "pcode": "EG2804",
@@ -4753,7 +5827,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز كوم امبو",
+   "pcodes": [
+    "EG2804"
+   ]
   },
   {
    "pcode": "EG2805",
@@ -4768,7 +5846,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز نصر",
+   "pcodes": [
+    "EG2805"
+   ]
   },
   {
    "pcode": "EG2806",
@@ -4783,7 +5865,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز دراو",
+   "pcodes": [
+    "EG2806"
+   ]
   },
   {
    "pcode": "EG2807",
@@ -4798,7 +5884,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز أبوسنبل",
+   "pcodes": [
+    "EG2807"
+   ]
   },
   {
    "pcode": "EG2808",
@@ -4813,7 +5903,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة أسوان الجديدة",
+   "pcodes": [
+    "EG2808"
+   ]
   },
   {
    "pcode": "EG2809",
@@ -4828,7 +5922,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مدينة جديدة ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مدينة توشكى الجديدة",
+   "pcodes": [
+    "EG2809"
+   ]
   },
   {
    "pcode": "EG2900",
@@ -4843,7 +5941,8 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "منطقة غير سكنية/إدارية: استبعاد مقترح",
-   "review": true
+   "review": true,
+   "name_official": "خارج الزمام"
   },
   {
    "pcode": "EG2901",
@@ -4858,7 +5957,8 @@
    "parent": "الأقصر",
    "parent_pcode": "EG2902",
    "rule": "قسم ← حي داخل مدينة المركز",
-   "review": false
+   "review": false,
+   "name_official": "قسم الأقصر"
   },
   {
    "pcode": "EG2902",
@@ -4873,7 +5973,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الأقصر",
+   "pcodes": [
+    "EG2902"
+   ]
   },
   {
    "pcode": "EG2903",
@@ -4888,7 +5992,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز شرطة طيبة",
+   "pcodes": [
+    "EG2903"
+   ]
   },
   {
    "pcode": "EG3101",
@@ -4898,12 +6006,17 @@
    "name_en_source": "Hurghada 1",
    "lat": 27.12888189,
    "lng": 33.24391464,
-   "type": "district",
-   "name_ar": "أول الغردقة",
-   "parent": "الغردقة",
+   "type": "city",
+   "name_ar": "الغردقة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG3101، EG3108",
+   "review": false,
+   "name_official": "قسم أول الغردقة",
+   "pcodes": [
+    "EG3101",
+    "EG3108"
+   ]
   },
   {
    "pcode": "EG3102",
@@ -4913,12 +6026,16 @@
    "name_en_source": "Qusir",
    "lat": 25.95669031,
    "lng": 33.95052207,
-   "type": "district",
+   "type": "city",
    "name_ar": "القصير",
-   "parent": "القصير",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم القصير",
+   "pcodes": [
+    "EG3102"
+   ]
   },
   {
    "pcode": "EG3103",
@@ -4928,12 +6045,16 @@
    "name_en_source": "Safaga",
    "lat": 26.73173007,
    "lng": 33.46049466,
-   "type": "district",
+   "type": "city",
    "name_ar": "سفاجا",
-   "parent": "سفاجا",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم سفاجا",
+   "pcodes": [
+    "EG3103"
+   ]
   },
   {
    "pcode": "EG3104",
@@ -4943,12 +6064,16 @@
    "name_en_source": "Marsa Alam",
    "lat": 24.70693152,
    "lng": 34.28558673,
-   "type": "district",
+   "type": "city",
    "name_ar": "مرسى علم",
-   "parent": "مرسى علم",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم مرسى علم",
+   "pcodes": [
+    "EG3104"
+   ]
   },
   {
    "pcode": "EG3105",
@@ -4958,12 +6083,16 @@
    "name_en_source": "Ras Gharib",
    "lat": 28.50629722,
    "lng": 32.37696766,
-   "type": "district",
+   "type": "city",
    "name_ar": "رأس غارب",
-   "parent": "رأس غارب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم رأس غارب",
+   "pcodes": [
+    "EG3105"
+   ]
   },
   {
    "pcode": "EG3106",
@@ -4973,12 +6102,16 @@
    "name_en_source": "Shallatin",
    "lat": 23.07920343,
    "lng": 34.57402392,
-   "type": "district",
+   "type": "city",
    "name_ar": "شلاتين",
-   "parent": "شلاتين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم شلاتين",
+   "pcodes": [
+    "EG3106"
+   ]
   },
   {
    "pcode": "EG3107",
@@ -4988,12 +6121,16 @@
    "name_en_source": "Halayib",
    "lat": 22.38566907,
    "lng": 35.99967792,
-   "type": "district",
+   "type": "city",
    "name_ar": "حلايب",
-   "parent": "حلايب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم حلايب",
+   "pcodes": [
+    "EG3107"
+   ]
   },
   {
    "pcode": "EG3108",
@@ -5003,12 +6140,17 @@
    "name_en_source": "Hurghada 2",
    "lat": 27.74455516,
    "lng": 33.08031549,
-   "type": "district",
-   "name_ar": "ثان الغردقة",
-   "parent": "الغردقة",
+   "type": "city",
+   "name_ar": "الغردقة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG3101، EG3108",
+   "review": false,
+   "name_official": "قسم ثان الغردقة",
+   "pcodes": [
+    "EG3101",
+    "EG3108"
+   ]
   },
   {
    "pcode": "EG3201",
@@ -5023,7 +6165,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الواحات الخارجة",
+   "pcodes": [
+    "EG3201"
+   ]
   },
   {
    "pcode": "EG3202",
@@ -5038,7 +6184,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الوحات الداخلة",
+   "pcodes": [
+    "EG3202"
+   ]
   },
   {
    "pcode": "EG3203",
@@ -5053,7 +6203,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الفرافرة",
+   "pcodes": [
+    "EG3203"
+   ]
   },
   {
    "pcode": "EG3204",
@@ -5068,7 +6222,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز باريس",
+   "pcodes": [
+    "EG3204"
+   ]
   },
   {
    "pcode": "EG3301",
@@ -5083,7 +6241,8 @@
    "parent": "مرسى مطروح",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم مرسى مطروح"
   },
   {
    "pcode": "EG3302",
@@ -5098,7 +6257,8 @@
    "parent": "الحمام",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم الحمام"
   },
   {
    "pcode": "EG3303",
@@ -5113,7 +6273,8 @@
    "parent": "السلوم",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم السلوم"
   },
   {
    "pcode": "EG3304",
@@ -5128,7 +6289,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز الضبعة",
+   "pcodes": [
+    "EG3304"
+   ]
   },
   {
    "pcode": "EG3305",
@@ -5143,7 +6308,8 @@
    "parent": "سيدى برانى",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم سيدى برانى"
   },
   {
    "pcode": "EG3306",
@@ -5158,7 +6324,11 @@
    "parent": null,
    "parent_pcode": null,
    "rule": "مركز ← مدينة",
-   "review": false
+   "review": false,
+   "name_official": "مركز سيوة",
+   "pcodes": [
+    "EG3306"
+   ]
   },
   {
    "pcode": "EG3307",
@@ -5173,7 +6343,8 @@
    "parent": "مارينا العلمين السياحية",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم مارينا العلمين السياحية"
   },
   {
    "pcode": "EG3308",
@@ -5188,7 +6359,8 @@
    "parent": "الساحل الشمالى-جزء",
    "parent_pcode": null,
    "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "review": true,
+   "name_official": "قسم الساحل الشمالى-جزء"
   },
   {
    "pcode": "EG3401",
@@ -5198,12 +6370,19 @@
    "name_en_source": "El Arish 1",
    "lat": 31.11980133,
    "lng": 33.82429875,
-   "type": "district",
-   "name_ar": "أول العريش",
-   "parent": "العريش",
+   "type": "city",
+   "name_ar": "العريش",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG3401، EG3402، EG3403، EG3404",
+   "review": false,
+   "name_official": "قسم أول العريش",
+   "pcodes": [
+    "EG3401",
+    "EG3402",
+    "EG3403",
+    "EG3404"
+   ]
   },
   {
    "pcode": "EG3402",
@@ -5213,12 +6392,19 @@
    "name_en_source": "El Arish 2",
    "lat": 31.09021853,
    "lng": 33.75084223,
-   "type": "district",
-   "name_ar": "ثان العريش",
-   "parent": "العريش",
+   "type": "city",
+   "name_ar": "العريش",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG3401، EG3402، EG3403، EG3404",
+   "review": false,
+   "name_official": "قسم ثان العريش",
+   "pcodes": [
+    "EG3401",
+    "EG3402",
+    "EG3403",
+    "EG3404"
+   ]
   },
   {
    "pcode": "EG3403",
@@ -5228,12 +6414,19 @@
    "name_en_source": "El Arish 3",
    "lat": 30.99502225,
    "lng": 33.77663353,
-   "type": "district",
-   "name_ar": "ثالث العريش",
-   "parent": "العريش",
+   "type": "city",
+   "name_ar": "العريش",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG3401، EG3402، EG3403، EG3404",
+   "review": false,
+   "name_official": "قسم ثالث العريش",
+   "pcodes": [
+    "EG3401",
+    "EG3402",
+    "EG3403",
+    "EG3404"
+   ]
   },
   {
    "pcode": "EG3404",
@@ -5243,12 +6436,19 @@
    "name_en_source": "El Arish 4",
    "lat": 30.85120336,
    "lng": 33.59570642,
-   "type": "district",
-   "name_ar": "رابع العريش",
-   "parent": "العريش",
+   "type": "city",
+   "name_ar": "العريش",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية) — مدموجة: EG3401، EG3402، EG3403، EG3404",
+   "review": false,
+   "name_official": "قسم رابع العريش",
+   "pcodes": [
+    "EG3401",
+    "EG3402",
+    "EG3403",
+    "EG3404"
+   ]
   },
   {
    "pcode": "EG3405",
@@ -5258,12 +6458,16 @@
    "name_en_source": "Bir Al-Abd",
    "lat": 30.69012049,
    "lng": 33.10158503,
-   "type": "district",
+   "type": "city",
    "name_ar": "بئر العبد",
-   "parent": "بئر العبد",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم بئر العبد",
+   "pcodes": [
+    "EG3405"
+   ]
   },
   {
    "pcode": "EG3406",
@@ -5273,12 +6477,16 @@
    "name_en_source": "Al-Hasna",
    "lat": 30.28825262,
    "lng": 33.54224018,
-   "type": "district",
+   "type": "city",
    "name_ar": "الحسنة",
-   "parent": "الحسنة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الحسنة",
+   "pcodes": [
+    "EG3406"
+   ]
   },
   {
    "pcode": "EG3407",
@@ -5288,12 +6496,16 @@
    "name_en_source": "Nakhl",
    "lat": 29.90919106,
    "lng": 34.02429967,
-   "type": "district",
+   "type": "city",
    "name_ar": "نخل",
-   "parent": "نخل",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم نخل",
+   "pcodes": [
+    "EG3407"
+   ]
   },
   {
    "pcode": "EG3408",
@@ -5303,12 +6515,16 @@
    "name_en_source": "Shaykh Zuwayd",
    "lat": 30.91792378,
    "lng": 33.97086931,
-   "type": "district",
+   "type": "city",
    "name_ar": "الشيخ زويد",
-   "parent": "الشيخ زويد",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الشيخ زويد",
+   "pcodes": [
+    "EG3408"
+   ]
   },
   {
    "pcode": "EG3409",
@@ -5318,12 +6534,16 @@
    "name_en_source": "Rafah",
    "lat": 31.08660233,
    "lng": 34.22684661,
-   "type": "district",
+   "type": "city",
    "name_ar": "رفح",
-   "parent": "رفح",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم رفح",
+   "pcodes": [
+    "EG3409"
+   ]
   },
   {
    "pcode": "EG3410",
@@ -5333,12 +6553,16 @@
    "name_en_source": "Rummana",
    "lat": 30.95660446,
    "lng": 32.69869741,
-   "type": "district",
+   "type": "city",
    "name_ar": "رمانة",
-   "parent": "رمانة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم رمانة",
+   "pcodes": [
+    "EG3410"
+   ]
   },
   {
    "pcode": "EG3411",
@@ -5348,12 +6572,16 @@
    "name_en_source": "Qasima",
    "lat": 30.46355984,
    "lng": 34.30095759,
-   "type": "district",
+   "type": "city",
    "name_ar": "القسيمة",
-   "parent": "القسيمة",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم القسيمة",
+   "pcodes": [
+    "EG3411"
+   ]
   },
   {
    "pcode": "EG3501",
@@ -5363,12 +6591,16 @@
    "name_en_source": "Al-Tur",
    "lat": 28.36472811,
    "lng": 33.75327612,
-   "type": "district",
+   "type": "city",
    "name_ar": "الطور",
-   "parent": "الطور",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم الطور",
+   "pcodes": [
+    "EG3501"
+   ]
   },
   {
    "pcode": "EG3502",
@@ -5378,12 +6610,16 @@
    "name_en_source": "Ras Sidr",
    "lat": 29.59933439,
    "lng": 33.31744279,
-   "type": "district",
+   "type": "city",
    "name_ar": "رأس سدر",
-   "parent": "رأس سدر",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم رأس سدر",
+   "pcodes": [
+    "EG3502"
+   ]
   },
   {
    "pcode": "EG3503",
@@ -5393,12 +6629,16 @@
    "name_en_source": "Abu Radis",
    "lat": 29.04939859,
    "lng": 33.59781529,
-   "type": "district",
+   "type": "city",
    "name_ar": "أبو رديس",
-   "parent": "أبو رديس",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم أبو رديس",
+   "pcodes": [
+    "EG3503"
+   ]
   },
   {
    "pcode": "EG3504",
@@ -5408,12 +6648,16 @@
    "name_en_source": "Sant Katrin",
    "lat": 28.65972175,
    "lng": 34.05176215,
-   "type": "district",
+   "type": "city",
    "name_ar": "سانت كاترين",
-   "parent": "سانت كاترين",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم سانت كاترين",
+   "pcodes": [
+    "EG3504"
+   ]
   },
   {
    "pcode": "EG3505",
@@ -5423,12 +6667,16 @@
    "name_en_source": "Sharm el-Sheikh",
    "lat": 28.07987961,
    "lng": 34.20279752,
-   "type": "district",
+   "type": "city",
    "name_ar": "شرم الشيخ",
-   "parent": "شرم الشيخ",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم شرم الشيخ",
+   "pcodes": [
+    "EG3505"
+   ]
   },
   {
    "pcode": "EG3506",
@@ -5438,12 +6686,16 @@
    "name_en_source": "Dahab",
    "lat": 28.73029145,
    "lng": 34.45078662,
-   "type": "district",
+   "type": "city",
    "name_ar": "دهب",
-   "parent": "دهب",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم دهب",
+   "pcodes": [
+    "EG3506"
+   ]
   },
   {
    "pcode": "EG3507",
@@ -5453,12 +6705,16 @@
    "name_en_source": "Nuweiba",
    "lat": 29.3137184,
    "lng": 34.311738,
-   "type": "district",
+   "type": "city",
    "name_ar": "نويبع",
-   "parent": "نويبع",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم نويبع",
+   "pcodes": [
+    "EG3507"
+   ]
   },
   {
    "pcode": "EG3508",
@@ -5468,12 +6724,16 @@
    "name_en_source": "Taba",
    "lat": 29.5007464,
    "lng": 34.84014165,
-   "type": "district",
+   "type": "city",
    "name_ar": "طابا",
-   "parent": "طابا",
+   "parent": null,
    "parent_pcode": null,
-   "rule": "قسم ← حي، والمدينة الأم جديدة (محافظة حضرية أو مدينة جديدة)",
-   "review": true
+   "rule": "قسم ← منطقة (محافظة حضرية)",
+   "review": false,
+   "name_official": "قسم طابا",
+   "pcodes": [
+    "EG3508"
+   ]
   }
  ],
  "existing_links": [
@@ -5486,14 +6746,14 @@
   {
    "city_id": 2,
    "name": "مدينة نصر",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0126، EG0127"
+   "pcode": "EG0126، EG0127",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 3,
    "name": "المعادي",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0104"
+   "pcode": "EG0104",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 4,
@@ -5504,26 +6764,26 @@
   {
    "city_id": 5,
    "name": "الزمالك",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0133"
+   "pcode": "EG0133",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 6,
    "name": "شبرا",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0119"
+   "pcode": "EG0119",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 7,
    "name": "عين شمس",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0130"
+   "pcode": "EG0130",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 8,
    "name": "حلوان",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0102"
+   "pcode": "EG0102",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 9,
@@ -5552,8 +6812,8 @@
   {
    "city_id": 13,
    "name": "المطرية",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0125"
+   "pcode": "EG0125",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 14,
@@ -5570,8 +6830,8 @@
   {
    "city_id": 16,
    "name": "الدقي",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG2103"
+   "pcode": "EG2103",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 17,
@@ -5588,14 +6848,14 @@
   {
    "city_id": 19,
    "name": "6 أكتوبر",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG2107، EG2121"
+   "pcode": "EG2107، EG2121",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 20,
    "name": "الشيخ زايد",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG2119"
+   "pcode": "EG2119",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 21,
@@ -5606,20 +6866,20 @@
   {
    "city_id": 22,
    "name": "إمبابة",
-   "pcode": "EG2113",
-   "note": "نفس اسم المركز"
+   "pcode": "EG2101، EG2113",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 23,
    "name": "المنتزه",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0201"
+   "pcode": "EG0201",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 24,
    "name": "سيدي جابر",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0203"
+   "pcode": "EG0203",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 25,
@@ -5636,8 +6896,8 @@
   {
    "city_id": 27,
    "name": "محرم بك",
-   "pcode": null,
-   "note": "مدينة أم لأقسام: EG0205"
+   "pcode": "EG0205",
+   "note": "نفس اسم المنطقة"
   },
   {
    "city_id": 28,

@@ -42,15 +42,39 @@ android {
             System.getenv("MAPS_API_KEY") ?: localProps.getProperty("MAPS_API_KEY", "")
     }
 
+    // Upload key from android/key.properties (not in git), or from the file
+    // named by WASLA_KEY_PROPERTIES: storeFile, storePassword, keyAlias,
+    // keyPassword. Without it a release build is signed with the debug key,
+    // which runs on a device but the Play Store rejects.
+    val keyPropsFile = System.getenv("WASLA_KEY_PROPERTIES")?.let { file(it) }
+        ?: rootProject.file("key.properties")
+    val keyProps = Properties()
+    if (keyPropsFile.exists()) keyPropsFile.inputStream().use { keyProps.load(it) }
+
+    signingConfigs {
+        if (keyPropsFile.exists()) {
+            create("upload") {
+                storeFile = file(keyProps.getProperty("storeFile"))
+                storePassword = keyProps.getProperty("storePassword")
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // Optimization: Obfuscate code and shrink resources for production
+            // Obfuscate code and shrink resources for production
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            
-            // TODO: Replace with production signing config before final store upload
-            signingConfig = signingConfigs.getByName("debug")
+
+            signingConfig = if (keyPropsFile.exists()) {
+                signingConfigs.getByName("upload")
+            } else {
+                logger.warn("wasla: no key.properties, release build signed with the debug key (not for the Play Store)")
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

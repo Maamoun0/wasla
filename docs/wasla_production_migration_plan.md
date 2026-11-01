@@ -92,6 +92,8 @@ When an account is purged 30 days after a deletion request, its payment transact
 
 Build with `--dart-define=SUPABASE_URL=...` and `--dart-define=SUPABASE_ANON_KEY=...` for the new project. Use the production `google-services.json` and `GoogleService-Info.plist`.
 
+**Android signing:** create the upload key once (`keytool -genkeypair -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000`), keep it outside the repository with a backup, and write `android/key.properties` (git-ignored) with `storeFile`, `storePassword`, `keyAlias`, `keyPassword`. CI can point `WASLA_KEY_PROPERTIES` at the file instead. Without it a release build falls back to the debug key and Gradle prints a warning; the Play Store rejects that build. Then `flutter build appbundle --release --dart-define=...`. iOS needs a Mac with Xcode and was not built here.
+
 ## 7. Crash reporting (Sentry)
 
 Off until a DSN is set, in each of the three places:

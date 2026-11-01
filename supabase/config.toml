@@ -126,6 +126,10 @@ enabled = false
 [functions.send-sms-hook]
 verify_jwt = false
 
+# Polled by uptime monitors without a JWT; returns no secrets.
+[functions.health]
+verify_jwt = false
+
 [functions.create-payment]
 verify_jwt = false
 

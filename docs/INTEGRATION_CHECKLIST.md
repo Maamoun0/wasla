@@ -153,6 +153,19 @@ MAPS_API_KEY=<KEY> flutter build apk --debug
 
 **النجاح:** على جهاز، دوس "تابع بـ Facebook". المفروض يتفتح Facebook، وبعد الموافقة ترجع للتطبيق وإنت داخل، ويطلع حساب جديد في Authentication ← Users بالـ provider `facebook`.
 
+## 8. المراقبة (NFR-3.1)
+
+| | |
+|---|---|
+| جاهز | دالة `health`: بترجع 200 لو قاعدة البيانات وStorage شغالين، و503 مع اسم الفحص اللي فشل لو لأ. من غير أي تفاصيل خطأ أو أسرار |
+| فين | أي خدمة uptime (UptimeRobot، Better Stack…) بتعمل GET على `https://<REF>.supabase.co/functions/v1/health` كل دقيقة، وتنبّه لو الرد مش 200 |
+| **محتاج قرارك** | تتبّع الأخطاء (Sentry) والتحليلات (PostHog). الاتنين محتاجين SDK جديد في التطبيق، وبيبعتوا بيانات لطرف تالت جديد، فمحتاجين موافقة واتفاقية معالجة بيانات وإضافة في جرد البيانات |
+
+```bash
+curl -s -o /dev/null -w "%{http_code}
+" https://<DEV_REF>.supabase.co/functions/v1/health
+```
+
 ---
 
 ## الحالة

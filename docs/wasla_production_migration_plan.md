@@ -35,6 +35,7 @@ Deploy with `supabase functions deploy <name> --project-ref <PROD_REF>`:
 - `purge-deleted-accounts`
 - `purge-kyc-documents`
 - `send-sms-hook` (with `--no-verify-jwt`; see §4)
+- `health` (with `--no-verify-jwt`): point an uptime monitor at `https://<PROD_REF>.supabase.co/functions/v1/health` (200 = database and Storage answer, 503 otherwise).
 
 ## 3. Secrets
 

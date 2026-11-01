@@ -219,7 +219,17 @@ class VerificationScreen extends ConsumerWidget {
           onCapture: () => controller.captureImage(2),
           onClear: () => controller.clearImage(2),
         );
-      case 3:
+      case selfieStep:
+        return _buildCaptureCard(
+          context: context,
+          title: 'صورة سيلفي',
+          subtitle: 'صوّر وشّك بوضوح في إضاءة كويسة، من غير نظارة شمس أو كمامة، عشان المراجع يقارنها بصورة البطاقة.',
+          file: state.selfieFile,
+          placeholderIcon: Icons.face_retouching_natural_outlined,
+          onCapture: () => controller.captureImage(selfieStep),
+          onClear: () => controller.clearImage(selfieStep),
+        );
+      case reviewStep:
         return _buildReviewStep(context, state);
       default:
         return const SizedBox.shrink();
@@ -464,6 +474,7 @@ class VerificationScreen extends ConsumerWidget {
         ),
         _buildReviewThumbnail(context, 'وجه البطاقة', state.frontIdFile),
         _buildReviewThumbnail(context, 'ظهر البطاقة', state.backIdFile),
+        _buildReviewThumbnail(context, 'السيلفي', state.selfieFile),
       ],
     );
   }
@@ -521,7 +532,7 @@ class VerificationScreen extends ConsumerWidget {
 
   // ── Progress indicator bar at the top ──
   Widget _buildProgressIndicator(BuildContext context, int currentStep) {
-    final steps = ['البيانات', 'وجه البطاقة', 'ظهر البطاقة', 'المراجعة'];
+    final steps = ['البيانات', 'وجه البطاقة', 'ظهر البطاقة', 'سيلفي', 'المراجعة'];
     return Container(
       color: AppColors.white,
       padding: const EdgeInsets.symmetric(vertical: AppSizes.md, horizontal: AppSizes.sm),
@@ -627,7 +638,7 @@ class VerificationScreen extends ConsumerWidget {
     VerificationController controller,
   ) {
     final currentStep = state.currentStep;
-    final isLastStep = currentStep == 3;
+    final isLastStep = currentStep == reviewStep;
 
     // Check if the current step has a valid file/input captured
     bool canProceed = false;
@@ -639,7 +650,9 @@ class VerificationScreen extends ConsumerWidget {
       canProceed = state.frontIdFile != null;
     } else if (currentStep == 2) {
       canProceed = state.backIdFile != null;
-    } else if (currentStep == 3) {
+    } else if (currentStep == selfieStep) {
+      canProceed = state.selfieFile != null;
+    } else if (currentStep == reviewStep) {
       canProceed = true;
     }
 

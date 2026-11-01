@@ -34,6 +34,7 @@ export interface SubmitKycDeps {
     user_id: string;
     document_url: string;
     document_back_url: string;
+    selfie_url: string;
     national_id_last4: string;
     national_id_hmac: string;
   }): Promise<void>;
@@ -127,7 +128,7 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
     return json({ error: "استقبال طلبات توثيق الهوية متوقف حالياً.", code: "kyc_disabled" }, 403);
   }
 
-  let body: { full_name?: unknown; national_id?: unknown; front_image?: unknown; back_image?: unknown };
+  let body: { full_name?: unknown; national_id?: unknown; front_image?: unknown; back_image?: unknown; selfie_image?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -144,6 +145,10 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   if (typeof body.front_image !== "string" || typeof body.back_image !== "string" || !body.front_image || !body.back_image) {
     return json({ error: "صور بطاقة الرقم القومي مطلوبة (الوجه والخلفية)" }, 400);
   }
+  // FR-1.4: a selfie for the moderator to compare with the card (no automatic face match).
+  if (typeof body.selfie_image !== "string" || !body.selfie_image) {
+    return json({ error: "صورة السيلفي مطلوبة" }, 400);
+  }
 
   if (await deps.hasPendingRequest(userId)) return json({ error: "لديك طلب تحقق قيد المراجعة بالفعل" }, 400);
 
@@ -152,9 +157,11 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
 
   let frontBytes: Uint8Array;
   let backBytes: Uint8Array;
+  let selfieBytes: Uint8Array;
   try {
     frontBytes = base64ToBytes(body.front_image);
     backBytes = base64ToBytes(body.back_image);
+    selfieBytes = base64ToBytes(body.selfie_image);
   } catch {
     return json({ error: "فشل فك تشفير الصور. يرجى التأكد من إرسال صيغة base64 صالحة." }, 400);
   }
@@ -162,19 +169,22 @@ export async function handleSubmitKyc(req: Request, deps: SubmitKycDeps): Promis
   const folder = `${userId}/kyc/${deps.now()}`;
   const frontPath = `${folder}/front.jpg`;
   const backPath = `${folder}/back.jpg`;
+  const selfiePath = `${folder}/selfie.jpg`;
   try {
     await deps.uploadDocument(frontPath, frontBytes);
     await deps.uploadDocument(backPath, backBytes);
+    await deps.uploadDocument(selfiePath, selfieBytes);
     await deps.createVerification({
       user_id: userId,
       document_url: frontPath,
       document_back_url: backPath,
+      selfie_url: selfiePath,
       national_id_last4: nationalId.slice(-4),
       national_id_hmac: hmac,
     });
   } catch (error) {
     // No request row means nobody will ever review or purge these images.
-    await deps.removeDocuments([frontPath, backPath]).catch(() => {});
+    await deps.removeDocuments([frontPath, backPath, selfiePath]).catch(() => {});
     // A concurrent request took the ID between the check and the insert.
     if (error instanceof DuplicateNationalIdError) return json({ error: NATIONAL_ID_REJECTED }, 400);
     throw error;

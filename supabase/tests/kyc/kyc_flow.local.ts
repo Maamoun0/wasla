@@ -37,7 +37,7 @@ const submit = (token: string, nationalId: string) =>
   new Request("http://local/submit-kyc-request", {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ full_name: "مستخدم تجريبي", national_id: nationalId, front_image: JPEG_B64, back_image: JPEG_B64 }),
+    body: JSON.stringify({ full_name: "مستخدم تجريبي", national_id: nationalId, front_image: JPEG_B64, back_image: JPEG_B64, selfie_image: JPEG_B64 }),
   });
 const ID_APPROVED = "29001011234567";
 const ID_REJECTED = "29502021234568";
@@ -86,7 +86,7 @@ Deno.test({
       assertEquals(requests?.length, 2);
       const req = (userId: string) => requests!.find((r) => r.user_id === userId)!;
       const { data: files } = await admin.storage.from("id-documents").list(req(approvedUser.id).document_url.split("/").slice(0, 3).join("/"));
-      assertEquals(files?.map((f) => f.name).sort(), ["back.jpg", "front.jpg"]);
+      assertEquals(files?.map((f) => f.name).sort(), ["back.jpg", "front.jpg", "selfie.jpg"]);
 
       // The documents are not public.
       const { data: anonList } = await anon.storage.from("id-documents").list(`${approvedUser.id}/kyc`);

@@ -42,7 +42,7 @@ const submit = (nationalId: string) =>
   new Request("https://x.test/submit-kyc-request", {
     method: "POST",
     headers: { Authorization: "Bearer user-token" },
-    body: JSON.stringify({ full_name: "مستخدم", national_id: nationalId, front_image: IMAGE, back_image: IMAGE }),
+    body: JSON.stringify({ full_name: "مستخدم", national_id: nationalId, front_image: IMAGE, back_image: IMAGE, selfie_image: IMAGE }),
   });
 
 Deno.test("spaces and Arabic digits normalize to the same ID and the same HMAC", async () => {
@@ -118,4 +118,19 @@ Deno.test("a suspended or banned account cannot submit KYC with its remaining to
   assertEquals(res.status, 403);
   assertEquals((await res.json()).code, "account_blocked");
   assertEquals(uploaded.length, 0);
+});
+
+Deno.test("a selfie is required and stored next to the card images (FR-1.4)", async () => {
+  const { deps, rows, uploaded } = fakeDeps();
+  const noSelfie = new Request("https://x.test/submit-kyc-request", {
+    method: "POST",
+    headers: { Authorization: "Bearer user-token" },
+    body: JSON.stringify({ full_name: "مستخدم", national_id: ID, front_image: IMAGE, back_image: IMAGE }),
+  });
+  assertEquals((await handleSubmitKyc(noSelfie, deps)).status, 400);
+  assertEquals(uploaded.length, 0);
+
+  assertEquals((await handleSubmitKyc(submit(ID), deps)).status, 200);
+  assertEquals(uploaded.map((p) => p.split("/").pop()), ["front.jpg", "back.jpg", "selfie.jpg"]);
+  assertEquals(rows[0].selfie_url, uploaded[2]);
 });

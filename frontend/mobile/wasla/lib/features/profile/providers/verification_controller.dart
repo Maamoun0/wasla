@@ -14,6 +14,8 @@ class VerificationState {
   final String nationalId;
   final File? frontIdFile;
   final File? backIdFile;
+  /// Selfie for the moderator to compare with the card (FR-1.4, manual review).
+  final File? selfieFile;
   final int currentStep;
   final VerificationStatus status;
   final String? errorMessage;
@@ -25,6 +27,7 @@ class VerificationState {
     this.nationalId = '',
     this.frontIdFile,
     this.backIdFile,
+    this.selfieFile,
     this.currentStep = 0,
     this.status = VerificationStatus.idle,
     this.errorMessage,
@@ -37,6 +40,7 @@ class VerificationState {
     String? nationalId,
     File? Function()? frontIdFile,
     File? Function()? backIdFile,
+    File? Function()? selfieFile,
     int? currentStep,
     VerificationStatus? status,
     String? Function()? errorMessage,
@@ -48,6 +52,7 @@ class VerificationState {
       nationalId: nationalId ?? this.nationalId,
       frontIdFile: frontIdFile != null ? frontIdFile() : this.frontIdFile,
       backIdFile: backIdFile != null ? backIdFile() : this.backIdFile,
+      selfieFile: selfieFile != null ? selfieFile() : this.selfieFile,
       currentStep: currentStep ?? this.currentStep,
       status: status ?? this.status,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
@@ -56,6 +61,10 @@ class VerificationState {
     );
   }
 }
+
+/// Wizard steps: 0 data, 1 card front, 2 card back, 3 selfie, 4 review.
+const selfieStep = 3;
+const reviewStep = 4;
 
 class VerificationController extends StateNotifier<VerificationState> {
   final SupabaseClient _client;
@@ -119,6 +128,8 @@ class VerificationController extends StateNotifier<VerificationState> {
     try {
       final XFile? capturedFile = await _picker.pickImage(
         source: ImageSource.camera,
+        // The selfie uses the front camera.
+        preferredCameraDevice: stepIndex == selfieStep ? CameraDevice.front : CameraDevice.rear,
         imageQuality: 80,   // Compress native output to 80% quality
         maxWidth: 1600,     // Downscale larger dimension to 1600px
       );
@@ -131,6 +142,8 @@ class VerificationController extends StateNotifier<VerificationState> {
         state = state.copyWith(frontIdFile: () => file);
       } else if (stepIndex == 2) {
         state = state.copyWith(backIdFile: () => file);
+      } else if (stepIndex == selfieStep) {
+        state = state.copyWith(selfieFile: () => file);
       }
     } catch (e) {
       state = state.copyWith(
@@ -146,6 +159,8 @@ class VerificationController extends StateNotifier<VerificationState> {
       state = state.copyWith(frontIdFile: () => null);
     } else if (stepIndex == 2) {
       state = state.copyWith(backIdFile: () => null);
+    } else if (stepIndex == selfieStep) {
+      state = state.copyWith(selfieFile: () => null);
     }
   }
 
@@ -161,8 +176,9 @@ class VerificationController extends StateNotifier<VerificationState> {
     if (_userId == null || 
         state.fullName.trim().isEmpty ||
         state.nationalId.trim().isEmpty ||
-        state.frontIdFile == null || 
-        state.backIdFile == null) {
+        state.frontIdFile == null ||
+        state.backIdFile == null ||
+        state.selfieFile == null) {
       state = state.copyWith(
         status: VerificationStatus.error,
         errorMessage: () => 'يرجى إكمال كافة البيانات والتقاط الصور المطلوبة أولاً.',
@@ -187,6 +203,7 @@ class VerificationController extends StateNotifier<VerificationState> {
       final backBytes = await state.backIdFile!.readAsBytes();
       final base64Front = base64Encode(frontBytes);
       final base64Back = base64Encode(backBytes);
+      final base64Selfie = base64Encode(await state.selfieFile!.readAsBytes());
 
       // Invoke submit-kyc-request
       await _client.functions.invoke(
@@ -197,6 +214,7 @@ class VerificationController extends StateNotifier<VerificationState> {
           'national_id': NationalIdValidator.normalize(state.nationalId),
           'front_image': base64Front,
           'back_image': base64Back,
+          'selfie_image': base64Selfie,
         },
       );
 

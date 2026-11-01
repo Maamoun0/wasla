@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/push_notification_service.dart';
+import '../../saved/providers/saved_ads_provider.dart';
 
 // ── Supabase Client Provider ─────────────────────────────────────
 final supabaseClientProvider = Provider<SupabaseClient>(
@@ -169,7 +170,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
     try {
       // Delete FCM token before signing out (Piece 1.3)
       await PushNotificationService.deleteToken();
-      
+      // Nothing personal stays on the device after sign-out.
+      await SavedAdsCache.clearAll();
+
       await _client.auth.signOut();
       state = const AsyncValue.data(null);
     } catch (e, st) {

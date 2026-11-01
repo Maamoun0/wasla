@@ -11,6 +11,7 @@ import '../../../shared/providers/ads_provider.dart';
 import '../../../shared/widgets/wasla_logo.dart' show EmptyState;
 import '../../../features/auth/providers/auth_provider.dart';
 import '../providers/saved_searches_provider.dart';
+import '../providers/saved_ads_provider.dart';
 
 class SavedScreen extends ConsumerStatefulWidget {
   const SavedScreen({super.key, this.initialTab = 0});
@@ -79,25 +80,27 @@ class _FavoritesTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final client = ref.watch(supabaseClientProvider);
+    final saved = ref.watch(savedAdsProvider(userId));
+    if (saved.isLoading && !saved.hasValue) return const Center(child: CircularProgressIndicator());
+    if (saved.hasError && !saved.hasValue) {
+      return EmptyState(
+        title: 'تعذّر تحميل المحفوظات',
+        subtitle: 'تحقق من اتصالك وحاول مرة أخرى.',
+        action: TextButton(onPressed: () => ref.invalidate(savedAdsProvider(userId)), child: const Text('إعادة المحاولة')),
+      );
+    }
+    final result = saved.requireValue;
+    return Column(
+      children: [
+        if (result.fromCache) _OfflineBanner(savedAt: result.cachedAt!, onRetry: () => ref.invalidate(savedAdsProvider(userId))),
+        Expanded(child: _favoritesList(context, ref, result.items)),
+      ],
+    );
+  }
 
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: client
-          .from('favorites')
-          .select('''
-        id, notes, created_at,
-        ads(id, title, price, price_type, status, city_id,
-          ad_media(url, is_primary),
-          cities(name_ar))
-      ''')
-          .eq('user_id', userId)
-          .order('created_at', ascending: false)
-          .then((r) => (r as List).cast<Map<String, dynamic>>()),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final favs = snapshot.data ?? [];
+  Widget _favoritesList(BuildContext context, WidgetRef ref, List<Map<String, dynamic>> favs) {
+    return Builder(
+      builder: (context) {
         if (favs.isEmpty) {
           return EmptyState(
             title: 'noSavedAds'.tr(),
@@ -115,12 +118,35 @@ class _FavoritesTab extends ConsumerWidget {
           itemBuilder: (_, i) => _FavoriteCard(
             fav: favs[i],
             onRemove: () async {
-              await client.from('favorites').delete().eq('id', favs[i]['id']);
+              await ref.read(supabaseClientProvider).from('favorites').delete().eq('id', favs[i]['id']);
               ref.invalidate(favoritesProvider);
+              ref.invalidate(savedAdsProvider(userId));
             },
           ),
         );
       },
+    );
+  }
+}
+
+/// Shown when the list comes from the device (no connection).
+class _OfflineBanner extends StatelessWidget {
+  const _OfflineBanner({required this.savedAt, required this.onRetry});
+  final DateTime savedAt;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = savedAt.toLocal();
+    final when = '${t.day}/${t.month} ${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+    return Material(
+      color: AppColors.neutral100,
+      child: ListTile(
+        dense: true,
+        leading: const Icon(Icons.cloud_off_rounded),
+        title: Text('إنت مش متصل. دي آخر نسخة محفوظة على الجهاز ($when).'),
+        trailing: TextButton(onPressed: onRetry, child: const Text('تحديث')),
+      ),
     );
   }
 }

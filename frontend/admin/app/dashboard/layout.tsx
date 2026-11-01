@@ -11,6 +11,7 @@ import {
   LogOut 
 } from 'lucide-react';
 import { requireStaff } from '@/lib/auth';
+import { signOutAction } from './actions';
 
 // Every dashboard request is per-user and access-checked; never prerender.
 export const dynamic = 'force-dynamic';
@@ -51,10 +52,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         </nav>
 
         <div className="p-4 border-t border-slate-800">
-          <button className="flex items-center space-x-3 space-x-reverse p-3 w-full rounded-lg hover:bg-red-900/20 text-red-400 transition-colors font-cairo text-sm">
-            <LogOut size={20} />
-            <span>تسجيل الخروج</span>
-          </button>
+          <form action={signOutAction}>
+            <button type="submit" className="flex items-center space-x-3 space-x-reverse p-3 w-full rounded-lg hover:bg-red-900/20 text-red-400 transition-colors font-cairo text-sm">
+              <LogOut size={20} />
+              <span>تسجيل الخروج</span>
+            </button>
+          </form>
         </div>
       </aside>
 

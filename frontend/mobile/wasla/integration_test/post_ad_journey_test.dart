@@ -74,6 +74,20 @@ void main() {
       'p_privacy_version': versions['legal_privacy'],
     });
 
+    // Leave the stack as it was: the test ads and their photos go, pass or fail
+    // (owners may delete both).
+    final title = 'شقة اختبار الجهاز ${DateTime.now().millisecondsSinceEpoch}';
+    addTearDown(() async {
+      final ads = await client.from('ads').select('id, ad_media(url)').eq('user_id', userId).eq('title', title);
+      for (final ad in ads) {
+        final paths = [
+          for (final m in ad['ad_media'] as List) (m['url'] as String).split('/object/public/ads/').last,
+        ];
+        if (paths.isNotEmpty) await client.storage.from('ads').remove(paths);
+        await client.from('ads').delete().eq('id', ad['id']);
+      }
+    });
+
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(
@@ -96,7 +110,6 @@ void main() {
 
     // Details, with the category's required fields.
     await _waitFor(tester, find.text('القسم المختار: شقق للبيع'));
-    final title = 'شقة اختبار الجهاز ${DateTime.now().millisecondsSinceEpoch}';
     await tester.enterText(find.byType(TextFormField).at(0), title);
     await tester.enterText(find.byType(TextFormField).at(1), 'شقة للاختبار على المحاكي، 120 متر، الدور الخامس.');
     await tester.enterText(find.byType(TextFormField).at(2), '120');

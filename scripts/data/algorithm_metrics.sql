@@ -50,7 +50,12 @@ WITH s AS (
          CASE WHEN u.is_id_verified THEN 30 ELSE 0 END + coalesce(avg(r.rating), 0) / 5 * 40 + least(count(r.*), 20)
            + least(floor(extract(epoch FROM now() - u.created_at) / 2592000)::int, 10) AS old
   FROM public.users u LEFT JOIN public.reviews r ON r.reviewed_user_id = u.id AND r.status = 'active'
-  WHERE u.is_seed GROUP BY u.id
+  WHERE u.is_seed
+    -- The planted ring sellers are measured in 4/4b (their fake reviews now
+    -- weigh little, so ranking below a one-review seller is intended).
+    AND NOT EXISTS (SELECT 1 FROM public.reviews x JOIN public.users xr ON xr.id = x.reviewer_id
+                    WHERE x.reviewed_user_id = u.id AND xr.full_name LIKE 'مستخدم %')
+  GROUP BY u.id
 )
 SELECT count(*) FILTER (WHERE one.old > many.old) AS inversions_old,
        count(*) FILTER (WHERE one.cur > many.cur) AS inversions_now,

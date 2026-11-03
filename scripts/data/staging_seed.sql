@@ -98,8 +98,14 @@ BEGIN
     v_desc := 'إعلان ' || v_cat.name_ar || ' في ' || v_city.name_ar || '. ' || conditions[1 + floor(random() * 5)::int]
               || '. للتواصل من خلال التطبيق. رقم الإعلان ' || i || '.';
 
-    v_created := now() - (random() * 60 || ' days')::interval;
     v_status := (ARRAY['active','active','active','active','active','active','pending','pending','expired','expired','expired','rejected']::ad_status_enum[])[1 + floor(random() * 12)::int];
+    -- Dates that the hourly expire-ads job leaves alone: active ads were
+    -- approved within their 30 days, expired ones well before.
+    v_created := now() - (CASE v_status
+                            WHEN 'active'  THEN random() * 25
+                            WHEN 'pending' THEN random() * 3
+                            WHEN 'expired' THEN 35 + random() * 25
+                            ELSE random() * 60 END || ' days')::interval;
 
     INSERT INTO public.ads (user_id, category_id, title, description, price, price_type, city_id,
                             latitude, longitude, status, rejection_reason, is_featured, is_urgent,
@@ -119,6 +125,15 @@ BEGIN
                  ELSE v_created + interval '2 hours' + interval '30 days' END,
             true);
   END LOOP;
+
+  -- Featured/urgent ads need a running boost, or the hourly expire-boosts
+  -- job clears the flag.
+  INSERT INTO public.ad_boosts (ad_id, user_id, boost_type, started_at, expires_at)
+  SELECT id, user_id, 'featured', now() - interval '1 day', now() + (3 + random() * 11 || ' days')::interval
+  FROM public.ads WHERE is_seed AND is_featured;
+  INSERT INTO public.ad_boosts (ad_id, user_id, boost_type, started_at, expires_at)
+  SELECT id, user_id, 'urgent', now() - interval '1 day', now() + (3 + random() * 4 || ' days')::interval
+  FROM public.ads WHERE is_seed AND is_urgent;
 
   -- The farm's ads: the same text, copied, at a too-good price.
   FOR i IN 1..100 LOOP

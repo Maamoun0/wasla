@@ -314,7 +314,8 @@ class _ViewToggle extends StatelessWidget {
         children: [
           _ToggleBtn(icon: Icons.grid_view_rounded, isActive: view == _ResultsView.grid, onTap: () => onToggle(_ResultsView.grid)),
           _ToggleBtn(icon: Icons.view_list_rounded, isActive: view == _ResultsView.list, onTap: () => onToggle(_ResultsView.list)),
-          _ToggleBtn(icon: Icons.map_outlined,      isActive: view == _ResultsView.map,  onTap: () => onToggle(_ResultsView.map)),
+          if (AppConfig.mapsEnabled)
+            _ToggleBtn(icon: Icons.map_outlined,      isActive: view == _ResultsView.map,  onTap: () => onToggle(_ResultsView.map)),
         ],
       ),
     );

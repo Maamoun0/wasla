@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.168.0/testing/asserts.ts";
-import { CreatePaymentDeps, handleCreatePayment, NewTransaction, PaymentPackage } from "./handler.ts";
+import { CreatePaymentDeps, handleCreatePayment, NewTransaction, PaymentPackage, paymentsUnavailable } from "./handler.ts";
 
 const AD_ID = "aaaaaaaa-0000-0000-0000-000000000001";
 const PACKAGES: Record<string, PaymentPackage> = {
@@ -163,4 +163,10 @@ Deno.test("a suspended or banned account cannot start a payment with its remaini
   assertEquals(res.status, 403);
   assertEquals((await res.json()).code, "account_blocked");
   assertEquals(inserted.length, 0);
+});
+
+Deno.test("without Paymob keys the answer is a clear 503, not an unexpected error", async () => {
+  const res = paymentsUnavailable();
+  assertEquals(res.status, 503);
+  assertEquals((await res.json()).error, "الدفع الإلكتروني مش متاح في النسخة دي حالياً.");
 });

@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
-import { corsHeaders, handleCreatePayment } from "./handler.ts";
+import { corsHeaders, handleCreatePayment, paymentsUnavailable } from "./handler.ts";
 import { createPaymobPayment } from "./paymob.ts";
 import { reportError } from "../_shared/error_reporting.ts";
 
@@ -13,9 +13,11 @@ serve(async (req) => {
       integrationId: parseInt(Deno.env.get("PAYMOB_INTEGRATION_ID") ?? "0"),
       iframeId: parseInt(Deno.env.get("PAYMOB_IFRAME_ID") ?? "0"),
     };
-    if (!supabaseUrl || !supabaseServiceKey || !paymob.apiKey || !paymob.integrationId || !paymob.iframeId) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error("create-payment: required environment variables are missing");
     }
+    if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+    if (!paymob.apiKey || !paymob.integrationId || !paymob.iframeId) return paymentsUnavailable();
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { autoRefreshToken: false, persistSession: false },

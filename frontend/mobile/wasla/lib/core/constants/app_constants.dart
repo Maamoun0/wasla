@@ -149,7 +149,13 @@ class AppConfig {
 
   static const String supabaseUrl     = String.fromEnvironment('SUPABASE_URL',     defaultValue: 'https://bizikadaucsyevdoagmm.supabase.co');
   static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpemlrYWRhdWNzeWV2ZG9hZ21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MDUwNTUsImV4cCI6MjA5OTE4MTA1NX0.f-0cxoeh_h9r3PkJ1D_C0q7-JTFXg50zzrmY6enZG3Q');
-  static const String mapsApiKey      = String.fromEnvironment('GOOGLE_MAPS_KEY',   defaultValue: '');
+  /// Google Maps key (`--dart-define=MAPS_API_KEY=…`; Gradle reads the same
+  /// define). Without it the maps are hidden: the SDK refuses to run keyless.
+  static const String mapsApiKey      = String.fromEnvironment('MAPS_API_KEY',      defaultValue: '');
+  static bool get mapsEnabled => mapsApiKey.isNotEmpty;
+  /// Resized photos through Storage's render endpoint (a Pro-plan feature).
+  /// `--dart-define=IMAGE_TRANSFORMS=false` serves the original files instead.
+  static const bool imageTransforms = bool.fromEnvironment('IMAGE_TRANSFORMS', defaultValue: true);
   static const String paymobApiKey    = String.fromEnvironment('PAYMOB_API_KEY', defaultValue: '');
   static String get defaultCountry => 'defaultCountry'.tr();
   static String get defaultCurrency => 'defaultCurrency'.tr();

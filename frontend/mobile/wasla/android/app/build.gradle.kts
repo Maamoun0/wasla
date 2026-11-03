@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 
 plugins {
@@ -32,14 +33,30 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        // Google Maps key from the MAPS_API_KEY environment variable or
-        // android/local.properties (not in git). Empty: the map shows an
-        // error tile instead of crashing.
+        // Google Maps key: `--dart-define=MAPS_API_KEY=…` (the app hides the
+        // maps without it), else the MAPS_API_KEY environment variable or
+        // android/local.properties (not in git).
         val localProps = Properties()
         val localPropsFile = rootProject.file("local.properties")
         if (localPropsFile.exists()) localPropsFile.inputStream().use { localProps.load(it) }
-        manifestPlaceholders["mapsApiKey"] =
-            System.getenv("MAPS_API_KEY") ?: localProps.getProperty("MAPS_API_KEY", "")
+        manifestPlaceholders["mapsApiKey"] = dartDefine("MAPS_API_KEY")
+            ?: System.getenv("MAPS_API_KEY") ?: localProps.getProperty("MAPS_API_KEY", "")
+    }
+
+    // staging: the build for device testing against the staging project. Its
+    // own id and name, so it installs next to any other build.
+    flavorDimensions += "env"
+    productFlavors {
+        create("prod") {
+            dimension = "env"
+            resValue("string", "app_name", "Wasla")
+        }
+        create("staging") {
+            dimension = "env"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            resValue("string", "app_name", "وصلة تجريبي")
+        }
     }
 
     // Upload key from android/key.properties (not in git), or from the file
@@ -86,3 +103,19 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// Staging has no Firebase app of its own (google-services.json only knows the
+// prod id), so it builds without it; the app then runs with push disabled.
+tasks.configureEach {
+    if (name.contains("GoogleServices") && name.contains("Staging")) enabled = false
+}
+
+/// A `--dart-define` value: Flutter hands them to Gradle base64-encoded in
+/// the `dart-defines` property.
+fun dartDefine(key: String): String? =
+    (project.findProperty("dart-defines") as String?)
+        ?.split(",")
+        ?.map { String(Base64.getDecoder().decode(it)) }
+        ?.firstOrNull { it.startsWith("$key=") }
+        ?.substringAfter("=")
+        ?.takeIf { it.isNotEmpty() }

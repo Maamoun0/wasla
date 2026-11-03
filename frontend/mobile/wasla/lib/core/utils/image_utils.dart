@@ -1,3 +1,5 @@
+import '../constants/app_constants.dart';
+
 /// Image URLs for display (NFR-1.2).
 ///
 /// Photos are stored once in Supabase Storage. Resized, compressed versions
@@ -10,17 +12,18 @@ class ImageUtils {
   static const _renderPath = '/storage/v1/render/image/public/';
 
   /// للبطاقات والقوائم — صورة صغيرة مضغوطة
-  static String thumbnail(String originalUrl, {int width = 400}) =>
-      _render(originalUrl, {'width': '$width', 'quality': '70'});
+  static String thumbnail(String originalUrl, {int width = 400, bool transforms = AppConfig.imageTransforms}) =>
+      _render(originalUrl, {'width': '$width', 'quality': '70'}, enabled: transforms);
 
   /// لشاشة التفاصيل — مقاس كبير بجودة عالية، بس مضغوط
-  static String fullQuality(String originalUrl) => _render(originalUrl, {'width': '1600', 'quality': '80'});
+  static String fullQuality(String originalUrl, {bool transforms = AppConfig.imageTransforms}) =>
+      _render(originalUrl, {'width': '1600', 'quality': '80'}, enabled: transforms);
 
   /// Our Storage URLs go through the render endpoint; any other URL (or a
   /// malformed one) is returned unchanged. Existing query parameters (e.g.
   /// the avatar's `?v=` cache buster) are kept.
-  static String _render(String url, Map<String, String> params) {
-    if (url.isEmpty || !url.contains(_objectPath)) return url;
+  static String _render(String url, Map<String, String> params, {required bool enabled}) {
+    if (!enabled || url.isEmpty || !url.contains(_objectPath)) return url;
     final uri = Uri.tryParse(url.replaceFirst(_objectPath, _renderPath));
     if (uri == null) return url;
     return uri.replace(queryParameters: {...uri.queryParameters, ...params}).toString();

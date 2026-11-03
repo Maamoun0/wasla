@@ -135,3 +135,23 @@ verify_jwt = false
 
 [functions.payment-webhook]
 verify_jwt = false
+
+# Staging (wasla_app): the hosted project used for device testing. Pushed with
+#   STAGING_SEND_SMS_HOOK_SECRETS=... npx -y supabase@2.120.0 config push --project-ref bizikadaucsyevdoagmm
+# Only staging gets fixed test numbers; production never does (production plan §4).
+[remotes.staging]
+project_id = "bizikadaucsyevdoagmm"
+
+[remotes.staging.auth.hook.send_sms]
+enabled = true
+uri = "https://bizikadaucsyevdoagmm.supabase.co/functions/v1/send-sms-hook"
+secrets = "env(STAGING_SEND_SMS_HOOK_SECRETS)"
+
+# No SMS provider on staging (SMS_PROVIDER unset): codes go only to the test
+# numbers below; any other number gets the hook's "SMS unavailable" error.
+[remotes.staging.auth.sms.test_otp]
+201000000101 = "123456"
+201000000102 = "123456"
+201000000103 = "123456"
+201000000104 = "123456"
+201000000105 = "123456"

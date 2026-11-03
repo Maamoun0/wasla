@@ -20,4 +20,10 @@ void main() {
     expect(ImageUtils.thumbnail('https://example.com/a.jpg'), 'https://example.com/a.jpg');
     expect(ImageUtils.thumbnail(''), '');
   });
+
+  test('with transforms off (free plan) the original file is served', () {
+    const url = 'https://p.supabase.co/storage/v1/object/public/ads/u1/a.jpg';
+    expect(ImageUtils.thumbnail(url, transforms: false), url);
+    expect(ImageUtils.fullQuality(url, transforms: false), url);
+  });
 }

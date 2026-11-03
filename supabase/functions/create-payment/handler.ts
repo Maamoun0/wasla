@@ -61,6 +61,12 @@ export interface CreatePaymentDeps {
   markFailed(transactionId: string, reason: string): Promise<void>;
 }
 
+/** No Paymob keys (staging, or a misconfigured project): a clear 503 the app
+ *  shows as is, instead of an "unexpected error". */
+export function paymentsUnavailable(): Response {
+  return json({ error: "الدفع الإلكتروني مش متاح في النسخة دي حالياً." }, 503);
+}
+
 function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,

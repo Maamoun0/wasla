@@ -315,7 +315,8 @@ class _LocationPriceScreenState extends ConsumerState<LocationPriceScreen> {
                             },
                           ),
 
-                        // Precise map location picker (optional)
+                        // Precise map location picker (optional; needs a Maps key)
+                        if (AppConfig.mapsEnabled)
                         OutlinedButton.icon(
                           onPressed: _openMapPicker,
                           icon: const Icon(Icons.my_location_rounded, size: 18),

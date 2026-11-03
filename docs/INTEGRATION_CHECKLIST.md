@@ -137,7 +137,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<DEV_REF>.supabase.co/
 | بيستخدمه | شاشة تحديد المكان في نشر الإعلان، وعرض الخريطة في البحث (🟡13). الاتنين ماكانوش هيشتغلوا قبل كده، لأن المفتاح كان placeholder مكتوب في الكود |
 
 ```bash
-MAPS_API_KEY=<KEY> flutter build apk --debug
+flutter build apk --debug --flavor prod --dart-define=MAPS_API_KEY=<KEY>
 ```
 
 **النجاح:** على جهاز، افتح البحث ← زرار الخريطة. الإعلانات تظهر مجمّعة، والضغط على مجموعة بيقرّب، والضغط على إعلان لوحده بيفتح صفحته. وشاشة تحديد المكان في نشر الإعلان بتعرض الخريطة.

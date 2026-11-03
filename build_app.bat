@@ -12,7 +12,7 @@ call flutter pub get
 
 echo.
 echo [2/2] Building APK...
-call flutter build apk
+call flutter build apk --flavor prod
 
 echo.
 echo =======================================

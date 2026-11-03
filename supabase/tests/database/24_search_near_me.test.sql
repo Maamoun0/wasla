@@ -3,7 +3,7 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
 SET LOCAL search_path = public, extensions;
-SELECT plan(7);
+SELECT plan(8);
 
 INSERT INTO auth.users (id, email, phone, raw_user_meta_data, aud, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'a@test.local', '+201000000001', '{}', 'authenticated', 'authenticated');
@@ -43,14 +43,24 @@ SELECT is((SELECT count(*)::int FROM public.search_ads(p_near_lat => 30.0444, p_
   'a radius below 1 km is treated as 1 km (the nearest ad is ~2.5 km away)');
 RESET ROLE;
 
--- Featured ads keep their paid placement inside the radius.
+-- Featured ads keep their paid placement inside their distance band only
+-- (near_me_band_edges_km): a featured ad ~25 km away no longer jumps ahead
+-- of ads 2–10 km away. With one wide band, it does again.
 UPDATE public.ads SET is_featured = true WHERE id = 'eeee0000-0000-0000-0000-00000000000c';
 SET LOCAL ROLE anon;
 SELECT results_eq(
   $$ SELECT title::text FROM public.search_ads(p_near_lat => 30.0444, p_near_lng => 31.2357, p_radius_km => 50)
      WHERE id::text LIKE 'eeee0000%' LIMIT 2 $$,
+  $$ VALUES ('الزمالك بإحداثيات'), ('المعادي بدون إحداثيات') $$,
+  'a featured ad in a farther distance band does not jump ahead of nearer ads');
+RESET ROLE;
+UPDATE public.app_configs SET value = '[50]' WHERE key = 'near_me_band_edges_km';
+SET LOCAL ROLE anon;
+SELECT results_eq(
+  $$ SELECT title::text FROM public.search_ads(p_near_lat => 30.0444, p_near_lng => 31.2357, p_radius_km => 50)
+     WHERE id::text LIKE 'eeee0000%' LIMIT 2 $$,
   $$ VALUES ('التجمع'), ('الزمالك بإحداثيات') $$,
-  'a featured ad within the radius comes first, then the closest');
+  'inside one band the featured ad comes first, then the closest');
 RESET ROLE;
 SELECT hasnt_function('public', 'get_ads_near_me', 'the old near-me function is gone');
 

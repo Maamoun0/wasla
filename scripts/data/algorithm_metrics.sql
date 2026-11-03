@@ -74,6 +74,15 @@ SELECT CASE WHEN EXISTS (SELECT 1 FROM information_schema.columns WHERE table_na
                    FROM public.reviews r JOIN public.users rv ON rv.id = r.reviewer_id WHERE r.is_seed) x)
        ELSE 'no flagging yet' END AS flags;
 
-\echo === 5. car (category 29) price median, plain vs robust
-SELECT round(percentile_cont(0.5) WITHIN GROUP (ORDER BY price)) AS plain_median
-FROM public.ads WHERE is_seed AND category_id = 29 AND price > 0;
+\echo === 5. cars (category 29): plain vs robust median; real cars flagged "too expensive" (> 5x); farm ads flagged "too cheap" (< 1/5)
+WITH plain AS (SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY price) AS m FROM public.ads WHERE category_id = 29 AND status = 'active' AND price > 0),
+robust AS (SELECT CASE WHEN EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'category_price_median')
+                       THEN public.category_price_median(29) END AS m),
+cars AS (SELECT price, title = 'عربية بسعر لقطة للبيع فوراً' AS farm FROM public.ads WHERE category_id = 29 AND status = 'active' AND price > 0)
+SELECT round((SELECT m FROM plain)) AS plain_median, round((SELECT m FROM robust)) AS robust_median,
+       count(*) FILTER (WHERE NOT farm AND price > 5 * (SELECT m FROM plain)) AS real_high_plain,
+       count(*) FILTER (WHERE NOT farm AND price > 5 * (SELECT m FROM robust)) AS real_high_robust,
+       count(*) FILTER (WHERE farm AND price < (SELECT m FROM plain) / 5) AS farm_low_plain,
+       count(*) FILTER (WHERE farm AND price < (SELECT m FROM robust) / 5) AS farm_low_robust,
+       count(*) FILTER (WHERE farm) AS farm_active
+FROM cars;

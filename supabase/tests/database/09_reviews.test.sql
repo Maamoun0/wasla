@@ -49,8 +49,8 @@ SELECT throws_ok($$ INSERT INTO public.reviews (reviewer_id, reviewed_user_id, a
   '42501', NULL, 'cannot review on behalf of someone else');
 RESET ROLE;
 
-SELECT is((SELECT trust_score FROM public.users WHERE id = '22222222-2222-2222-2222-222222222222'), 41.00::numeric,
-  'seller trust_score = 40 x 5/5 + 1 review (unverified, new account)');
+SELECT is((SELECT trust_score FROM public.users WHERE id = '22222222-2222-2222-2222-222222222222'), 31.00::numeric,
+  'seller trust_score = 40 x 3.75/5 + 1 review: Bayesian (5 x 3.5 + 5) / 6 (unverified, new account)');
 
 -- Seller replies once.
 SELECT set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true),

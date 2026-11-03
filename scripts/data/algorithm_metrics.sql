@@ -42,6 +42,22 @@ SELECT (SELECT max(u.trust_score) FROM public.users u WHERE u.is_seed AND NOT u.
           AND (SELECT count(*) FROM public.reviews r WHERE r.reviewed_user_id = u.id) >= 6
           AND (SELECT avg(rating) FROM public.reviews r WHERE r.reviewed_user_id = u.id) >= 4) AS six_plus_avg4_unverified;
 
+\echo === 3b. pairs where a 1-review seller outranks a seller with 6+ reviews averaging 4+ (same verification), old formula vs current
+WITH s AS (
+  SELECT u.id, u.is_id_verified v, u.trust_score AS cur,
+         count(r.*) n, avg(r.rating) a,
+         -- the formula before the Bayesian average
+         CASE WHEN u.is_id_verified THEN 30 ELSE 0 END + coalesce(avg(r.rating), 0) / 5 * 40 + least(count(r.*), 20)
+           + least(floor(extract(epoch FROM now() - u.created_at) / 2592000)::int, 10) AS old
+  FROM public.users u LEFT JOIN public.reviews r ON r.reviewed_user_id = u.id AND r.status = 'active'
+  WHERE u.is_seed GROUP BY u.id
+)
+SELECT count(*) FILTER (WHERE one.old > many.old) AS inversions_old,
+       count(*) FILTER (WHERE one.cur > many.cur) AS inversions_now,
+       count(*) AS pairs
+FROM s one JOIN s many ON one.v = many.v
+WHERE one.n = 1 AND many.n >= 6 AND many.a >= 4;
+
 \echo === 4. review rings: trust rank of the five ring sellers among all seed users
 WITH ring AS (
   SELECT r.reviewed_user_id AS id FROM public.reviews r JOIN public.users rv ON rv.id = r.reviewer_id

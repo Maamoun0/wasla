@@ -3,7 +3,7 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
 SET LOCAL search_path = public, extensions;
-SELECT plan(14);
+SELECT plan(15);
 
 INSERT INTO auth.users (id, email, phone, raw_user_meta_data, aud, role) VALUES
   ('11111111-1111-1111-1111-111111111111', 'a@test.local', '+201000000001', '{}', 'authenticated', 'authenticated');
@@ -13,7 +13,8 @@ INSERT INTO public.transactions (id, user_id, type, amount, payment_method, paym
   ('bbbbbbbb-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'ad_boost', 60, 'card', 'paymob', 'pending', now() - interval '10 minutes'),
   ('bbbbbbbb-0000-0000-0000-000000000003', '11111111-1111-1111-1111-111111111111', 'ad_boost', 60, 'card', 'paymob', 'completed', now() - interval '3 hours');
 
-SELECT is((SELECT count(*)::int FROM cron.job), 10, 'ten scheduled jobs');
+SELECT is((SELECT count(*)::int FROM cron.job), 11, 'eleven scheduled jobs');
+SELECT lives_ok((SELECT command FROM cron.job WHERE jobname = 'recompute-trust-scores'), 'recompute-trust-scores runs');
 SELECT lives_ok((SELECT command FROM cron.job WHERE jobname = 'cleanup-ad-views'), 'cleanup-ad-views runs');
 
 SELECT lives_ok((SELECT command FROM cron.job WHERE jobname = 'expire-ads'), 'expire-ads runs');

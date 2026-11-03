@@ -150,6 +150,12 @@ class AdCard extends StatelessWidget {
     final imageUrl   = media?['url'] as String?;
     final city       = (ad['cities'] as Map?)?['name_ar'] ?? '';
 
+    // In a grid cell or a fixed-height row the card has a bounded height: the
+    // photo takes what the text leaves, so long titles never overflow. In a
+    // list the photo keeps its fixed height.
+    return LayoutBuilder(builder: (context, constraints) {
+    final bounded = constraints.hasBoundedHeight;
+    Widget image(Widget child) => bounded ? Expanded(child: child) : child;
     return GestureDetector(
       onTap: () => context.push('/ad/${ad['id']}'),
       child: Container(
@@ -168,20 +174,21 @@ class AdCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // â”€â”€ Image â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            Stack(
+            image(Stack(
+              fit: bounded ? StackFit.expand : StackFit.loose,
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSizes.adCardRadius)),
                   child: imageUrl != null
                       ? CachedNetworkImage(
                           imageUrl: ImageUtils.thumbnail(imageUrl),
-                          height: AppSizes.adCardImageHeight,
+                          height: bounded ? null : AppSizes.adCardImageHeight,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          placeholder: (_, __) => _ImagePlaceholder(),
-                          errorWidget: (_, __, ___) => _ImagePlaceholder(),
+                          placeholder: (_, __) => _ImagePlaceholder(fill: bounded),
+                          errorWidget: (_, __, ___) => _ImagePlaceholder(fill: bounded),
                         )
-                      : _ImagePlaceholder(),
+                      : _ImagePlaceholder(fill: bounded),
                 ),
                 // Badges
                 Positioned(
@@ -195,7 +202,7 @@ class AdCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
+            )),
 
             // â”€â”€ Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             Padding(
@@ -232,14 +239,18 @@ class AdCard extends StatelessWidget {
         ),
       ),
     );
+    });
   }
 }
 
 class _ImagePlaceholder extends StatelessWidget {
+  const _ImagePlaceholder({this.fill = false});
+  final bool fill;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: AppSizes.adCardImageHeight,
+      height: fill ? null : AppSizes.adCardImageHeight,
       color: AppColors.neutral100,
       child: const Center(
         child: Icon(Icons.image_outlined, size: 40, color: AppColors.neutral300),

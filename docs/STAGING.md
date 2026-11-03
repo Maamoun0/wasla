@@ -25,7 +25,7 @@
 | ضغط الصور (Image Transformations) | محتاجة خطة Pro | الصور بتتعرض بحجمها الأصلي (`IMAGE_TRANSFORMS=false`) |
 
 ## تثبيت الـ APK على موبايل Android
-1. انقل `app-staging-release.apk` للموبايل.
+1. انقل الـ APK للموبايل. `app-arm64-v8a-staging-release.apk` (حوالي 28 ميجا) بيشتغل على أي موبايل Android حديث. ولو الموبايل قديم (32 بت)، استخدم `app-armeabi-v7a-…`. والملف الكبير `app-staging-release.apk` (68 ميجا) فيه الاتنين.
 2. افتحه من مدير الملفات. أول مرة الموبايل هيطلب «السماح بالتثبيت من المصدر ده»، وافق للتطبيق اللي فتحت منه الملف.
 3. اضغط «تثبيت». لو Play Protect ظهر، اختار «تثبيت على أي حال»، لأن التوقيع تجريبي ومش من المتجر.
 4. افتح «وصلة تجريبي» وادخل برقم من الجدول.
@@ -37,8 +37,10 @@
 
 ```bash
 cd frontend/mobile/wasla
-WASLA_KEY_PROPERTIES=C:/Users/Maamoun/.wasla-staging/key.properties flutter build apk --release --flavor staging --dart-define=SUPABASE_URL=https://bizikadaucsyevdoagmm.supabase.co --dart-define=SUPABASE_ANON_KEY=<anon key> --dart-define=IMAGE_TRANSFORMS=false
+WASLA_KEY_PROPERTIES=C:/Users/Maamoun/.wasla-staging/key.properties flutter build apk --release --flavor staging --dart-define=SUPABASE_URL=https://bizikadaucsyevdoagmm.supabase.co --dart-define=SUPABASE_ANON_KEY=<anon key> --dart-define=IMAGE_TRANSFORMS=false --split-per-abi
 ```
+
+من غير `--split-per-abi` بيطلع ملف واحد لكل الأنواع، وحجمه أكبر من حد الرفع على الموبايل (30 ميجا).
 
 الـ anon key بتجيبه من `npx -y supabase@2.120.0 projects api-keys --project-ref bizikadaucsyevdoagmm`. ولو عايز الخرائط، ضيف `--dart-define=MAPS_API_KEY=<key>`.
 

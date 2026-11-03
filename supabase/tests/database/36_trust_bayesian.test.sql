@@ -15,6 +15,12 @@ INSERT INTO public.ads (id, user_id, category_id, title, description, price, cit
 INSERT INTO public.contact_logs (ad_id, user_id, contact_type)
 SELECT ad, ('00000000-0000-0000-0000-0000000003' || lpad(i::text, 2, '0'))::uuid, 'phone'
 FROM generate_series(3, 9) i, (VALUES ('00000000-0000-0000-0000-00000000a301'::uuid), ('00000000-0000-0000-0000-00000000a302'::uuid)) v(ad);
+-- Real buyers: months-old accounts, contacts days before the reviews (so the
+-- ring checks of test 37 leave them alone).
+UPDATE public.contact_logs SET created_at = now() - interval '3 days'
+WHERE ad_id IN ('00000000-0000-0000-0000-00000000a301', '00000000-0000-0000-0000-00000000a302');
+UPDATE public.users SET created_at = now() - interval '200 days'
+WHERE id IN (SELECT ('00000000-0000-0000-0000-0000000003' || lpad(i::text, 2, '0'))::uuid FROM generate_series(3, 9) i);
 
 INSERT INTO public.reviews (reviewer_id, reviewed_user_id, ad_id, rating) VALUES
   ('00000000-0000-0000-0000-000000000303', '00000000-0000-0000-0000-000000000301', '00000000-0000-0000-0000-00000000a301', 5);

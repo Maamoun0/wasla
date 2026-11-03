@@ -65,6 +65,15 @@ WITH ring AS (
 ), ranked AS (SELECT id, trust_score, rank() OVER (ORDER BY trust_score DESC) rk FROM public.users WHERE is_seed)
 SELECT string_agg(rk::text || ' (' || trust_score || ')', ', ' ORDER BY rk) AS ring_ranks FROM ranked WHERE id IN (SELECT id FROM ring);
 
+\echo === 4b. flagged reviews: ring (planted) vs everyone else (false positives), when the column exists
+SELECT CASE WHEN EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'reviews' AND column_name = 'flagged_at')
+       THEN (SELECT format('ring %s of %s flagged; others %s of %s flagged',
+                count(*) FILTER (WHERE ring AND flagged), count(*) FILTER (WHERE ring),
+                count(*) FILTER (WHERE NOT ring AND flagged), count(*) FILTER (WHERE NOT ring))
+             FROM (SELECT rv.full_name LIKE 'مستخدم %' AS ring, (to_jsonb(r) ->> 'flagged_at') IS NOT NULL AS flagged
+                   FROM public.reviews r JOIN public.users rv ON rv.id = r.reviewer_id WHERE r.is_seed) x)
+       ELSE 'no flagging yet' END AS flags;
+
 \echo === 5. car (category 29) price median, plain vs robust
 SELECT round(percentile_cont(0.5) WITHIN GROUP (ORDER BY price)) AS plain_median
 FROM public.ads WHERE is_seed AND category_id = 29 AND price > 0;

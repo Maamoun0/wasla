@@ -31,6 +31,13 @@ SELECT set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111
        set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
 SET LOCAL ROLE authenticated;
 SELECT public.reveal_seller_phone('aaaaaaaa-0000-0000-0000-000000000001');
+-- A real buyer: an account months old whose contact came days before the
+-- review (a brand-new account reviewing minutes after contact is flagged as a
+-- possible ring, test 37).
+RESET ROLE;
+UPDATE public.users SET created_at = now() - interval '200 days' WHERE id = '11111111-1111-1111-1111-111111111111';
+UPDATE public.contact_logs SET created_at = now() - interval '3 days' WHERE user_id = '11111111-1111-1111-1111-111111111111';
+SET LOCAL ROLE authenticated;
 
 SELECT lives_ok($$ INSERT INTO public.reviews (reviewer_id, reviewed_user_id, ad_id, rating, comment)
                    VALUES (auth.uid(), '22222222-2222-2222-2222-222222222222', 'aaaaaaaa-0000-0000-0000-000000000001', 5, 'ممتاز') $$,

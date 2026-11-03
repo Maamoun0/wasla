@@ -11,6 +11,16 @@ SELECT count(DISTINCT user_id) AS distinct_sellers,
        max(n) AS max_ads_one_seller
 FROM (SELECT a.*, count(*) OVER (PARTITION BY user_id) n FROM public.search_ads(p_query := 'عربية', p_limit := 20) a) s;
 
+\echo === 1a. cars feed (category 29), first 20: farm copies and distinct sellers, old order vs search_ads
+WITH old AS (  -- the order before search diversity: featured, then newest
+  SELECT user_id, title FROM public.ads
+  WHERE status = 'active' AND category_id = 29 AND deleted_at IS NULL
+  ORDER BY is_featured DESC, created_at DESC LIMIT 20
+), new AS (SELECT user_id, title FROM public.search_ads(p_category_id := 29, p_limit := 20))
+SELECT 'old' AS ordering, count(*) FILTER (WHERE title = 'عربية بسعر لقطة للبيع فوراً') farm_copies, count(DISTINCT user_id) sellers FROM old
+UNION ALL
+SELECT 'search_ads', count(*) FILTER (WHERE title = 'عربية بسعر لقطة للبيع فوراً'), count(DISTINCT user_id) FROM new;
+
 \echo === 1b. default feed: distinct sellers in the first 20
 SELECT count(DISTINCT user_id) AS distinct_sellers FROM public.search_ads(p_limit := 20);
 
